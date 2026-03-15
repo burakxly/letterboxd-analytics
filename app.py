@@ -193,7 +193,14 @@ with col_mid_right:
         line=dict(color='#5a6b7c', width=2.5, shape='spline'), fillcolor='rgba(90, 107, 124, 0.15)',
         hovertemplate="<b>Runtime:</b> ~%{x:.0f} mins<br><b>Films:</b> %{y}<extra></extra>"
     ))
-    fig_runtime.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=260, margin=dict(l=0, r=0, t=10, b=0), xaxis=dict(gridcolor='rgba(255, 255, 255, 0.03)', tickfont=dict(color='#7a8b99')), yaxis=dict(gridcolor='rgba(255, 255, 255, 0.03)', tickfont=dict(color='#7a8b99')), hoverlabel=dict(bgcolor="#181c20", font_size=14, font_color="#e0e6ed"))
+    fig_runtime.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=260,
+        margin=dict(l=0, r=0, t=10, b=0),
+        dragmode=False, # Sürüklemeyi tamamen kapatır
+        xaxis=dict(gridcolor='rgba(255, 255, 255, 0.03)', tickfont=dict(color='#7a8b99'), fixedrange=True), # X eksenini kilitler (Zoom yapılamaz)
+        yaxis=dict(gridcolor='rgba(255, 255, 255, 0.03)', tickfont=dict(color='#7a8b99'), fixedrange=True), # Y eksenini kilitler (Zoom yapılamaz)
+        hoverlabel=dict(bgcolor="#181c20", font_size=14, font_color="#e0e6ed")
+    )
     st.plotly_chart(fig_runtime, width="stretch", theme=None, config={'displayModeBar': False})
 
 st.markdown("<hr style='border: 1px solid #2c3440; margin-bottom: 20px;'>", unsafe_allow_html=True)
