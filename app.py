@@ -100,9 +100,30 @@ def load_data():
     return df
 
 df = load_data()
+
 df_dates = df.dropna(subset=['Watched_Date_Log']).copy()
 df_dates['DateOnly'] = df_dates['Watched_Date_Log'].dt.date
 df_rated = df[df['Rating'] > 0].copy()
+# --- EN SON IZLENEN FILM VERISI ---
+# Veritabanına tekrar bağlanıp sadece en üstteki satırı çekiyoruz
+conn = sqlite3.connect("letterboxd_master.db")
+# Senin sütun ismin Watched_Date_Log olduğu için ona göre sıralıyoruz
+last_movie_query = "SELECT Name, Rating FROM movies ORDER BY Watched_Date_Log DESC LIMIT 1"
+last_movie_df = pd.read_sql(last_movie_query, conn)
+conn.close()
+
+if not last_movie_df.empty:
+    last_name = str(last_movie_df['Name'].iloc[0]).upper()
+    raw_rating = last_movie_df['Rating'].iloc[0]
+    # Puanı sayıya çeviriyoruz, hata varsa 0 kabul ediyoruz
+    try:
+        last_rating_val = int(float(raw_rating))
+    except:
+        last_rating_val = 0
+else:
+    last_name = "VERI YOK"
+    last_rating_val = 0
+# ----------------------------------
 
 
 
@@ -148,11 +169,12 @@ m4.metric("Top Genre (Weighted)", best_genre_str)
 st.markdown("<hr style='border: 1px solid #2c3440; margin: 20px 0 30px 0;'>", unsafe_allow_html=True)
 
 # ==========================================
-# ROW 2: THIS WEEK & RUNTIME SPLINE
+# ROW 2: TRIPLE PANEL (ACTIVITY - RECENT - FLOW)
 # ==========================================
-col_mid_left, col_mid_right = st.columns([1.2, 2.8])
+# Kolon genişliklerini [Aktivite, Son İzlenen, Grafik] olarak ayarlıyoruz
+col1, col2, col3 = st.columns([1, 1, 1.3])
 
-with col_mid_left:
+with col1:
     st.markdown("<h4 style='color: #a0b0c0; margin-bottom: 15px; font-size: 0.9rem; letter-spacing: 1px;'>CURRENT ACTIVITY</h4>", unsafe_allow_html=True)
     if not df_dates.empty:
         max_date = df_dates['Watched_Date_Log'].max()
@@ -161,7 +183,6 @@ with col_mid_left:
         df_week = df_dates[(df_dates['Watched_Date_Log'] >= start_of_week) & (df_dates['Watched_Date_Log'] <= end_of_week)]
         week_count = len(df_week)
         week_avg = df_week[df_week['Rating'] > 0]['Rating'].mean() if week_count > 0 else 0.0
-        if pd.isna(week_avg): week_avg = 0.0
         
         st.markdown(f"""
         <div class="ins-week">
@@ -171,37 +192,51 @@ with col_mid_left:
             <div class="week-stats">
                 <div class="w-stat-item">
                     <p class="w-stat-label">Films</p>
-                    <p class="w-stat-val">{week_count}</p>
+                    <p class="w-stat-val" style="font-size: 2.2rem;">{week_count}</p>
                 </div>
                 <div class="w-stat-item">
                     <p class="w-stat-label">Rating</p>
-                    <p class="w-stat-val">{week_avg:.2f}</p>
+                    <p class="w-stat-val" style="font-size: 2.2rem;">{week_avg:.2f}</p>
                 </div>
             </div>
-            <p class="week-date">[{start_of_week.strftime('%b %d')} - {end_of_week.strftime('%b %d, %Y')}]</p>
+            <p class="week-date">[{start_of_week.strftime('%b %d')} - {end_of_week.strftime('%b %d')}]</p>
         </div>
         """, unsafe_allow_html=True)
 
-with col_mid_right:
-    st.markdown("<h4 style='color: #a0b0c0; margin-bottom: 15px; font-size: 0.9rem; letter-spacing: 1px;'>RUNTIME FLOW (10 - 220 MINS)</h4>", unsafe_allow_html=True)
+with col2:
+    st.markdown("<h4 style='color: #a0b0c0; margin-bottom: 15px; font-size: 0.9rem; letter-spacing: 1px;'>MOST RECENT WATCH</h4>", unsafe_allow_html=True)
+    # Emoji yok, saf Unicode karakter yıldızlar:
+    stars = "★" * last_rating_val + "☆" * (5 - last_rating_val)
+    st.markdown(f"""
+    <div class="ins-week" style="border-left: 2px solid #c5a059;">
+        <div>
+            <p style="color: #7a8b99; font-size: 0.75rem; letter-spacing: 1.5px; margin-bottom: 15px; text-transform: uppercase;">Latest Entry</p>
+            <h2 style="font-size: 1.1rem; color: #f0f0f0; margin: 5px 0; line-height: 1.4; font-weight: 800;">{last_name}</h2>
+        </div>
+        <div>
+            <div style="color: #c5a059; font-size: 1.3rem; letter-spacing: 3px; margin-bottom: 10px;">{stars}</div>
+            <p style="color: #445566; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Auto-synced via Bot</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col3:
+    st.markdown("<h4 style='color: #a0b0c0; margin-bottom: 15px; font-size: 0.9rem; letter-spacing: 1px;'>RUNTIME FLOW</h4>", unsafe_allow_html=True)
     df_runtime = df[(df['Runtime'] >= 10) & (df['Runtime'] <= 220)]
     hist_data = df_runtime['Runtime'].value_counts(bins=30).sort_index()
-    
-    # Grafiği de çelik mavisi (Steel Blue) tonlarına çektik
     fig_runtime = go.Figure(go.Scatter(
         x=[m.mid for m in hist_data.index], y=hist_data.values, mode='lines', fill='tozeroy',
         line=dict(color='#5a6b7c', width=2.5, shape='spline'), fillcolor='rgba(90, 107, 124, 0.15)',
-        hovertemplate="<b>Runtime:</b> ~%{x:.0f} mins<br><b>Films:</b> %{y}<extra></extra>"
+        hovertemplate="<b>%{x:.0f} mins</b><br>Films: %{y}<extra></extra>"
     ))
     fig_runtime.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=260,
-        margin=dict(l=0, r=0, t=10, b=0),
-        dragmode=False, # Sürüklemeyi tamamen kapatır
-        xaxis=dict(gridcolor='rgba(255, 255, 255, 0.03)', tickfont=dict(color='#7a8b99'), fixedrange=True), # X eksenini kilitler (Zoom yapılamaz)
-        yaxis=dict(gridcolor='rgba(255, 255, 255, 0.03)', tickfont=dict(color='#7a8b99'), fixedrange=True), # Y eksenini kilitler (Zoom yapılamaz)
+        margin=dict(l=0, r=0, t=10, b=0), dragmode=False,
+        xaxis=dict(gridcolor='rgba(255, 255, 255, 0.03)', tickfont=dict(color='#7a8b99'), fixedrange=True),
+        yaxis=dict(gridcolor='rgba(255, 255, 255, 0.03)', tickfont=dict(color='#7a8b99'), fixedrange=True),
         hoverlabel=dict(bgcolor="#181c20", font_size=14, font_color="#e0e6ed")
     )
-    st.plotly_chart(fig_runtime, width="stretch", theme=None, config={'displayModeBar': False})
+    st.plotly_chart(fig_runtime, use_container_width=True, theme=None, config={'displayModeBar': False})
 
 st.markdown("<hr style='border: 1px solid #2c3440; margin-bottom: 20px;'>", unsafe_allow_html=True)
 
@@ -314,14 +349,3 @@ with col_right:
                 <p class="movie-meta">Period: <b style="color: #a0b0c0;">{row['YearMonthStr']}</b> &nbsp;|&nbsp; Dir: {str(row['Director']).split(',')[0]}</p>
             </div>
             """, unsafe_allow_html=True)
-
-
-
-    
- 
-
-
-
-
-     
-

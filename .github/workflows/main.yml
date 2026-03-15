@@ -3,7 +3,7 @@ name: Sunday Night Shift
 on:
   schedule:
     # Her Pazar gecesi saat 03:00'te çalışır (UTC saatiyle)
-    - cron: '0 3 * * 0'
+    - cron: '0 3 * * *'
   workflow_dispatch: # İstediğin zaman manuel çalıştırmak için buton ekler
 
 jobs:
