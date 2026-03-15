@@ -63,34 +63,45 @@ def enrich_master_database():
     conn = sqlite3.connect(db_path)
     df = pd.read_sql("SELECT * FROM movies", conn)
 
-    # Runtime sütunu yoksa oluştur
-    if "Runtime" not in df.columns:
-        df["Runtime"] = 0
+    # 1. Eksik Sütunları Baştan Yarat (KeyError'ı engeller)
+    if "Runtime" not in df.columns: df["Runtime"] = 0
+    if "Director" not in df.columns: df["Director"] = "Unknown"
+    if "Genre" not in df.columns: df["Genre"] = "Unknown"
+    if "Country" not in df.columns: df["Country"] = "Unknown"
 
-    print("Eksik süreler tamamlanıyor...")
+    print("Eksik veriler tamamlanıyor...")
 
     for index, row in df.iterrows():
-        # EĞER süre 0 ise kazı (Yönetmen dolu olsa bile süreyi tamir eder)
-        if row["Runtime"] == 0 or pd.isna(row["Runtime"]):
+        # EĞER süre 0 ise veya yönetmen bilinmiyorsa kazı
+        if row["Runtime"] == 0 or pd.isna(row["Runtime"]) or row["Director"] == "Unknown" or pd.isna(row["Director"]):
             uri = row['Letterboxd URI']
-            print(f"Süre çekiliyor: {row['Name']}")
+            print(f"Veri çekiliyor: {row['Name']}")
             
             data = scrape_film_data(uri)
             
-            if data and data["Runtime"] > 0:
-                df.at[index, "Runtime"] = data["Runtime"]
-                # Eğer yönetmen de eksikse onu da hazır gelmişken doldurur
-                if pd.isna(row["Director"]) or row["Director"] == "Unknown":
+            if data:
+                # 2. Gelen verileri tabloya işle
+                if data["Runtime"] > 0:
+                    df.at[index, "Runtime"] = data["Runtime"]
+                
+                if data["Director"] != "Unknown":
                     df.at[index, "Director"] = data["Director"]
+                
+                if data["Genre"]:
+                    # Türler liste olarak geliyorsa string'e çevir
+                    df.at[index, "Genre"] = ", ".join(data["Genre"]) if isinstance(data["Genre"], list) else data["Genre"]
+                
+                if data["Country"] != "Unknown":
+                    df.at[index, "Country"] = data["Country"]
                 
                 # Checkpoint: Her başarılı işlemde kaydet
                 df.to_sql('movies', conn, if_exists='replace', index=False)
                 
-                # Valf (6-10 saniye)
+                # Valf (Letterboxd'dan ban yememek için bekleme süresi)
                 time.sleep(random.uniform(6.0, 10.0))
 
     conn.close()
-    print("Süre tamamlama işlemi bitti!")
+    print("Veri tamamlama işlemi bitti!")
 
 if __name__ == "__main__":
     enrich_master_database()

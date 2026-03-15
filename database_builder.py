@@ -4,55 +4,71 @@ import sqlite3
 import os
 
 def create_master_database():
-    # 1. Dosya Yollarının Dinamik Tanımlanması [cite: 32, 33, 34, 35]
     data_dir = "letterboxd_data"
     watched_path = os.path.join(data_dir, "watched.csv")
     ratings_path = os.path.join(data_dir, "ratings.csv")
     diary_path = os.path.join(data_dir, "diary.csv")
     reviews_path = os.path.join(data_dir, "reviews.csv")
 
-    # 2. Verilerin Yüklenmesi (Ana İskelet: watched.csv) [cite: 39]
-    # Watched dosyasını tam olarak alıyoruz.
+    # 1. Ana İskelet (Watched)
     df_watched = pd.read_csv(watched_path)
-    # Çakışmaları önlemek için sütun ismini değiştiriyoruz [cite: 40]
     df_watched.rename(columns={'Date': 'Watched_Date_Log'}, inplace=True)
 
-    # 3. Diğer Verilerin Çekilmesi (Sütun Filtreleme ile Çakışma Önleme) [cite: 37, 41, 46, 51]
-    # Sadece bize lazım olan sütunları alıyoruz ki 'Name' ve 'Year' gibi isimler çakışmasın.
+    # 2. Puanlar (Ratings)
     try:
-        df_ratings = pd.read_csv(ratings_path, usecols=['Letterboxd URI', 'Rating'])
+        df_ratings = pd.read_csv(ratings_path, usecols=['Name', 'Rating'])
     except FileNotFoundError:
-        df_ratings = pd.DataFrame(columns=['Letterboxd URI', 'Rating'])
+        df_ratings = pd.DataFrame(columns=['Name', 'Rating'])
 
+    # 3. Günlük (Diary)
     try:
-        df_diary = pd.read_csv(diary_path, usecols=['Letterboxd URI', 'Watched Date', 'Rewatch', 'Tags'])
+        df_diary = pd.read_csv(diary_path, usecols=['Name', 'Watched Date', 'Rewatch', 'Tags'])
+        df_diary = df_diary.sort_values('Watched Date').drop_duplicates('Name', keep='last')
     except FileNotFoundError:
-        df_diary = pd.DataFrame(columns=['Letterboxd URI', 'Watched Date', 'Rewatch', 'Tags'])
+        df_diary = pd.DataFrame(columns=['Name', 'Watched Date', 'Rewatch', 'Tags'])
 
+    # 4. İncelemeler (Reviews)
     try:
-        df_reviews = pd.read_csv(reviews_path, usecols=['Letterboxd URI', 'Review'])
+        df_reviews = pd.read_csv(reviews_path, usecols=['Name', 'Review'])
     except FileNotFoundError:
-        df_reviews = pd.DataFrame(columns=['Letterboxd URI', 'Review'])
+        df_reviews = pd.DataFrame(columns=['Name', 'Review'])
 
-    # 4. Left Join ile Verilerin Birleştirilmesi [cite: 18, 21, 57]
-    # Ortak anahtarımız en güvenli tanımlayıcı olan 'Letterboxd URI' [cite: 20]
-    master_df = pd.merge(df_watched, df_ratings, on='Letterboxd URI', how='left') 
-    master_df = pd.merge(master_df, df_diary, on='Letterboxd URI', how='left') 
-    master_df = pd.merge(master_df, df_reviews, on='Letterboxd URI', how='left') 
+    # 5. BİRLEŞTİRME 
+    master_df = pd.merge(df_watched, df_ratings, on='Name', how='left') 
+    master_df = pd.merge(master_df, df_diary, on='Name', how='left') 
+    master_df = pd.merge(master_df, df_reviews, on='Name', how='left') 
 
-    # 5. Veri Temizliği (Data Cleaning)
-    # Sayısal sütunlar (Rating, Year) için boşlukları 0.0 ile dolduruyoruz 
-  
+    # --- BÜYÜK KURTARMA OPERASYONU (YENİ EKLENEN KISIM) ---
+    db_path = "letterboxd_master.db"
+    if os.path.exists(db_path):
+        try:
+            old_conn = sqlite3.connect(db_path)
+            # Mevcut veritabanındaki tüm veriyi çek
+            old_df = pd.read_sql("SELECT * FROM movies", old_conn)
+            old_conn.close()
+            
+            # Eğer eski veritabanında Runtime, Director gibi sütunlar varsa onları tespit et
+            cols_to_rescue = ['Name']
+            for col in ['Runtime', 'Director', 'Genre', 'Country']:
+                if col in old_df.columns:
+                    cols_to_rescue.append(col)
+            
+            # Eğer Name dışında kurtaracak bir şey bulduysa (yani scraper daha önce çalışmışsa)
+            if len(cols_to_rescue) > 1:
+                old_df_rescued = old_df[cols_to_rescue].drop_duplicates('Name')
+                # Eski kazınmış verileri, yeni CSV verileriyle birleştir
+                master_df = pd.merge(master_df, old_df_rescued, on='Name', how='left')
+                print(f"Eski veritabanından {len(cols_to_rescue)-1} adet özel sütun başarıyla kurtarıldı!")
+        except Exception as e:
+            print(f"Uyarı - Eski veriler kurtarılamadı (İlk kurulum olabilir): {e}")
+    # -------------------------------------------------------
+
+    # 6. Veri Temizliği
     master_df['Rating'] = pd.to_numeric(master_df['Rating'], errors='coerce').fillna(0.0)
-    
-    # Geri kalan tüm metinsel boşlukları güvenli bir şekilde dolduruyoruz [cite: 65, 66]
     master_df = master_df.fillna("")
 
-    # 6. SQLite Veritabanına Yazma [cite: 26, 68, 70]
-    db_path = "letterboxd_master.db"
+    # 7. Veritabanına Yazma
     conn = sqlite3.connect(db_path) 
-    
-    # 'movies' adında bir tablo oluşturuyoruz [cite: 71]
     master_df.to_sql('movies', conn, if_exists='replace', index=False) 
     conn.close() 
 

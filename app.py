@@ -93,39 +93,56 @@ def load_data():
     conn = sqlite3.connect("letterboxd_master.db")
     df = pd.read_sql("SELECT * FROM movies", conn)
     conn.close()
-    df['Watched_Date_Log'] = pd.to_datetime(df['Watched_Date_Log'], errors='coerce')
+    
+    # --- YENİ EKLENEN KORUMA KALKANI ---
+    # Eğer veritabanı sıfırlanmışsa ve sütunlar yoksa, programın çökmesini engeller
+    if 'Runtime' not in df.columns: df['Runtime'] = 0
+    if 'Year' not in df.columns: df['Year'] = 0
+    if 'Rating' not in df.columns: df['Rating'] = 0
+    if 'Director' not in df.columns: df['Director'] = "Unknown"
+    if 'Genre' not in df.columns: df['Genre'] = "Unknown"
+    # -----------------------------------
+
+    # Her iki tarihi de sisteme tanıtıyoruz
+    if 'Watched_Date_Log' in df.columns:
+        df['Watched_Date_Log'] = pd.to_datetime(df['Watched_Date_Log'], errors='coerce')
+    if 'Watched Date' in df.columns:
+        df['Watched Date'] = pd.to_datetime(df['Watched Date'], errors='coerce') 
+        
     df['Rating'] = pd.to_numeric(df['Rating'], errors='coerce').fillna(0)
     df['Runtime'] = pd.to_numeric(df['Runtime'], errors='coerce').fillna(0)
     df['Year'] = pd.to_numeric(df['Year'], errors='coerce').fillna(0)
+    
     return df
 
 df = load_data()
 
-# DÜNYA 1: TÜM FİLMLER (Total stats, türler ve yönetmenler için)
+# DÜNYA 1: Toplam veriler (Her şey dahil)
 df_all = df.copy()
 
-# DÜNYA 2: SADECE GÜNLÜK/DIARY (Recent Watch, Maraton ve Aktivite için)
-# Burada o kazalı 'Watched_Date_Log' yerine gerçek 'Watched Date' sütununu kullanıyoruz
-df_diary = df_all[df_all['Watched Date'] != ''].copy()
-df_diary['Watched Date'] = pd.to_datetime(df_diary['Watched Date'], errors='coerce')
+# DÜNYA 2: Sadece Günlük (Diary) Verileri
+# "Watched Date" (Günlük) sütunu boş olmayanları alıyoruz
+df_diary = df_all.dropna(subset=['Watched Date']).copy()
 
-# Alt analizlerin bozulmaması için:
+# Aşağıdaki analizlerin bozulmaması için isimleri Diary'ye güncelliyoruz
 df_dates = df_diary.copy()
-df_dates['DateOnly'] = df_dates['Watched Date'].dt.date
+# DİKKAT: Artık DateOnly için gerçek günlüğü ('Watched Date') baz alıyoruz!
+df_dates['DateOnly'] = df_dates['Watched Date'].dt.date 
+
+# Puanlı filmler her iki dünyadan da gelebilir (Tür hesaplamaları için)
 df_rated = df_all[df_all['Rating'] > 0].copy()
 
-df_dates = df.dropna(subset=['Watched_Date_Log']).copy()
-df_dates['DateOnly'] = df_dates['Watched_Date_Log'].dt.date
-df_rated = df[df['Rating'] > 0].copy()
 # --- EN SON IZLENEN FILM VERISI ---
-# Veritabanına tekrar bağlanıp sadece en üstteki satırı çekiyoruz
+# --- EN SON IZLENEN FILM VERISI ---
 conn = sqlite3.connect("letterboxd_master.db")
-# Senin sütun ismin Watched_Date_Log olduğu için ona göre sıralıyoruz
-# Sadece tarihi olan (Diary'ye işlenmiş) en son filmi getirir
+
+# ÖNEMLİ DEĞİŞİKLİK: Sadece Watched Date değil, rowid'yi de işin içine katarak 
+# veritabanına "en son eklenen" satırı garantiliyoruz.
 last_movie_query = """
     SELECT Name, Rating FROM movies 
     WHERE "Watched Date" IS NOT NULL AND "Watched Date" != ''
-    ORDER BY "Watched Date" DESC LIMIT 1
+    ORDER BY "Watched Date" DESC, rowid DESC 
+    LIMIT 1
 """
 last_movie_df = pd.read_sql(last_movie_query, conn)
 conn.close()
@@ -133,7 +150,6 @@ conn.close()
 if not last_movie_df.empty:
     last_name = str(last_movie_df['Name'].iloc[0]).upper()
     raw_rating = last_movie_df['Rating'].iloc[0]
-    # Puanı sayıya çeviriyoruz, hata varsa 0 kabul ediyoruz
     try:
         last_rating_val = int(float(raw_rating))
     except:
@@ -154,7 +170,8 @@ st.markdown("<hr style='border: 1px solid #2c3440; margin-bottom: 20px;'>", unsa
 # ==========================================
 # ROW 1: TOP KPI METRICS
 # ==========================================
-total_films = len(df_all) # Tüm izlenenleri sayar
+# Sadece isim değil, isim ve yönetmen kombinasyonu eşsiz olanları sayar
+total_films = len(df_all.drop_duplicates(subset=['Name', 'Director']))
 total_hours = int(df_all['Runtime'].sum()) / 60 # Tüm izlenenlerin süresini toplar
 
 df_dir = df_rated.assign(Director=df_rated['Director'].str.split(', ')).explode('Director')

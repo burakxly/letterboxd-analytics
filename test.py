@@ -1,8 +1,16 @@
 ﻿import sqlite3
 import pandas as pd
+
+pd.set_option('display.max_columns', None)
 conn = sqlite3.connect("letterboxd_master.db")
-# Tarihi olmayan (sadece izledim denen) filmleri listeler
-check = pd.read_sql("SELECT Name FROM movies WHERE Watched_Date_Log IS NULL OR Watched_Date_Log = ''", conn)
-print("Loglanmamış (Sadece izlendi işaretli) Filmler:")
-print(check)
+
+# Sorunlu filmlerin ve sağlam filmlerin iki farklı tarih sütununda nasıl durduğuna bakıyoruz
+query = """
+SELECT Name, Rating, Watched_Date_Log, "Watched Date" 
+FROM movies 
+WHERE Name LIKE '%Sherlock%' OR Name LIKE '%Shazam%' OR Name LIKE '%Citizen Kane%'
+"""
+df = pd.read_sql(query, conn)
 conn.close()
+
+print(df)
