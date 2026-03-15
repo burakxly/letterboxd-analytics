@@ -36,4 +36,5 @@ jobs:
           git config --global user.email "action@github.com"
           git add letterboxd_master.db
           git commit -m "Automated database update: $(date)" || echo "No changes to commit"
+          git pull --rebase origin main
           git push
