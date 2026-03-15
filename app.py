@@ -19,7 +19,8 @@ st.markdown("""
     .movie-meta { color: #7a8b99 !important; font-size: 0.85rem; margin: 0; }
     .rating-badge { float: right; background-color: #111315; padding: 4px 8px; border-radius: 4px; color: #c5a059; font-weight: 700; font-size: 0.85rem; border: 1px solid rgba(197, 160, 89, 0.2); }
     
-    [data-testid="stMetricValue"] { font-size: 1.8rem !important; font-weight: 700 !important; color: #e0e6ed !important; }
+    [data-testid="stMetricValue"] { font-size: 1.8rem !important; font-weight: 700 !important; color: #e0e6ed !important; white-space: normal !important; line-height: 1.2 !important; }
+    @media (max-width: 768px) { [data-testid="stMetricValue"] { font-size: 1.3rem !important; } }
     [data-testid="stMetricLabel"] { font-size: 0.9rem !important; color: #7a8b99 !important; text-transform: uppercase !important; letter-spacing: 1px !important; }
 
     /* ========================================================= */
