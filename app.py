@@ -101,6 +101,19 @@ def load_data():
 
 df = load_data()
 
+# DÜNYA 1: TÜM FİLMLER (Total stats, türler ve yönetmenler için)
+df_all = df.copy()
+
+# DÜNYA 2: SADECE GÜNLÜK/DIARY (Recent Watch, Maraton ve Aktivite için)
+# Burada o kazalı 'Watched_Date_Log' yerine gerçek 'Watched Date' sütununu kullanıyoruz
+df_diary = df_all[df_all['Watched Date'] != ''].copy()
+df_diary['Watched Date'] = pd.to_datetime(df_diary['Watched Date'], errors='coerce')
+
+# Alt analizlerin bozulmaması için:
+df_dates = df_diary.copy()
+df_dates['DateOnly'] = df_dates['Watched Date'].dt.date
+df_rated = df_all[df_all['Rating'] > 0].copy()
+
 df_dates = df.dropna(subset=['Watched_Date_Log']).copy()
 df_dates['DateOnly'] = df_dates['Watched_Date_Log'].dt.date
 df_rated = df[df['Rating'] > 0].copy()
@@ -108,7 +121,12 @@ df_rated = df[df['Rating'] > 0].copy()
 # Veritabanına tekrar bağlanıp sadece en üstteki satırı çekiyoruz
 conn = sqlite3.connect("letterboxd_master.db")
 # Senin sütun ismin Watched_Date_Log olduğu için ona göre sıralıyoruz
-last_movie_query = "SELECT Name, Rating FROM movies ORDER BY Watched_Date_Log DESC LIMIT 1"
+# Sadece tarihi olan (Diary'ye işlenmiş) en son filmi getirir
+last_movie_query = """
+    SELECT Name, Rating FROM movies 
+    WHERE "Watched Date" IS NOT NULL AND "Watched Date" != ''
+    ORDER BY "Watched Date" DESC LIMIT 1
+"""
 last_movie_df = pd.read_sql(last_movie_query, conn)
 conn.close()
 
@@ -136,8 +154,8 @@ st.markdown("<hr style='border: 1px solid #2c3440; margin-bottom: 20px;'>", unsa
 # ==========================================
 # ROW 1: TOP KPI METRICS
 # ==========================================
-total_films = len(df)
-total_hours = int(df['Runtime'].sum()) / 60
+total_films = len(df_all) # Tüm izlenenleri sayar
+total_hours = int(df_all['Runtime'].sum()) / 60 # Tüm izlenenlerin süresini toplar
 
 df_dir = df_rated.assign(Director=df_rated['Director'].str.split(', ')).explode('Director')
 df_dir = df_dir[~df_dir['Director'].isin(['Unknown', '', None])]
