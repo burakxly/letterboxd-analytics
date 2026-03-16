@@ -132,31 +132,26 @@ df_dates['DateOnly'] = df_dates['Watched Date'].dt.date
 # Puanlı filmler her iki dünyadan da gelebilir (Tür hesaplamaları için)
 df_rated = df_all[df_all['Rating'] > 0].copy()
 
-# --- EN SON IZLENEN FILM VERISI ---
+
 # --- EN SON IZLENEN FILM VERISI ---
 conn = sqlite3.connect("letterboxd_master.db")
-
-# ÖNEMLİ DEĞİŞİKLİK: Sadece Watched Date değil, rowid'yi de işin içine katarak 
-# veritabanına "en son eklenen" satırı garantiliyoruz.
 last_movie_query = """
     SELECT Name, Rating FROM movies 
     WHERE "Watched Date" IS NOT NULL AND "Watched Date" != ''
-    ORDER BY "Watched Date" DESC, rowid DESC 
-    LIMIT 1
+    ORDER BY "Watched Date" DESC, rowid DESC LIMIT 1
 """
 last_movie_df = pd.read_sql(last_movie_query, conn)
 conn.close()
 
 if not last_movie_df.empty:
     last_name = str(last_movie_df['Name'].iloc[0]).upper()
-    raw_rating = last_movie_df['Rating'].iloc[0]
     try:
-        last_rating_val = int(float(raw_rating))
+        raw_rating = float(last_movie_df['Rating'].iloc[0])
     except:
-        last_rating_val = 0
+        raw_rating = 0.0
 else:
     last_name = "VERI YOK"
-    last_rating_val = 0
+    raw_rating = 0.0
 # ----------------------------------
 
 
@@ -240,8 +235,20 @@ with col1:
 
 with col2:
     st.markdown("<h4 style='color: #a0b0c0; margin-bottom: 15px; font-size: 0.9rem; letter-spacing: 1px;'>MOST RECENT WATCH</h4>", unsafe_allow_html=True)
-    # Emoji yok, saf Unicode karakter yıldızlar:
-    stars = "★" * last_rating_val + "☆" * (5 - last_rating_val)
+    
+    # Yıldız mantığını buçuklu değerlere göre ayarlıyoruz
+    full_stars = int(raw_rating)
+    has_half_star = (raw_rating % 1 != 0)
+    
+    if raw_rating > 0:
+        stars = "★" * full_stars
+        if has_half_star:
+            stars += "½"
+        # Kalanı boş yıldızla tamamla (toplam 5 karakter olacak şekilde)
+        stars += "☆" * (5 - full_stars - int(has_half_star))
+    else:
+        stars = "No Rating"
+
     st.markdown(f"""
     <div class="ins-week" style="border-left: 2px solid #c5a059;">
         <div>
