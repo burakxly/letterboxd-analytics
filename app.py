@@ -210,7 +210,7 @@ st.markdown("<hr style='border: 1px solid #2c3440; margin: 20px 0 30px 0;'>", un
 col1, col2, col3 = st.columns([1, 1, 1.3])
 
 with col1:
-    st.markdown("<h4 style='color: #a0b0c0; margin-bottom: 15px; font-size: 0.9rem; letter-spacing: 1px;'>CURRENT ACTIVITY</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='color: #a0b0c0; margin-bottom: 15px; font-size: 0.9rem; letter-spacing: 1px;'>THIS WEEK'S ACTIVITY</h4>", unsafe_allow_html=True)
     if not df_dates.empty:
         max_date = df_dates['Watched_Date_Log'].max()
         start_of_week = max_date - pd.Timedelta(days=max_date.weekday()) 
