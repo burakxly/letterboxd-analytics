@@ -136,7 +136,7 @@ df_rated = df_all[df_all['Rating'] > 0].copy()
 # --- EN SON IZLENEN FILM VERISI ---
 conn = sqlite3.connect("letterboxd_master.db")
 last_movie_query = """
-    SELECT Name, Rating FROM movies 
+    SELECT Name, Rating, Director, Runtime FROM movies 
     WHERE "Watched Date" IS NOT NULL AND "Watched Date" != ''
     ORDER BY "Watched Date" DESC, rowid DESC LIMIT 1
 """
@@ -145,12 +145,16 @@ conn.close()
 
 if not last_movie_df.empty:
     last_name = str(last_movie_df['Name'].iloc[0]).upper()
+    last_dir = str(last_movie_df['Director'].iloc[0]).split(',')[0] # Sadece ilk yönetmeni alır (temiz görünüm için)
+    last_runtime = int(last_movie_df['Runtime'].iloc[0])
     try:
         raw_rating = float(last_movie_df['Rating'].iloc[0])
     except:
         raw_rating = 0.0
 else:
     last_name = "VERI YOK"
+    last_dir = "Unknown"
+    last_runtime = 0
     raw_rating = 0.0
 # ----------------------------------
 
@@ -213,6 +217,7 @@ with col1:
         df_week = df_dates[(df_dates['Watched_Date_Log'] >= start_of_week) & (df_dates['Watched_Date_Log'] <= end_of_week)]
         week_count = len(df_week)
         week_avg = df_week[df_week['Rating'] > 0]['Rating'].mean() if week_count > 0 else 0.0
+        week_runtime = int(df_week['Runtime'].sum()) # Toplam süreyi hesapla
         
         st.markdown(f"""
         <div class="ins-week">
@@ -229,7 +234,10 @@ with col1:
                     <p class="w-stat-val" style="font-size: 2.2rem;">{week_avg:.2f}</p>
                 </div>
             </div>
-            <p class="week-date">[{start_of_week.strftime('%b %d')} - {end_of_week.strftime('%b %d')}]</p>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 15px;">
+                <p style="color: #7a8b99; font-size: 0.75rem; letter-spacing: 1px; font-weight: 600; margin: 0; text-transform: uppercase;">Total: <span style="color: #c5a059;">{week_runtime} mins</span></p>
+                <p class="week-date" style="margin: 0;">[{start_of_week.strftime('%b %d')} - {end_of_week.strftime('%b %d')}]</p>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -244,7 +252,6 @@ with col2:
         stars = "★" * full_stars
         if has_half_star:
             stars += "½"
-        # Kalanı boş yıldızla tamamla (toplam 5 karakter olacak şekilde)
         stars += "☆" * (5 - full_stars - int(has_half_star))
     else:
         stars = "No Rating"
@@ -252,8 +259,9 @@ with col2:
     st.markdown(f"""
     <div class="ins-week" style="border-left: 2px solid #c5a059;">
         <div>
-            <p style="color: #7a8b99; font-size: 0.75rem; letter-spacing: 1.5px; margin-bottom: 15px; text-transform: uppercase;">Latest Entry</p>
-            <h2 style="font-size: 1.1rem; color: #f0f0f0; margin: 5px 0; line-height: 1.4; font-weight: 800;">{last_name}</h2>
+            <p style="color: #7a8b99; font-size: 0.75rem; letter-spacing: 1.5px; margin-bottom: 10px; text-transform: uppercase;">Latest Entry</p>
+            <h2 style="font-size: 1.1rem; color: #f0f0f0; margin: 0 0 2px 0; line-height: 1.4; font-weight: 800; text-transform: uppercase;">{last_name}</h2>
+            <p style="color: #a0b0c0; font-size: 0.8rem; font-weight: 400; font-style: italic; margin: 0 0 15px 0; letter-spacing: 0.5px;">{last_dir} • {last_runtime} mins</p>
         </div>
         <div>
             <div style="color: #c5a059; font-size: 1.3rem; letter-spacing: 3px; margin-bottom: 10px;">{stars}</div>
