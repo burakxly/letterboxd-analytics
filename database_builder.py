@@ -66,6 +66,9 @@ def create_master_database():
     # 6. Veri Temizliği
     master_df['Rating'] = pd.to_numeric(master_df['Rating'], errors='coerce').fillna(0.0)
     master_df = master_df.fillna("")
+    # Scraper için boş Runtime sütununu hazırla
+    if 'Runtime' not in master_df.columns:
+        master_df['Runtime'] = 0
 
     # 7. Veritabanına Yazma
     conn = sqlite3.connect(db_path) 
