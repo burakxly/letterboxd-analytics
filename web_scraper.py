@@ -1,107 +1,101 @@
-﻿# -*- coding: utf-8 -*-
+﻿import sqlite3
 import requests
 from bs4 import BeautifulSoup
-import json
-import time
-import random
-import sqlite3
 import pandas as pd
+import feedparser
+import time
+import json
 
-def scrape_film_data(uri):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-    }
+# --- AYARLAR ---
+DB_NAME = "letterboxd_master.db"
+RSS_URL = "https://letterboxd.com/burakxly/rss/"
+
+def sync_rss_to_db():
+    print(f"[{time.ctime()}] RSS Kontrol ediliyor...")
+    feed = feedparser.parse(RSS_URL)
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    new_count = 0
+    for entry in feed.entries:
+        movie_name = entry.letterboxd_filmtitle
+        movie_link = entry.link
+        watched_date = getattr(entry, 'letterboxd_watcheddate', "")
+        
+        try:
+            raw_rating = int(entry.letterboxd_memberrating) / 2
+        except:
+            raw_rating = 0.0
+
+        # Veritabanında bu film (bu tarihle) var mı?
+        cursor.execute("SELECT * FROM movies WHERE Name = ? AND \"Watched Date\" = ?", (movie_name, watched_date))
+        if cursor.fetchone() is None:
+            print(f"Yeni keşif: {movie_name}")
+            # İlk başta boş verilerle ekliyoruz, enrich_data() hepsini dolduracak
+            cursor.execute("""
+                INSERT INTO movies (Name, Rating, "Watched Date", "Letterboxd URI", Runtime, Director, Genre, Year, Watched_Date_Log)
+                VALUES (?, ?, ?, ?, 0, '', '', 0, ?)
+            """, (movie_name, raw_rating, watched_date, movie_link, watched_date))
+            new_count += 1
     
-    try:
-        response = requests.get(uri, headers=headers, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        scraped_data = {"Director": "Unknown", "Genre": [], "Country": "Unknown", "Runtime": 0}
-        
-        # 1. JSON-LD Verisi (Yönetmen, Tür, Ülke için en sağlam kaynak)
-        json_ld_script = soup.find("script", type="application/ld+json")
-        if json_ld_script:
-            # CDATA etiketlerini temizle
-            clean_json = json_ld_script.text.split('/* <![CDATA[ */')[-1].split('/* ]]> */')[0].strip()
-            data = json.loads(clean_json)
-            
-            if "director" in data:
-                directors = data["director"]
-                scraped_data["Director"] = ", ".join([d.get("name", "Unknown") for d in directors]) if isinstance(directors, list) else directors.get("name", "Unknown")
-            
-            if "genre" in data:
-                scraped_data["Genre"] = data["genre"]
+    conn.commit()
+    conn.close()
+    print(f"Senkronizasyon: {new_count} yeni film eklendi.")
 
-        # 2. SÜRE (RUNTIME) ÇEKME - YENİ VE SAĞLAM YÖNTEM
-        # Ekran görüntüsündeki "122 mins" yazan yeri arıyoruz
-        runtime_tag = soup.find("p", class_="text-link text-footer")
-        if runtime_tag:
-            runtime_text = runtime_tag.get_text()
-            # Sayı dışındaki her şeyi temizle (örn: "122 mins" -> 122)
-            digits = "".join(filter(str.isdigit, runtime_text))
-            if digits:
-                scraped_data["Runtime"] = int(digits)
-        
-        # Eğer yukarıdaki yöntem bulamazsa alternatif (Twitter Meta)
-        if scraped_data["Runtime"] == 0:
-            runtime_meta = soup.find("meta", attrs={"name": "twitter:data2"})
-            if runtime_meta:
-                meta_text = runtime_meta.get("content", "")
-                digits = "".join(filter(str.isdigit, meta_text))
-                if digits:
-                    scraped_data["Runtime"] = int(digits)
-            
-        return scraped_data
-        
-    except Exception as e:
-        print(f"Hata - {uri}: {e}")
-        return None
-
-def enrich_master_database():
-    db_path = "letterboxd_master.db"
-    conn = sqlite3.connect(db_path)
-    df = pd.read_sql("SELECT * FROM movies", conn)
-
-    # 1. Eksik Sütunları Baştan Yarat (KeyError'ı engeller)
-    if "Runtime" not in df.columns: df["Runtime"] = 0
-    if "Director" not in df.columns: df["Director"] = "Unknown"
-    if "Genre" not in df.columns: df["Genre"] = "Unknown"
-    if "Country" not in df.columns: df["Country"] = "Unknown"
-
-    print("Eksik veriler tamamlanıyor...")
+def enrich_movie_data():
+    print(f"[{time.ctime()}] Eksik veriler (Yönetmen, Tür, Süre) kazınıyor...")
+    conn = sqlite3.connect(DB_NAME)
+    # Verisi eksik olanları seç (Runtime 0 olanlar veya Director'ı boş olanlar)
+    df = pd.read_sql("SELECT * FROM movies WHERE Runtime = 0 OR Director = '' OR Genre = ''", conn)
+    
+    if df.empty:
+        print("Tüm veriler güncel.")
+        conn.close()
+        return
 
     for index, row in df.iterrows():
-        # EĞER süre 0 ise veya yönetmen bilinmiyorsa kazı
-        if row["Runtime"] == 0 or pd.isna(row["Runtime"]) or row["Director"] == "Unknown" or pd.isna(row["Director"]):
-            uri = row['Letterboxd URI']
-            print(f"Veri çekiliyor: {row['Name']}")
+        url = row['Letterboxd URI']
+        print(f"Veri çekiliyor: {row['Name']}")
+        try:
+            response = requests.get(url, timeout=10)
+            soup = BeautifulSoup(response.text, 'lxml')
             
-            data = scrape_film_data(uri)
-            
-            if data:
-                # 2. Gelen verileri tabloya işle
-                if data["Runtime"] > 0:
-                    df.at[index, "Runtime"] = data["Runtime"]
+            # Letterboxd verileri JSON-LD içinde yapılandırılmış halde tutar (En temiz yöntem)
+            script_tag = soup.find('script', type='application/ld+json')
+            if script_tag:
+                data = json.loads(script_tag.string)
                 
-                if data["Director"] != "Unknown":
-                    df.at[index, "Director"] = data["Director"]
+                # 1. Yönetmen (Birden fazlaysa virgülle ayırır)
+                directors = data.get('director', [])
+                director_name = ", ".join([d.get('name') for d in directors]) if directors else ""
                 
-                if data["Genre"]:
-                    # Türler liste olarak geliyorsa string'e çevir
-                    df.at[index, "Genre"] = ", ".join(data["Genre"]) if isinstance(data["Genre"], list) else data["Genre"]
+                # 2. Türler (Genre)
+                genres = data.get('genre', [])
+                genre_name = ", ".join(genres) if isinstance(genres, list) else genres
                 
-                if data["Country"] != "Unknown":
-                    df.at[index, "Country"] = data["Country"]
+                # 3. Süre (Runtime)
+                duration = data.get('duration', '0') # Format: PT124M
+                runtime = int(''.join(filter(str.isdigit, duration))) if duration != '0' else 0
                 
-                # Checkpoint: Her başarılı işlemde kaydet
-                df.to_sql('movies', conn, if_exists='replace', index=False)
-                
-                # Valf (Letterboxd'dan ban yememek için bekleme süresi)
-                time.sleep(random.uniform(6.0, 10.0))
+                # 4. Yıl (Release Year)
+                released = data.get('releasedEvent', {})
+                year = released.get('startDate', '0')[:4] if released else 0
 
+                # Veritabanını güncelle
+                conn.execute("""
+                    UPDATE movies 
+                    SET Director = ?, Genre = ?, Runtime = ?, Year = ? 
+                    WHERE Name = ? AND "Letterboxd URI" = ?
+                """, (director_name, genre_name, runtime, year, row['Name'], url))
+                conn.commit()
+                print(f"Başarılı: {director_name} | {genre_name} | {runtime} dk")
+            
+            time.sleep(1) # Letterboxd'dan ban yememek için kısa bir mola
+        except Exception as e:
+            print(f"Hata ({row['Name']}): {e}")
+            
     conn.close()
-    print("Veri tamamlama işlemi bitti!")
 
 if __name__ == "__main__":
-    enrich_master_database()
+    sync_rss_to_db()
+    enrich_movie_data()
