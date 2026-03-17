@@ -18,7 +18,7 @@ def sync_rss_to_db():
     cursor = conn.cursor()
 
     new_count = 0
-    for entry in feed.entries:
+    for entry in reversed(feed.entries):
         movie_name = entry.letterboxd_filmtitle
         raw_link = entry.link
         watched_date = getattr(entry, 'letterboxd_watcheddate', "")

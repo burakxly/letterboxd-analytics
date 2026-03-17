@@ -138,7 +138,7 @@ conn = sqlite3.connect("letterboxd_master.db")
 last_movie_query = """
     SELECT Name, Rating, Director, Runtime FROM movies 
     WHERE "Watched Date" IS NOT NULL AND "Watched Date" != ''
-    ORDER BY "Watched Date" DESC, rowid DESC LIMIT 1
+    ORDER BY date("Watched Date") DESC, rowid DESC LIMIT 1
 """
 last_movie_df = pd.read_sql(last_movie_query, conn)
 conn.close()
