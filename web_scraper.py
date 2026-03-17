@@ -18,12 +18,18 @@ def sync_rss_to_db():
     cursor = conn.cursor()
 
     new_count = 0
+    # reversed ekledik ki en eskiden en yeniye doğru okusun!
     for entry in reversed(feed.entries):
         movie_name = entry.letterboxd_filmtitle
         raw_link = entry.link
         watched_date = getattr(entry, 'letterboxd_watcheddate', "")
         
-        # Linki temizle (Günlük sayfasından ana film sayfasına çevir)
+        # Yılı da RSS'ten çekiyoruz (The Guilty karışıklığını çözen sihir bu)
+        try:
+            film_year = int(getattr(entry, 'letterboxd_filmyear', 0))
+        except:
+            film_year = 0
+        
         match = re.search(r'/film/([^/]+)/', raw_link)
         movie_link = f"https://letterboxd.com/film/{match.group(1)}/" if match else raw_link
         
@@ -32,13 +38,15 @@ def sync_rss_to_db():
         except:
             raw_rating = 0.0
 
-        cursor.execute("SELECT * FROM movies WHERE Name = ? AND \"Watched Date\" = ?", (movie_name, watched_date))
+        # Artık İsim + İzlenme Tarihi + YIL olarak üçlü kontrol yapıyoruz!
+        cursor.execute("SELECT * FROM movies WHERE Name = ? AND \"Watched Date\" = ? AND Year = ?", (movie_name, watched_date, film_year))
+        
         if cursor.fetchone() is None:
-            print(f"Yeni keşif: {movie_name}")
+            print(f"Yeni keşif: {movie_name} ({film_year})")
             cursor.execute("""
                 INSERT INTO movies (Name, Rating, "Watched Date", "Letterboxd URI", Runtime, Director, Genre, Year, Watched_Date_Log)
-                VALUES (?, ?, ?, ?, 0, '', '', 0, ?)
-            """, (movie_name, raw_rating, watched_date, movie_link, watched_date))
+                VALUES (?, ?, ?, ?, 0, '', '', ?, ?)
+            """, (movie_name, raw_rating, watched_date, movie_link, film_year, watched_date))
             new_count += 1
     
     conn.commit()

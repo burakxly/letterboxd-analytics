@@ -71,7 +71,8 @@ def get_latest_movie():
     return last_name, last_dir, last_runtime, raw_rating, poster_url, last_url
 
 def get_kpis(df_all, df_rated):
-    total_films = len(df_all.drop_duplicates(subset=['Name', 'Director']))
+    # Filmleri İsim/Yönetmen üzerinden değil, eşsiz Linkleri üzerinden sayıyoruz
+    total_films = len(df_all.drop_duplicates(subset=['Letterboxd URI']))
     total_hours = int(df_all['Runtime'].sum()) / 60 
 
     df_dir = df_rated.assign(Director=df_rated['Director'].str.split(', ')).explode('Director')
