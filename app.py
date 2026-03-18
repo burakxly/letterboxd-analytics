@@ -23,6 +23,8 @@ total_films, total_hours, best_dir_name, best_dir_avg, best_genre_name, best_gen
 # ==========================================
 # HEADER & TOP KPI ŞERİDİ
 # ==========================================
+# app.py içindeki HEADER & TOP KPI ŞERİDİ kısmını bu blokla tamamen değiştir:
+
 st.markdown(f"""
 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; margin-top: -20px;">
     <div>
@@ -30,25 +32,26 @@ st.markdown(f"""
         <a href="https://letterboxd.com/burakxly/" target="_blank" class="custom-link" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 1px;">@burakxly on Letterboxd ↗</a>
     </div>
 </div>
-<div style="display: flex; width: 100%; align-items: center; justify-content: space-between; padding: 20px 10px; margin-bottom: 35px; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.015) 0%, transparent 100%);">
-<div style="flex: 1; padding: 0 15px; border-right: 1px solid rgba(255,255,255,0.05);">
-<p style="color: #7a8b99; font-size: 0.7rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 5px 0;">Total Films</p>
-<p style="color: #e0e6ed; font-size: 2.2rem; font-weight: 700; line-height: 1; margin: 0;">{total_films}</p>
-</div>
-<div style="flex: 1; padding: 0 15px; border-right: 1px solid rgba(255,255,255,0.05);">
-<p style="color: #7a8b99; font-size: 0.7rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 5px 0;">Total Hours</p>
-<p style="color: #e0e6ed; font-size: 2.2rem; font-weight: 700; line-height: 1; margin: 0;">{total_hours:,.0f} <span style="font-size: 1rem; color: #5a6b7c; font-weight: 500;">hrs</span></p>
-</div>
-<div style="flex: 1.8; padding: 0 25px; border-right: 1px solid rgba(255,255,255,0.05);">
-<p style="color: #7a8b99; font-size: 0.7rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 5px 0;">Top Director <span style="color: #445566; font-weight: 400;">(Min 5)</span></p>
-<p style="color: #c5a059; font-size: 1.4rem; font-weight: 700; line-height: 1.2; margin: 0; letter-spacing: 0px;">{best_dir_name}</p>
-<p style="color: #a0b0c0; font-size: 0.8rem; font-weight: 400; margin: 3px 0 0 0; font-style: italic;">{best_dir_avg:.2f} Avg Rating</p>
-</div>
-<div style="flex: 1.8; padding: 0 0 0 25px;">
-<p style="color: #7a8b99; font-size: 0.7rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 5px 0;">Top Genre <span style="color: #445566; font-weight: 400;">(Weighted)</span></p>
-<p style="color: #c5a059; font-size: 1.4rem; font-weight: 700; line-height: 1.2; margin: 0; letter-spacing: 0px;">{best_genre_name}</p>
-<p style="color: #a0b0c0; font-size: 0.8rem; font-weight: 400; margin: 3px 0 0 0; font-style: italic;">{best_genre_avg:.2f} Avg &nbsp;•&nbsp; {best_genre_count} Films</p>
-</div>
+
+<div class="kpi-container" style="display: flex; width: 100%; align-items: center; justify-content: space-between; padding: 20px 10px; margin-bottom: 35px; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.015) 0%, transparent 100%);">
+    <div class="kpi-item" style="flex: 1; padding: 0 15px; border-right: 1px solid rgba(255,255,255,0.05);">
+        <p style="color: #7a8b99; font-size: 0.7rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 5px 0;">Total Films</p>
+        <p style="color: #e0e6ed; font-size: 2.2rem; font-weight: 700; line-height: 1; margin: 0;">{total_films}</p>
+    </div>
+    <div class="kpi-item" style="flex: 1; padding: 0 15px; border-right: 1px solid rgba(255,255,255,0.05);">
+        <p style="color: #7a8b99; font-size: 0.7rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 5px 0;">Total Hours</p>
+        <p style="color: #e0e6ed; font-size: 2.2rem; font-weight: 700; line-height: 1; margin: 0;">{total_hours:,.0f} <span style="font-size: 1rem; color: #5a6b7c; font-weight: 500;">hrs</span></p>
+    </div>
+    <div class="kpi-item" style="flex: 1.8; padding: 0 25px; border-right: 1px solid rgba(255,255,255,0.05);">
+        <p style="color: #7a8b99; font-size: 0.7rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 5px 0;">Top Director <span style="color: #445566; font-weight: 400;">(Min 5)</span></p>
+        <p style="color: #c5a059; font-size: 1.4rem; font-weight: 700; line-height: 1.2; margin: 0; letter-spacing: 0px;">{best_dir_name}</p>
+        <p style="color: #a0b0c0; font-size: 0.8rem; font-weight: 400; margin: 3px 0 0 0; font-style: italic;">{best_dir_avg:.2f} Avg Rating</p>
+    </div>
+    <div class="kpi-item" style="flex: 1.8; padding: 0 0 0 25px;">
+        <p style="color: #7a8b99; font-size: 0.7rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 5px 0;">Top Genre <span style="color: #445566; font-weight: 400;">(Weighted)</span></p>
+        <p style="color: #c5a059; font-size: 1.4rem; font-weight: 700; line-height: 1.2; margin: 0; letter-spacing: 0px;">{best_genre_name}</p>
+        <p style="color: #a0b0c0; font-size: 0.8rem; font-weight: 400; margin: 3px 0 0 0; font-style: italic;">{best_genre_avg:.2f} Avg • {best_genre_count} Films</p>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 

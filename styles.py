@@ -72,5 +72,24 @@ def inject_custom_css():
         .ins-habit { display: flex; align-items: center; gap: 15px; background-color: #111315; border: 1px dashed rgba(122, 139, 153, 0.4); border-radius: 50px; padding: 10px 25px; width: fit-content; margin-top: 5px; }
         .h-title { color: #667788 !important; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
         .h-val { font-size: 1.2rem; font-weight: 800; color: #a0b0c0; margin: 0; text-transform: uppercase; }
+        
+        @media (max-width: 768px) {
+            .kpi-container {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 20px !important;
+                padding: 20px !important;
+            }
+            .kpi-item {
+                border-right: none !important;
+                border-left: 2px solid rgba(197, 160, 89, 0.3) !important;
+                padding: 0 0 0 15px !important;
+                width: 100% !important;
+            }
+            [data-testid="stMetricValue"] {
+                font-size: 1.5rem !important;
+            }
+        }
+    
     </style>
     """, unsafe_allow_html=True)
