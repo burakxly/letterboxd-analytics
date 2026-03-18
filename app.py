@@ -25,6 +25,9 @@ total_films, total_hours, best_dir_name, best_dir_avg, best_genre_name, best_gen
 # ==========================================
 # app.py içindeki HEADER & TOP KPI ŞERİDİ kısmını bu blokla tamamen değiştir:
 
+dir_slug = best_dir_name.lower().replace(' ', '-')
+dir_url = f"https://letterboxd.com/director/{dir_slug}/"
+
 st.markdown(f"""
 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; margin-top: -20px;">
     <div>
@@ -44,7 +47,7 @@ st.markdown(f"""
     </div>
     <div class="kpi-item" style="flex: 1.8; padding: 0 25px; border-right: 1px solid rgba(255,255,255,0.05);">
         <p style="color: #7a8b99; font-size: 0.7rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 5px 0;">Top Director <span style="color: #445566; font-weight: 400;">(Min 5)</span></p>
-        <p style="color: #c5a059; font-size: 1.4rem; font-weight: 700; line-height: 1.2; margin: 0; letter-spacing: 0px;">{best_dir_name}</p>
+        <p style="color: #c5a059; font-size: 1.4rem; ..."><a href="{dir_url}" target="_blank" class="custom-link" style="color: #c5a059 !important;">{best_dir_name}</a></p>
         <p style="color: #a0b0c0; font-size: 0.8rem; font-weight: 400; margin: 3px 0 0 0; font-style: italic;">{best_dir_avg:.2f} Avg Rating</p>
     </div>
     <div class="kpi-item" style="flex: 1.8; padding: 0 0 0 25px;">
@@ -202,7 +205,7 @@ with col_right:
             <div class="movie-card" style="position: relative; overflow: hidden; z-index: 1;">
                 <div style="position: absolute; right: 10px; bottom: -15px; font-size: 4.5rem; font-weight: 900; color: rgba(255,255,255,0.02); z-index: -1; line-height: 1; font-family: 'Courier New', Courier, monospace;">{i+1:02d}</div>
                 <div class="rating-badge">{row['Rating']} / 5.0</div>
-                <p class="movie-title">{row['Name']} <span style='color: #5a6b7c; font-weight: 400; font-size:0.9rem;'>({int(row['Year'])})</span></p>
+                <p class="movie-title"><a href="{row['Letterboxd URI']}" target="_blank" class="custom-link" style="color: #f0f0f0 !important;">{row['Name']}</a> <span style='color: #5a6b7c; font-weight: 400; font-size:0.9rem;'>({int(row['Year'])})</span></p>
                 <p class="movie-meta">Period: <b style="color: #a0b0c0;">{row['YearMonthStr']}</b> &nbsp;|&nbsp; Dir: {str(row['Director']).split(',')[0]}</p>
             </div>
             """, unsafe_allow_html=True)

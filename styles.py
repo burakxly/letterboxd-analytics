@@ -87,9 +87,11 @@ def inject_custom_css():
                 width: 100% !important;
             }
             [data-testid="stMetricValue"] {
-                font-size: 1.5rem !important;
-            }
+            font-size: 1.5rem !important;
         }
-    
-    </style>
-    """, unsafe_allow_html=True)
+        [data-testid="stPlotlyChart"] {
+            pointer-events: none;
+        }
+    }
+</style>
+""", unsafe_allow_html=True)
