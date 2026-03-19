@@ -265,7 +265,7 @@ with col_right:
                 f"<div class='tm-info'>"
                 f"<div class='tm-date'>THE {decade_val}s</div>"
                 f"<div class='tm-title'>{m_name}</div>"
-                f"<div style='display:flex;align-items:center;gap:6px;flex-wrap:nowrap;'><span style='color:#c5a059;'>★</span><span style='color:#fff;font-size:1.8rem;font-weight:300;'>{m_rating} / 5.0</span><span style='font-size:0.65rem;color:#6c757d;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-left:8px;border-left:1px solid rgba(255,255,255,0.1);padding-left:8px;white-space:nowrap;'>RATED BY BURAK</span></div>"
+                f"<p style='color:#fff;font-size:1.5rem;font-weight:300;margin:0;white-space:nowrap;'><span style='color:#c5a059;'>★</span> {m_rating} / 5.0 &nbsp;<span style='font-size:0.6rem;color:#6c757d;font-weight:700;letter-spacing:2px;text-transform:uppercase;'>RATED BY BURAK</span></p>"
                 f"</div>"
                 f"</div>"
             )
