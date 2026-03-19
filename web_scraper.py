@@ -83,6 +83,12 @@ def enrich_movie_data():
                 # Kılıfı yırt
                 raw_json = script_tag.text.replace('/* <![CDATA[ */', '').replace('/* ]]> */', '').strip()
                 data = json.loads(raw_json)
+
+                poster_url = data.get('image', '')
+                if not poster_url:
+                    og = soup.find('meta', property='og:image')
+                    if og:
+                        poster_url = og.get('content', '')
                 
                 directors = data.get('director', [])
                 director_name = ", ".join([d.get('name') for d in directors]) if directors else ""
@@ -115,9 +121,9 @@ def enrich_movie_data():
                 # Veritabanını Düzelt (Link dahil her şeyi güncelle)
                 conn.execute("""
                     UPDATE movies 
-                    SET Director = ?, Genre = ?, Runtime = ?, Year = ?, "Letterboxd URI" = ? 
+                    SET Director = ?, Genre = ?, Runtime = ?, Year = ?, "Letterboxd URI" = ?, Poster_URL = ? 
                     WHERE Name = ? AND "Letterboxd URI" = ?
-                """, (director_name, genre_name, runtime, year, clean_url, row['Name'], original_url))
+                """, (director_name, genre_name, runtime, year, clean_url, poster_url, row['Name'], original_url))
                 conn.commit()
                 print(f"Başarılı: {director_name} | {genre_name} | {runtime} dk")
             

@@ -64,7 +64,7 @@ def get_latest_movie():
         last_url = str(last_movie_df['Letterboxd URI'].iloc[0])
         try: raw_rating = float(last_movie_df['Rating'].iloc[0])
         except: raw_rating = 0.0
-        poster_url = fetch_poster_url(last_url)
+        poster_url = str(last_movie_df['Poster_URL'].iloc[0]) or fetch_poster_url(last_url)
     else:
         last_name, last_dir, last_runtime, raw_rating, poster_url, last_url = "VERI YOK", "Unknown", 0, 0.0, "", "#"
         

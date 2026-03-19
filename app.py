@@ -2,6 +2,7 @@
 import pandas as pd
 from styles import inject_custom_css
 from data_core import load_data, get_latest_movie, get_kpis, fetch_poster_url
+import streamlit.components.v1 as components
 
 # 1. PAGE SETTINGS
 st.set_page_config(page_title="Letterboxd Analytics", layout="wide", initial_sidebar_state="collapsed")
@@ -297,4 +298,4 @@ with col_right:
             f"</div>"
         )
         
-        st.markdown(final_html, unsafe_allow_html=True)
+        components.html(final_html, height=520, scrolling=False)
