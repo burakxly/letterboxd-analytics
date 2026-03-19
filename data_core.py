@@ -50,7 +50,7 @@ def load_data():
 def get_latest_movie():
     conn = sqlite3.connect("letterboxd_master.db")
     last_movie_query = """
-        SELECT Name, Rating, Director, Runtime, "Letterboxd URI" FROM movies 
+        SELECT Name, Rating, Director, Runtime, "Letterboxd URI" Poster_URL FROM movies 
         WHERE "Watched Date" IS NOT NULL AND "Watched Date" != ''
         ORDER BY date("Watched Date") DESC, rowid DESC LIMIT 1
     """
