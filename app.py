@@ -42,7 +42,7 @@ st.markdown(
     # 3. MİNİMALİST YAZI BÖLÜMÜ
     + "<div style=\"position:absolute;right:0;top:0;width:45%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:40px 50px 40px 20px; z-index:10;\">"
     + "<p style=\"color:rgba(200,212,222,0.85)!important;font-size:0.95rem;font-weight:400;line-height:1.8;margin:0 0 20px 0;font-family:Georgia,serif;\">"
-    + "This project was born from a mix of pure boredom and absolute freedom. I built this system as a direct response to the sheer absurdity of Letterboxd processing my own data just to sell it back to me. Now, fueled by a 24/7 GitHub automation, I construct my archive exactly how I want it, visualizing and tracking my cinematic history strictly on my own terms, in a way no paid subscription ever could."
+    + "This project was born from a mix of pure boredom and absolute freedom. I built this system as a direct response to the absurdity of Letterboxd processing my own data just to sell it back to me. Now, fueled by a 24/7 GitHub automation, I construct my archive exactly how I want it, visualizing and tracking my cinematic history strictly on my own terms, in a way no paid subscription ever could."
     + "</p>"
     + "<p style=\"color:#c5a059!important;font-size:0.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0;font-family:Georgia,serif;font-style:italic;\">created by burak</p>"
     + "</div></div>",
@@ -75,7 +75,6 @@ dir_url = f"https://letterboxd.com/director/{dir_slug}/"
 st.markdown(f"""
 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; margin-top: -20px;">
     <div>
-        <h2 style="margin: 0; color: #e0e6ed; font-size: 1.5rem; letter-spacing: 1px; font-weight: 700; text-transform: uppercase;">Cinema Log</h2>
         <a href="https://letterboxd.com/burakxly/" target="_blank" class="custom-link" style="font-size: 0.85rem; font-weight: 600; letter-spacing: 1px;">@burakxly on Letterboxd ↗</a>
     </div>
 </div>
