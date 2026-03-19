@@ -285,7 +285,34 @@ with col_right:
                 css_rules += f"#rd-dec-{i}:checked ~ .tm-nav-wrapper .tm-nav-track [for='rd-dec-0'] {{ color: #5a6b7c !important; font-weight: 600 !important; opacity: 0.5 !important; transform: scale(1) !important; }}"
                 css_rules += f"#rd-dec-{i}:checked ~ .tm-nav-wrapper .tm-nav-track [for='rd-dec-0']::after {{ opacity: 0 !important; transform: scaleX(0) !important; }}"
 
+
+
+
+        tm_css = """
+        <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: transparent; }
+        .tm-container { position: relative; width: 100%; height: 420px; border-radius: 16px; overflow: hidden; background: #0a0c0f; border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 25px 50px rgba(0,0,0,0.7); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; }
+        .tm-container input[type='radio'] { display: none; }
+        .tm-bg-container { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
+        .tm-bg { position: absolute; inset: -30px; background-size: cover; background-position: center; filter: blur(40px) brightness(0.2); opacity: 0; transition: opacity 0.6s ease; }
+        .tm-slides-container { position: absolute; inset: 0; z-index: 2; padding-bottom: 70px; }
+        .tm-slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-start; padding: 0 50px; opacity: 0; transform: translateX(40px); transition: opacity 0.4s ease, transform 0s 0.4s; pointer-events: none; gap: 40px; }
+        .tm-poster { width: 170px; height: 255px; border-radius: 8px; background-size: cover; background-position: center; box-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.08); flex-shrink: 0; }
+        .tm-info { display: flex; flex-direction: column; justify-content: center; max-width: 60%; }
+        .tm-date { color: #7a8b99; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.2em; margin-bottom: 12px; }
+        .tm-title { color: #F2F2F7; font-size: 2.6rem; font-weight: 800; line-height: 1.1; margin-bottom: 12px; letter-spacing: -0.02em; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .tm-rating { color: #FFFFFF; font-size: 1.8rem; font-weight: 300; letter-spacing: 0.05em; display: flex; align-items: center; }
+        .tm-nav-wrapper { position: absolute; bottom: 0; left: 0; right: 0; height: 75px; z-index: 999; background: linear-gradient(0deg, rgba(10,12,15,0.95) 0%, rgba(10,12,15,0) 100%); border-top: 1px solid rgba(255,255,255,0.03); overflow: hidden; mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent); }
+        .tm-nav-track { display: flex; position: absolute; height: 100%; align-items: center; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); left: 50%; }
+        .tm-nav-item { width: 80px; text-align: center; color: #5a6b7c; font-size: 1.2rem; font-weight: 600; cursor: pointer; transition: all 0.4s ease; position: relative; user-select: none; opacity: 0.5; padding: 15px 0; flex-shrink: 0; }
+        .tm-nav-item:hover { opacity: 0.9; color: #a0b0c0; }
+        .tm-nav-item::after { content: ''; position: absolute; bottom: 10px; left: 50%; width: 4px; height: 4px; border-radius: 50%; background: #c5a059; transform: translateX(-50%) scaleX(0); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); opacity: 0; box-shadow: 0 0 10px rgba(197,160,89,0.8); }
+        </style>
+        """
+
         final_html = (
+            tm_css +
             f"<div style='margin-bottom:15px; margin-top: 10px;'>"
             f"<h4 style='color:#a0b0c0;font-size:0.8rem;letter-spacing:2px;font-weight:800;margin:0 0 15px 0;text-transform:uppercase;'>DECADES OF CINEMA</h4>"
             f"</div>"
