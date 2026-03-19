@@ -258,7 +258,7 @@ with col_right:
             decade_str = f"'{str(decade_val)[-2:]}s"
             
             inputs_html += f"<input type='radio' id='rd-dec-{i}' name='dec-slider'>"
-            bg_html += f"<div class='tm-bg tm-bg-{i}' style=\"background-image:url('{p_url}');\"></div>"
+            bg_html += f"<div class='tm-bg tm-bg-{i}'></div>"
             slides_html += (
                 f"<div class='tm-slide tm-slide-{i}'>"
                 f"<div class='tm-poster' style=\"background-image:url('{p_url}');\"></div>"
