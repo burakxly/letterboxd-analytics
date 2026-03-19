@@ -1,4 +1,4 @@
-﻿import sqlite3
+import sqlite3
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -44,8 +44,8 @@ def sync_rss_to_db():
         if cursor.fetchone() is None:
             print(f"Yeni keşif: {movie_name} ({film_year})")
             cursor.execute("""
-                INSERT INTO movies (Name, Rating, "Watched Date", "Letterboxd URI", Runtime, Director, Genre, Year, Watched_Date_Log)
-                VALUES (?, ?, ?, ?, 0, '', '', ?, ?)
+                INSERT INTO movies (Name, Rating, "Watched Date", "Letterboxd URI", Runtime, Director, Genre, Year, Watched_Date_Log, Poster_URL)
+                VALUES (?, ?, ?, ?, 0, '', '', ?, ?, '')
             """, (movie_name, raw_rating, watched_date, movie_link, film_year, watched_date))
             new_count += 1
     
@@ -57,7 +57,7 @@ def enrich_movie_data():
     print(f"[{time.ctime()}] Eksik veriler (Yönetmen, Tür, Süre) kazınıyor...")
     conn = sqlite3.connect(DB_NAME)
     # Verisi eksik olanları tekrar çek
-    df = pd.read_sql("SELECT * FROM movies WHERE Runtime = 0 OR Director = '' OR Genre = ''", conn)
+    df = pd.read_sql("SELECT * FROM movies WHERE Runtime = 0 OR Director = '' OR Genre = '' OR Poster_URL IS NULL OR Poster_URL = ''", conn)
     
     if df.empty:
         print("Tüm veriler güncel.")

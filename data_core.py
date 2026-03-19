@@ -1,4 +1,4 @@
-﻿import pandas as pd
+import pandas as pd
 import sqlite3
 import requests
 from bs4 import BeautifulSoup
@@ -47,6 +47,7 @@ def load_data():
     
     return df
 
+@st.cache_data(ttl=3600)
 def get_latest_movie():
     conn = sqlite3.connect("letterboxd_master.db")
     last_movie_query = """
@@ -64,7 +65,7 @@ def get_latest_movie():
         last_url = str(last_movie_df['Letterboxd URI'].iloc[0])
         try: raw_rating = float(last_movie_df['Rating'].iloc[0])
         except: raw_rating = 0.0
-        poster_url = str(last_movie_df['Poster_URL'].iloc[0]) or fetch_poster_url(last_url)
+        poster_url = str(last_movie_df['Poster_URL'].iloc[0]) or 'https://s.ltrbxd.com/static/img/empty-poster-1000.v3.jpg'
     else:
         last_name, last_dir, last_runtime, raw_rating, poster_url, last_url = "VERI YOK", "Unknown", 0, 0.0, "", "#"
         
