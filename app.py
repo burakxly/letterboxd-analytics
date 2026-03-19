@@ -1,8 +1,7 @@
 ﻿import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
 from styles import inject_custom_css
-from data_core import load_data, get_latest_movie, get_kpis
+from data_core import load_data, get_latest_movie, get_kpis, fetch_poster_url
 
 # 1. PAGE SETTINGS
 st.set_page_config(page_title="Letterboxd Analytics", layout="wide", initial_sidebar_state="collapsed")
@@ -129,24 +128,65 @@ with col2:
     """, unsafe_allow_html=True)
 
 with col3:
-    st.markdown("<h4 style='color: #a0b0c0; margin-bottom: 15px; font-size: 0.9rem; letter-spacing: 1px;'>RUNTIME FLOW</h4>", unsafe_allow_html=True)
-    df_runtime = df[(df['Runtime'] >= 10) & (df['Runtime'] <= 220)]
-    hist_data = df_runtime['Runtime'].value_counts(bins=30).sort_index()
-    fig_runtime = go.Figure(go.Scatter(
-        x=[m.mid for m in hist_data.index], y=hist_data.values, mode='lines', fill='tozeroy',
-        line=dict(color='#5a6b7c', width=2.5, shape='spline'), fillcolor='rgba(90, 107, 124, 0.15)',
-        hovertemplate="<b>%{x:.0f} mins</b><br>Films: %{y}<extra></extra>"
-    ))
-    fig_runtime.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=420, margin=dict(l=0, r=0, t=10, b=0), dragmode=False,
-        xaxis=dict(gridcolor='rgba(255, 255, 255, 0.03)', tickfont=dict(color='#7a8b99'), fixedrange=True),
-        yaxis=dict(gridcolor='rgba(255, 255, 255, 0.03)', tickfont=dict(color='#7a8b99'), fixedrange=True),
-        hoverlabel=dict(bgcolor="#181c20", font_size=14, font_color="#e0e6ed")
+    # --------------------------------------------------
+    # 1. BORDERLESS TRUE APPLE TYPOGRAPHY GOAL
+    # --------------------------------------------------
+    current_year = pd.Timestamp.now().year
+    df_this_year = df_dates[df_dates['Watched_Date_Log'].dt.year == current_year]
+    yearly_count = len(df_this_year)
+    goal = 200
+    progress_pct = min(100, int((yearly_count / goal) * 100))
+    
+    html_goal = (
+        f"<div style='margin-bottom:50px;width:100%;padding-top:10px;'>"
+        f"<div style='display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:15px;'>"
+        f"<div style=\"font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,sans-serif;\">"
+        f"<div style='color:#8E8E93;font-size:0.75rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;'>{current_year} Campaign</div>"
+        f"<div style='color:#F2F2F7;font-size:1.8rem;font-weight:700;letter-spacing:-0.04em;line-height:1;'>Annual Goal</div>"
+        f"</div>"
+        f"<div style=\"font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,sans-serif;display:flex;align-items:baseline;gap:6px;\">"
+        f"<span style='color:#FFFFFF;font-size:4rem;font-weight:200;letter-spacing:-0.05em;line-height:0.8;'>{yearly_count}</span>"
+        f"<span style='color:#636366;font-size:1.2rem;font-weight:500;'>/ {goal}</span>"
+        f"</div>"
+        f"</div>"
+        f"<div style='position:relative;width:100%;height:4px;background-color:rgba(255,255,255,0.06);border-radius:4px;margin-top:25px;'>"
+        f"<div style='position:absolute;top:0;left:0;width:{progress_pct}%;height:100%;background:linear-gradient(90deg,#D4AF37,#FDE08B);border-radius:4px;box-shadow:0 0 12px rgba(253,224,139,0.5);transition:width 1.5s cubic-bezier(0.2,0.8,0.2,1);'></div>"
+        f"<div style='position:absolute;top:50%;left:{progress_pct}%;transform:translate(-50%,-50%);width:10px;height:10px;background-color:#FFFFFF;border-radius:50%;box-shadow:0 0 8px rgba(255,255,255,0.8);'></div>"
+        f"</div>"
+        f"</div>"
     )
+    st.markdown(html_goal, unsafe_allow_html=True)
 
-    st.plotly_chart(fig_runtime, use_container_width=True, theme=None, config={'displayModeBar': False})
-
-st.markdown("<hr style='border: 1px solid #2c3440; margin-bottom: 20px;'>", unsafe_allow_html=True)
+    # --------------------------------------------------
+    # 2. WALL OF MASTERPIECES (SON 8 TANE 5 YILDIZ)
+    # --------------------------------------------------
+    df_5star = df_dates[df_dates['Rating'] == 5.0].sort_values('Watched_Date_Log', ascending=False).head(8)
+    
+    posters_html = ""
+    for _, row in df_5star.iterrows():
+        p_url = fetch_poster_url(row['Letterboxd URI'])
+        m_name = str(row['Name']).replace("'", "&#39;")
+        posters_html += f"<a href='{row['Letterboxd URI']}' target='_blank' title='{m_name}'><div class='master-poster' style=\"background-image:url('{p_url}');\"></div></a>"
+    
+    html_wall = (
+        "<style>"
+        "@keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }"
+        ".marquee-wrapper { display: flex; overflow: hidden; width: 100%; mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent); }"
+        ".marquee-content { display: flex; gap: 15px; padding-right: 15px; animation: scrollMarquee 30s linear infinite; }"
+        ".marquee-wrapper:hover .marquee-content { animation-play-state: paused; }"
+        ".master-poster { width: 110px; height: 165px; border-radius: 6px; background-size: cover; background-position: center; box-shadow: 0 8px 20px rgba(0,0,0,0.8); transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; filter: grayscale(20%) contrast(110%); }"
+        ".master-poster:hover { transform: translateY(-8px) scale(1.05); border-color: #c5a059; box-shadow: 0 12px 25px rgba(197, 160, 89, 0.4); filter: grayscale(0%) brightness(1.1); z-index: 10; }"
+        "</style>"
+        f"<div style='background:linear-gradient(180deg,#181c20 0%,#111315 100%);border-radius:8px;padding:22px 0 22px 25px;border:1px solid rgba(255,255,255,0.05);box-shadow:0 10px 30px rgba(0,0,0,0.5);position:relative;height:260px;display:flex;flex-direction:column;justify-content:center;'>"
+        f"<h4 style='color:#a0b0c0;font-size:0.8rem;letter-spacing:2px;font-weight:800;margin:0 0 15px 0;text-transform:uppercase;display:flex;align-items:center;gap:8px;'>"
+        f"HALL OF FAME <span style='color:#5a6b7c;font-weight:500;font-size:0.7rem;'>(MASTERPIECES)</span>"
+        f"</h4>"
+        f"<div class='marquee-wrapper'>"
+        f"<div class='marquee-content'>{posters_html}{posters_html}</div>"
+        f"</div>"
+        f"</div>"
+    )
+    st.markdown(html_wall, unsafe_allow_html=True)
 
 # ==========================================
 # ROW 3: DEEP INSIGHTS & TOP 10 MONTHS
