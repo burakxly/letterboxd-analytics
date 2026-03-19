@@ -265,7 +265,7 @@ with col_right:
                 f"<div class='tm-info'>"
                 f"<div class='tm-date'>THE {decade_val}s</div>"
                 f"<div class='tm-title'>{m_name}</div>"
-                f"<div class='tm-rating'><span style='color:#c5a059;'>★</span> {m_rating} <span style='font-size:1rem;color:#7a8b99;font-weight:600;'>/ 5.0</span> <span style='font-size:0.65rem; color:#6c757d; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-left: 12px; vertical-align: middle; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 12px;'>RATED BY BURAK</span></div>"
+                f"<div class='tm-rating' style='display:flex;align-items:baseline;gap:4px;flex-wrap:wrap;'><span style='color:#c5a059;'>★</span><span>{m_rating}</span><span style='font-size:1rem;color:#7a8b99;font-weight:600;'>/ 5.0</span> ..."
                 f"</div>"
                 f"</div>"
             )
@@ -315,6 +315,7 @@ with col_right:
             .tm-rating { font-size: 1.2rem; }
             .tm-date { font-size: 0.75rem; }
             .tm-nav-item { width: 60px; font-size: 1rem; }
+            .tm-nav-wrapper { mask-image: none; -webkit-mask-image: none; }
         
         </style>
         """
