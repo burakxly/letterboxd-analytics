@@ -169,14 +169,6 @@ with col3:
         posters_html += f"<a href='{row['Letterboxd URI']}' target='_blank' title='{m_name}'><div class='master-poster' style=\"background-image:url('{p_url}');\"></div></a>"
     
     html_wall = (
-        "<style>"
-        "@keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }"
-        ".marquee-wrapper { display: flex; overflow: hidden; width: 100%; mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent); }"
-        ".marquee-content { display: flex; gap: 15px; padding-right: 15px; animation: scrollMarquee 30s linear infinite; }"
-        ".marquee-wrapper:hover .marquee-content { animation-play-state: paused; }"
-        ".master-poster { width: 110px; height: 165px; border-radius: 6px; background-size: cover; background-position: center; box-shadow: 0 8px 20px rgba(0,0,0,0.8); transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; filter: grayscale(20%) contrast(110%); }"
-        ".master-poster:hover { transform: translateY(-8px) scale(1.05); border-color: #c5a059; box-shadow: 0 12px 25px rgba(197, 160, 89, 0.4); filter: grayscale(0%) brightness(1.1); z-index: 10; }"
-        "</style>"
         f"<div style='background:linear-gradient(180deg,#181c20 0%,#111315 100%);border-radius:8px;padding:22px 0 22px 25px;border:1px solid rgba(255,255,255,0.05);box-shadow:0 10px 30px rgba(0,0,0,0.5);position:relative;height:260px;display:flex;flex-direction:column;justify-content:center;'>"
         f"<h4 style='color:#a0b0c0;font-size:0.8rem;letter-spacing:2px;font-weight:800;margin:0 0 15px 0;text-transform:uppercase;display:flex;align-items:center;gap:8px;'>"
         f"HALL OF FAME <span style='color:#5a6b7c;font-weight:500;font-size:0.7rem;'>(MASTERPIECES)</span>"
@@ -234,19 +226,75 @@ with col_left:
         st.markdown(f"""<div class="ins-habit"><p class="h-title">FAVORITE RECENT DAY:</p><p class="h-val">{best_dow}s</p></div>""", unsafe_allow_html=True)
 
 with col_right:
-    st.markdown("<h4 style='color: #a0b0c0; margin-bottom: 15px; font-size: 0.9rem; letter-spacing: 1px;'>TOP 10 ACTIVE MONTHS' FAVORITES</h4>", unsafe_allow_html=True)
-    top_10_months_series = df_rated_months['YearMonth'].dt.strftime('%Y-%m').value_counts().head(10).index
-    df_rated_months['YearMonthStr'] = df_rated_months['YearMonth'].dt.strftime('%Y-%m')
-    df_top10 = df_rated_months[df_rated_months['YearMonthStr'].isin(top_10_months_series)]
+    # ==================================================
+    # 7. ZAMAN TÜNELİ SLIDER - REACT DOM BUG FIXED (KUSURSUZ)
+    # ==================================================
+    df_decades = df_rated[(df_rated['Year'] >= 1900) & (df_rated['Runtime'] >= 35)].copy()
+    df_decades['Decade'] = (df_decades['Year'] // 10 * 10).astype(int)
     
-    if not df_top10.empty:
-        monthly_top_busiest = df_top10.loc[df_top10.groupby('YearMonthStr')['Rating'].idxmax()].sort_values('YearMonthStr', ascending=False)
-        for i, (_, row) in enumerate(monthly_top_busiest.iterrows()):
-            st.markdown(f"""
-            <div class="movie-card" style="position: relative; overflow: hidden; z-index: 1;">
-                <div style="position: absolute; right: 10px; bottom: -15px; font-size: 4.5rem; font-weight: 900; color: rgba(255,255,255,0.02); z-index: -1; line-height: 1; font-family: 'Courier New', Courier, monospace;">{i+1:02d}</div>
-                <div class="rating-badge">{row['Rating']} / 5.0</div>
-                <p class="movie-title"><a href="{row['Letterboxd URI']}" target="_blank" class="custom-link" style="color: #f0f0f0 !important;">{row['Name']}</a> <span style='color: #5a6b7c; font-weight: 400; font-size:0.9rem;'>({int(row['Year'])})</span></p>
-                <p class="movie-meta">Period: <b style="color: #a0b0c0;">{row['YearMonthStr']}</b> &nbsp;|&nbsp; Dir: {str(row['Director']).split(',')[0]}</p>
-            </div>
-            """, unsafe_allow_html=True)
+    top_per_decade = df_decades.sort_values(['Rating', 'Watched_Date_Log'], ascending=[False, False]).groupby('Decade').first().reset_index()
+    top_per_decade = top_per_decade.sort_values('Decade', ascending=False)
+    
+    if not top_per_decade.empty:
+        inputs_html = ""
+        bg_html = ""
+        slides_html = ""
+        nav_items_html = ""
+        
+        css_rules = (
+            f".tm-bg-0 {{ opacity: 1; transform: scale(1.05); z-index: 2; }}"
+            f".tm-slide-0 {{ opacity: 1; transform: translateX(0); pointer-events: auto; z-index: 10; }}"
+            f".tm-nav-track {{ transform: translateX(-40px); }}"
+            f".tm-nav-wrapper .tm-nav-track [for='rd-dec-0'] {{ color: #F2F2F7; font-weight: 800; opacity: 1; transform: scale(1.15); }}"
+            f".tm-nav-wrapper .tm-nav-track [for='rd-dec-0']::after {{ opacity: 1; transform: scaleX(1); }}"
+        )
+        
+        for i, (_, row) in enumerate(top_per_decade.iterrows()):
+            p_url = fetch_poster_url(row['Letterboxd URI'])
+            m_name = str(row['Name']).replace("'", "&#39;")
+            m_rating = row['Rating']
+            decade_val = int(row['Decade'])
+            decade_str = f"'{str(decade_val)[-2:]}s"
+            
+            inputs_html += f"<input type='radio' id='rd-dec-{i}' name='dec-slider'>"
+            bg_html += f"<div class='tm-bg tm-bg-{i}' style=\"background-image:url('{p_url}');\"></div>"
+            slides_html += (
+                f"<div class='tm-slide tm-slide-{i}'>"
+                f"<div class='tm-poster' style=\"background-image:url('{p_url}');\"></div>"
+                f"<div class='tm-info'>"
+                f"<div class='tm-date'>THE {decade_val}s</div>"
+                f"<div class='tm-title'>{m_name}</div>"
+                f"<div class='tm-rating'><span style='color:#c5a059;'>★</span> {m_rating} <span style='font-size:1rem;color:#7a8b99;font-weight:600;'>/ 5.0</span> <span style='font-size:0.65rem; color:#6c757d; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-left: 12px; vertical-align: middle; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 12px;'>RATED BY BURAK</span></div>"
+                f"</div>"
+                f"</div>"
+            )
+            nav_items_html += f"<label for='rd-dec-{i}' class='tm-nav-item'>{decade_str}</label>"
+            
+            shift_px = (i * 80) + 40
+            
+            css_rules += f"#rd-dec-{i}:checked ~ .tm-bg-container .tm-bg-{i} {{ opacity: 1; transform: scale(1.05); z-index: 2; }}"
+            css_rules += f"#rd-dec-{i}:checked ~ .tm-slides-container .tm-slide-{i} {{ opacity: 1; transform: translateX(0); pointer-events: auto; z-index: 10; transition: all 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }}"
+            css_rules += f"#rd-dec-{i}:checked ~ .tm-nav-wrapper .tm-nav-track [for='rd-dec-{i}'] {{ color: #F2F2F7; font-weight: 800; opacity: 1; transform: scale(1.15); }}"
+            css_rules += f"#rd-dec-{i}:checked ~ .tm-nav-wrapper .tm-nav-track [for='rd-dec-{i}']::after {{ opacity: 1; transform: scaleX(1); }}"
+            css_rules += f"#rd-dec-{i}:checked ~ .tm-nav-wrapper .tm-nav-track {{ transform: translateX(-{shift_px}px); }}"
+            
+            if i > 0:
+                css_rules += f"#rd-dec-{i}:checked ~ .tm-bg-container .tm-bg-0 {{ opacity: 0 !important; transform: scale(1) !important; z-index: 1 !important; }}"
+                css_rules += f"#rd-dec-{i}:checked ~ .tm-slides-container .tm-slide-0 {{ opacity: 0 !important; transform: translateX(40px) !important; pointer-events: none !important; z-index: 1 !important; }}"
+                css_rules += f"#rd-dec-{i}:checked ~ .tm-nav-wrapper .tm-nav-track [for='rd-dec-0'] {{ color: #5a6b7c !important; font-weight: 600 !important; opacity: 0.5 !important; transform: scale(1) !important; }}"
+                css_rules += f"#rd-dec-{i}:checked ~ .tm-nav-wrapper .tm-nav-track [for='rd-dec-0']::after {{ opacity: 0 !important; transform: scaleX(0) !important; }}"
+
+        final_html = (
+            f"<div style='margin-bottom:15px; margin-top: 10px;'>"
+            f"<h4 style='color:#a0b0c0;font-size:0.8rem;letter-spacing:2px;font-weight:800;margin:0 0 15px 0;text-transform:uppercase;'>DECADES OF CINEMA</h4>"
+            f"</div>"
+            f"<style>{css_rules}</style>"
+            f"<div class='tm-container'>"
+            f"{inputs_html}"
+            f"<div class='tm-bg-container'>{bg_html}</div>"
+            f"<div class='tm-slides-container'>{slides_html}</div>"
+            f"<div class='tm-nav-wrapper'><div class='tm-nav-track'>{nav_items_html}</div></div>"
+            f"</div>"
+        )
+        
+        st.markdown(final_html, unsafe_allow_html=True)
