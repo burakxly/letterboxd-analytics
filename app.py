@@ -308,6 +308,14 @@ with col_right:
         .tm-nav-item { width: 80px; text-align: center; color: #5a6b7c; font-size: 1.2rem; font-weight: 600; cursor: pointer; transition: all 0.4s ease; position: relative; user-select: none; opacity: 0.5; padding: 15px 0; flex-shrink: 0; }
         .tm-nav-item:hover { opacity: 0.9; color: #a0b0c0; }
         .tm-nav-item::after { content: ''; position: absolute; bottom: 10px; left: 50%; width: 4px; height: 4px; border-radius: 50%; background: #c5a059; transform: translateX(-50%) scaleX(0); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); opacity: 0; box-shadow: 0 0 10px rgba(197,160,89,0.8); }
+        @media (max-width: 768px) {
+            .tm-slide { padding: 0 20px; gap: 15px; }
+            .tm-poster { width: 110px; height: 165px; }
+            .tm-title { font-size: 1.5rem; }
+            .tm-rating { font-size: 1.2rem; }
+            .tm-date { font-size: 0.75rem; }
+            .tm-nav-item { width: 60px; font-size: 1rem; }
+        
         </style>
         """
 
@@ -325,4 +333,4 @@ with col_right:
             f"</div>"
         )
         
-        components.html(final_html, height=520, scrolling=False)
+        components.html(final_html, height=600, scrolling=False)
