@@ -33,18 +33,14 @@ st.markdown("""
 st.markdown(
     "<div style=\"position:relative;width:100%;height:430px;margin-bottom:40px;margin-top:10px;border-radius:12px;overflow:hidden;background-color:#0a0c0f;border:1px solid rgba(255,255,255,0.04);box-shadow:0 15px 40px rgba(0,0,0,0.6);\">"
     
-    # 1. FOTOĞRAF: Boyu %100 sığdırıldı (auto 100%). KESİNLİKLE KIRPILMAZ. Sola dayalı.
-    + "<div style=\"position:absolute;left:0;top:0;width:100%;height:100%;background-image:url('data:image/jpeg;base64," + _hero_b64 + "');background-size:auto 100%;background-repeat:no-repeat;background-position:left center; filter:grayscale(20%) contrast(110%);\">"
+    # 1. FOTOĞRAF (EFSANE BOYUT GERİ DÖNDÜ): Genişlik %65. Merkezden hizalandı (Doktor da kafa da içeride). Sağ tarafa eriyor.
+    + "<div style=\"position:absolute;left:0;top:0;width:65%;height:100%;background-image:url('data:image/jpeg;base64," + _hero_b64 + "');background-size:cover;background-repeat:no-repeat;background-position:center center; mask-image:linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%); -webkit-mask-image:linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%); filter:grayscale(20%) contrast(110%);\"></div>"
     
-    # Sağ tarafa doğru siyaha erime (Fotoğrafın bittiği yeri gizler, yazıyla bütünleştirir)
-    + "<div style=\"position:absolute;inset:0;background:linear-gradient(to right, transparent 30%, #0a0c0f 55%);\"></div>"
-    # Sınırları yumuşatan ince gölgeler (Üst, alt, sol)
-    + "<div style=\"position:absolute;inset:0;background:linear-gradient(to bottom, #0a0c0f 0%, transparent 10%, transparent 90%, #0a0c0f 100%);\"></div>"
-    + "<div style=\"position:absolute;inset:0;background:linear-gradient(to left, #0a0c0f 0%, transparent 5%);\"></div>"
-    + "</div>"
+    # 2. SİNERJİ GÖLGELERİ: Üstten ve alttan hafif sinematik kararma (sınırları yumuşatır)
+    + "<div style=\"position:absolute;inset:0;background:linear-gradient(to bottom, rgba(10,12,15,0.8) 0%, transparent 15%, transparent 85%, rgba(10,12,15,0.8) 100%); pointer-events:none;\"></div>"
     
-    # 2. MİNİMALİST YAZI BÖLÜMÜ
-    + "<div style=\"position:absolute;right:0;top:0;width:55%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:40px 50px 40px 20px; z-index:10;\">"
+    # 3. MİNİMALİST YAZI BÖLÜMÜ
+    + "<div style=\"position:absolute;right:0;top:0;width:45%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:40px 50px 40px 20px; z-index:10;\">"
     + "<p style=\"color:rgba(200,212,222,0.85)!important;font-size:0.95rem;font-weight:400;line-height:1.8;margin:0 0 20px 0;font-family:Georgia,serif;\">"
     + "This project was born from a mix of pure boredom and absolute freedom. I built this system as a direct response to the sheer absurdity of Letterboxd processing my own data just to sell it back to me. Now, fueled by a 24/7 GitHub automation, I construct my archive exactly how I want it, visualizing and tracking my cinematic history strictly on my own terms, in a way no paid subscription ever could."
     + "</p>"
@@ -52,7 +48,6 @@ st.markdown(
     + "</div></div>",
     unsafe_allow_html=True
 )
-
 
 
 
