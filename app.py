@@ -1,4 +1,4 @@
-﻿import streamlit as st
+import streamlit as st
 import pandas as pd
 from styles import inject_custom_css
 from data_core import load_data, get_latest_movie, get_kpis, fetch_poster_url
@@ -9,6 +9,54 @@ st.set_page_config(page_title="Letterboxd Analytics", layout="wide", initial_sid
 
 # 2. CSS INJECTION (Diğer dosyadan çekiliyor)
 inject_custom_css()
+
+# ==========================================
+# QUOTE + HERO
+# ==========================================
+import base64 as _b64, os as _os
+
+_img_path = _os.path.join(_os.path.dirname(__file__), "another.jpeg")
+with open(_img_path, "rb") as _f:
+    _hero_b64 = _b64.b64encode(_f.read()).decode()
+
+st.markdown("""
+<div style="padding:28px 0 8px 0;">
+    <p style="color:rgba(255,255,255,0.22)!important;font-size:1.05rem;font-weight:400;letter-spacing:0.12em;font-family:Georgia,serif;font-style:italic;margin:0;line-height:1;">
+        some masks come off, some don&rsquo;t
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
+# ==========================================
+# 0. HERO BANNER (THE FACE OF ANOTHER)
+# ==========================================
+st.markdown(
+    "<div style=\"position:relative;width:100%;height:430px;margin-bottom:40px;margin-top:10px;border-radius:12px;overflow:hidden;background-color:#0a0c0f;border:1px solid rgba(255,255,255,0.04);box-shadow:0 15px 40px rgba(0,0,0,0.6);\">"
+    
+    # 1. FOTOĞRAF: Boyu %100 sığdırıldı (auto 100%). KESİNLİKLE KIRPILMAZ. Sola dayalı.
+    + "<div style=\"position:absolute;left:0;top:0;width:100%;height:100%;background-image:url('data:image/jpeg;base64," + _hero_b64 + "');background-size:auto 100%;background-repeat:no-repeat;background-position:left center; filter:grayscale(20%) contrast(110%);\">"
+    
+    # Sağ tarafa doğru siyaha erime (Fotoğrafın bittiği yeri gizler, yazıyla bütünleştirir)
+    + "<div style=\"position:absolute;inset:0;background:linear-gradient(to right, transparent 30%, #0a0c0f 55%);\"></div>"
+    # Sınırları yumuşatan ince gölgeler (Üst, alt, sol)
+    + "<div style=\"position:absolute;inset:0;background:linear-gradient(to bottom, #0a0c0f 0%, transparent 10%, transparent 90%, #0a0c0f 100%);\"></div>"
+    + "<div style=\"position:absolute;inset:0;background:linear-gradient(to left, #0a0c0f 0%, transparent 5%);\"></div>"
+    + "</div>"
+    
+    # 2. MİNİMALİST YAZI BÖLÜMÜ
+    + "<div style=\"position:absolute;right:0;top:0;width:55%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:40px 50px 40px 20px; z-index:10;\">"
+    + "<p style=\"color:rgba(200,212,222,0.85)!important;font-size:0.95rem;font-weight:400;line-height:1.8;margin:0 0 20px 0;font-family:Georgia,serif;\">"
+    + "This project was born from a mix of pure boredom and absolute freedom. I built this system as a direct response to the sheer absurdity of Letterboxd processing my own data just to sell it back to me. Now, fueled by a 24/7 GitHub automation, I construct my archive exactly how I want it, visualizing and tracking my cinematic history strictly on my own terms, in a way no paid subscription ever could."
+    + "</p>"
+    + "<p style=\"color:#c5a059!important;font-size:0.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0;font-family:Georgia,serif;font-style:italic;\">created by burak</p>"
+    + "</div></div>",
+    unsafe_allow_html=True
+)
+
+
+
+
+
 
 # 3. DATA PREPARATION (Veriler diğer dosyadan yüklenip hazırlanıyor)
 df = load_data()
@@ -27,6 +75,7 @@ total_films, total_hours, best_dir_name, best_dir_avg, best_genre_name, best_gen
 
 dir_slug = best_dir_name.lower().replace(' ', '-')
 dir_url = f"https://letterboxd.com/director/{dir_slug}/"
+
 
 st.markdown(f"""
 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; margin-top: -20px;">
@@ -57,6 +106,8 @@ st.markdown(f"""
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+
 
 # ==========================================
 # ROW 2: TRIPLE PANEL
