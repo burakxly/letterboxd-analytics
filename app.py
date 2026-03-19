@@ -316,9 +316,9 @@ with col_right:
         .tm-nav-item:hover { opacity: 0.9; color: #a0b0c0; }
         .tm-nav-item::after { content: ''; position: absolute; bottom: 10px; left: 50%; width: 4px; height: 4px; border-radius: 50%; background: #c5a059; transform: translateX(-50%) scaleX(0); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); opacity: 0; box-shadow: 0 0 10px rgba(197,160,89,0.8); }
         .rated-badge { font-size: 0.6rem; color: #6c757d; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-left: 8px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 8px; vertical-align: middle; }
-        .mobile .tm-slide { padding: 0 15px !important; gap: 12px !important; }
-        .mobile .tm-poster { width: 100px !important; height: 150px !important; }
-        .mobile .tm-title { font-size: 1.3rem !important; }
+        .mobile .tm-slide { padding: 0 15px !important; gap: 10px !important; }
+        .mobile .tm-poster { width: 80px !important; height: 120px !important; }
+        .mobile .tm-title { font-size: 1.1rem !important; -webkit-line-clamp: 2 !important; }
         .mobile .tm-date { font-size: 0.7rem !important; }
         .mobile .tm-nav-item { width: 60px !important; font-size: 0.9rem !important; }
         .mobile .tm-nav-wrapper { mask-image: none !important; -webkit-mask-image: none !important; }
@@ -328,7 +328,7 @@ with col_right:
 
         tm_js = """
         <script>
-        function isMobile() { return document.body.offsetWidth < 350; }
+        function isMobile() { return document.body.offsetWidth < 600; }
 
         function applyResponsive() {
             if (isMobile()) {
