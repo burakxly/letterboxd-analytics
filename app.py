@@ -256,16 +256,19 @@ with col_right:
             m_rating = row['Rating']
             decade_val = int(row['Decade'])
             decade_str = f"'{str(decade_val)[-2:]}s"
+            m_link = str(row['Letterboxd URI'])
             
             inputs_html += f"<input type='radio' id='rd-dec-{i}' name='dec-slider'>"
-            bg_html += f"<div class='tm-bg tm-bg-{i}'></div>"
+            bg_html += f"<div class='tm-bg tm-bg-{i}' style=\"background-image:url('{p_url}');\"></div>"
             poster_attr = f"style=\"background-image:url('{p_url}');\"" if i == 0 else f"data-bg='{p_url}'"
             slides_html += (
                 f"<div class='tm-slide tm-slide-{i}'>"
+                f"<a href='{m_link}' target='_blank' style='text-decoration:none;flex-shrink:0;'>"
                 f"<div class='tm-poster' {poster_attr}></div>"
+                f"</a>"
                 f"<div class='tm-info'>"
                 f"<div class='tm-date'>THE {decade_val}s</div>"
-                f"<div class='tm-title'>{m_name}</div>"
+                f"<a href='{m_link}' target='_blank' style='text-decoration:none;'><div class='tm-title'>{m_name}</div></a>"
                 f"<p style='color:#fff;font-size:1.5rem;font-weight:300;margin:0;'><span style='color:#c5a059;'>★</span> {m_rating} / 5.0 <span class='rated-badge'>RATED BY BURAK</span></p>"
                 f"</div>"
                 f"</div>"
@@ -294,13 +297,15 @@ with col_right:
         <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: transparent; }
-        .tm-container { position: relative; width: 100%; height: 420px; border-radius: 16px; overflow: hidden; background: #0a0c0f; border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 25px 50px rgba(0,0,0,0.7); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; }
+        .tm-container { position: relative; width: 100%; height: 480px; border-radius: 16px; overflow: hidden; background: #0a0c0f; border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 25px 50px rgba(0,0,0,0.7); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; }
         .tm-container input[type='radio'] { display: none; }
         .tm-bg-container { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
         .tm-bg { position: absolute; inset: -30px; background-size: cover; background-position: center; filter: blur(40px) brightness(0.2); opacity: 0; transition: opacity 0.6s ease; }
         .tm-slides-container { position: absolute; inset: 0; z-index: 2; padding-bottom: 70px; }
         .tm-slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-start; padding: 0 50px; opacity: 0; transform: translateX(40px); transition: opacity 0.4s ease, transform 0s 0.4s; pointer-events: none; gap: 40px; }
-        .tm-poster { width: 170px; height: 255px; border-radius: 8px; background-size: cover; background-position: center; box-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.08); flex-shrink: 0; }
+        .tm-poster { width: 220px; height: 330px; border-radius: 8px; background-size: cover; background-position: center; box-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.08); flex-shrink: 0; transition: transform 0.3s ease; }
+        .tm-poster:hover { transform: scale(1.03); }
+        .tm-title:hover { color: #c5a059 !important; }
         .tm-info { display: flex; flex-direction: column; justify-content: center; max-width: 60%; }
         .tm-date { color: #7a8b99; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.2em; margin-bottom: 12px; }
         .tm-title { color: #F2F2F7; font-size: 2.6rem; font-weight: 800; line-height: 1.1; margin-bottom: 12px; letter-spacing: -0.02em; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
@@ -357,4 +362,4 @@ with col_right:
             f"</div>"
         )
         
-        components.html(final_html, height=600, scrolling=False)
+        components.html(final_html, height=660, scrolling=False)
