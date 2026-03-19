@@ -165,7 +165,7 @@ with col3:
     
     posters_html = ""
     for _, row in df_5star.iterrows():
-        p_url = str(row.get('Poster_URL', '')) or fetch_poster_url(row['Letterboxd URI'])
+        p_url = str(row.get('Poster_URL', '')) or "https://s.ltrbxd.com/static/img/empty-poster-1000.v3.jpg"
         m_name = str(row['Name']).replace("'", "&#39;")
         posters_html += f"<a href='{row['Letterboxd URI']}' target='_blank' title='{m_name}'><div class='master-poster' style=\"background-image:url('{p_url}');\"></div></a>"
     
@@ -251,7 +251,7 @@ with col_right:
         )
         
         for i, (_, row) in enumerate(top_per_decade.iterrows()):
-            p_url = str(row.get('Poster_URL', '')) or fetch_poster_url(row['Letterboxd URI'])
+            p_url = str(row.get('Poster_URL', '')) or "https://s.ltrbxd.com/static/img/empty-poster-1000.v3.jpg"
             m_name = str(row['Name']).replace("'", "&#39;")
             m_rating = row['Rating']
             decade_val = int(row['Decade'])
