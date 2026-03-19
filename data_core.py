@@ -24,7 +24,7 @@ def fetch_poster_url(movie_page_url):
     except: pass
     return "https://s.ltrbxd.com/static/img/empty-poster-1000.v3.jpg"
 
-@st.cache_data
+@st.cache_data(ttl=3600)  
 def load_data():
     conn = sqlite3.connect("letterboxd_master.db")
     df = pd.read_sql("SELECT * FROM movies", conn)

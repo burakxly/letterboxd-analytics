@@ -143,6 +143,7 @@ with col3:
         yaxis=dict(gridcolor='rgba(255, 255, 255, 0.03)', tickfont=dict(color='#7a8b99'), fixedrange=True),
         hoverlabel=dict(bgcolor="#181c20", font_size=14, font_color="#e0e6ed")
     )
+
     st.plotly_chart(fig_runtime, use_container_width=True, theme=None, config={'displayModeBar': False})
 
 st.markdown("<hr style='border: 1px solid #2c3440; margin-bottom: 20px;'>", unsafe_allow_html=True)
