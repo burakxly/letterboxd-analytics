@@ -128,7 +128,7 @@ st.markdown(f"""
     <div class="hero-gradient"></div>
     <div class="hero-content">
         <p class="hero-manifesto">
-            This project was born from a mix of pure boredom and absolute freedom. I built this system as a direct response to the sheer absurdity of Letterboxd processing my own data just to sell it back to me. Now, fueled by a 24/7 GitHub automation, I construct my archive exactly how I want it, visualizing and tracking my cinematic history strictly on my own terms, in a way no paid subscription ever could.
+            This project was born from a mix of pure boredom and absolute freedom. I built this system as a direct response to the absurdity of Letterboxd processing my own data just to sell it back to me. Now, fueled by a 24/7 GitHub automation, I construct my archive exactly how I want it, visualizing and tracking my cinematic history strictly on my own terms, in a way no paid subscription ever could.
         </p>
         <p class="hero-signature">created by burak</p>
     </div>
