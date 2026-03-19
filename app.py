@@ -30,24 +30,110 @@ st.markdown("""
 # ==========================================
 # 0. HERO BANNER (THE FACE OF ANOTHER)
 # ==========================================
-st.markdown(
-    "<div style=\"position:relative;width:100%;height:430px;margin-bottom:40px;margin-top:10px;border-radius:12px;overflow:hidden;background-color:#0a0c0f;border:1px solid rgba(255,255,255,0.04);box-shadow:0 15px 40px rgba(0,0,0,0.6);\">"
-    
-    # 1. FOTOĞRAF (EFSANE BOYUT GERİ DÖNDÜ): Genişlik %65. Merkezden hizalandı (Doktor da kafa da içeride). Sağ tarafa eriyor.
-    + "<div style=\"position:absolute;left:0;top:0;width:65%;height:100%;background-image:url('data:image/jpeg;base64," + _hero_b64 + "');background-size:cover;background-repeat:no-repeat;background-position:center center; mask-image:linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%); -webkit-mask-image:linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%); filter:grayscale(20%) contrast(110%);\"></div>"
-    
-    # 2. SİNERJİ GÖLGELERİ: Üstten ve alttan hafif sinematik kararma (sınırları yumuşatır)
-    + "<div style=\"position:absolute;inset:0;background:linear-gradient(to bottom, rgba(10,12,15,0.8) 0%, transparent 15%, transparent 85%, rgba(10,12,15,0.8) 100%); pointer-events:none;\"></div>"
-    
-    # 3. MİNİMALİST YAZI BÖLÜMÜ
-    + "<div style=\"position:absolute;right:0;top:0;width:45%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:40px 50px 40px 20px; z-index:10;\">"
-    + "<p style=\"color:rgba(200,212,222,0.85)!important;font-size:0.95rem;font-weight:400;line-height:1.8;margin:0 0 20px 0;font-family:Georgia,serif;\">"
-    + "This project was born from a mix of pure boredom and absolute freedom. I built this system as a direct response to the absurdity of Letterboxd processing my own data just to sell it back to me. Now, fueled by a 24/7 GitHub automation, I construct my archive exactly how I want it, visualizing and tracking my cinematic history strictly on my own terms, in a way no paid subscription ever could."
-    + "</p>"
-    + "<p style=\"color:#c5a059!important;font-size:0.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0;font-family:Georgia,serif;font-style:italic;\">created by burak</p>"
-    + "</div></div>",
-    unsafe_allow_html=True
-)
+st.markdown(f"""
+<style>
+    /* --- DESKTOP (PC) GÖRÜNÜMÜ --- */
+    #hero-banner {{
+        position: relative;
+        width: 100%;
+        height: 430px;
+        margin-bottom: 40px;
+        margin-top: 10px;
+        border-radius: 12px;
+        overflow: hidden;
+        background-color: #0a0c0f;
+        border: 1px solid rgba(255,255,255,0.04);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    }}
+    .hero-img {{
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 65%;
+        height: 100%;
+        background-image: url('data:image/jpeg;base64,{_hero_b64}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        mask-image: linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+        -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+        filter: grayscale(20%) contrast(110%);
+    }}
+    .hero-gradient {{
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(10,12,15,0.8) 0%, transparent 15%, transparent 85%, rgba(10,12,15,0.8) 100%);
+        pointer-events: none;
+    }}
+    .hero-content {{
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 45%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 40px 50px 40px 20px;
+        z-index: 10;
+    }}
+    .hero-manifesto {{
+        color: rgba(200,212,222,0.85) !important;
+        font-size: 0.95rem !important;
+        font-weight: 400 !important;
+        line-height: 1.8 !important;
+        margin: 0 0 20px 0 !important;
+        font-family: Georgia, serif !important; /* FONT KURTARILDI */
+    }}
+    .hero-signature {{
+        color: rgba(200,212,222,0.85) !important;
+        font-size: 0.65rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 3px !important;
+        text-transform: uppercase !important;
+        margin: 0 !important;
+        font-family: Georgia, serif !important; /* FONT KURTARILDI */
+        font-style: italic !important;
+    }}
+
+    /* --- MOBİL (TELEFON) GÖRÜNÜMÜ --- */
+    @media (max-width: 768px) {{
+        #hero-banner {{
+            height: auto; 
+        }}
+        .hero-img {{
+            width: 100%; 
+            height: 250px; 
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+        }}
+        .hero-content {{
+            position: relative; 
+            width: 100%;
+            height: auto;
+            padding: 200px 20px 30px 20px; 
+        }}
+        .hero-manifesto {{
+            font-size: 0.85rem !important;
+            text-align: justify !important;
+        }}
+        .hero-signature {{
+            text-align: right !important;
+        }}
+    }}
+</style>
+
+<div id="hero-banner">
+    <div class="hero-img"></div>
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+        <p class="hero-manifesto">
+            This project was born from a mix of pure boredom and absolute freedom. I built this system as a direct response to the sheer absurdity of Letterboxd processing my own data just to sell it back to me. Now, fueled by a 24/7 GitHub automation, I construct my archive exactly how I want it, visualizing and tracking my cinematic history strictly on my own terms, in a way no paid subscription ever could.
+        </p>
+        <p class="hero-signature">created by burak</p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 
 
