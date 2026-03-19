@@ -160,7 +160,7 @@ with col3:
     # --------------------------------------------------
     # 2. WALL OF MASTERPIECES (SON 8 TANE 5 YILDIZ)
     # --------------------------------------------------
-    df_5star = df_dates[df_dates['Rating'] == 5.0].sort_values('Watched_Date_Log', ascending=False).head(8)
+    df_5star = df_dates[(df_dates['Rating'] == 5.0) & (df_dates['Runtime'] >= 35)].sort_values('Watched_Date_Log', ascending=False).head(8)
     
     posters_html = ""
     for _, row in df_5star.iterrows():
