@@ -259,9 +259,10 @@ with col_right:
             
             inputs_html += f"<input type='radio' id='rd-dec-{i}' name='dec-slider'>"
             bg_html += f"<div class='tm-bg tm-bg-{i}'></div>"
+            poster_attr = f"style=\"background-image:url('{p_url}');\"" if i == 0 else f"data-bg='{p_url}'"
             slides_html += (
                 f"<div class='tm-slide tm-slide-{i}'>"
-                f"<div class='tm-poster' style=\"background-image:url('{p_url}');\"></div>"
+                f"<div class='tm-poster' {poster_attr}></div>"
                 f"<div class='tm-info'>"
                 f"<div class='tm-date'>THE {decade_val}s</div>"
                 f"<div class='tm-title'>{m_name}</div>"
@@ -316,12 +317,31 @@ with col_right:
             .tm-date { font-size: 0.75rem; }
             .tm-nav-item { width: 60px; font-size: 1rem; }
             .tm-nav-wrapper { mask-image: none; -webkit-mask-image: none; }
-        
+        }
         </style>
+        """
+
+        tm_js = """
+        <script>
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.name === 'dec-slider') {
+                var idx = e.target.id.replace('rd-dec-', '');
+                var slide = document.querySelector('.tm-slide-' + idx);
+                if (slide) {
+                    var lazyEl = slide.querySelector('[data-bg]');
+                    if (lazyEl) {
+                        lazyEl.style.backgroundImage = "url('" + lazyEl.getAttribute('data-bg') + "')";
+                        lazyEl.removeAttribute('data-bg');
+                    }
+                }
+            }
+        });
+        </script>
         """
 
         final_html = (
             tm_css +
+            tm_js +
             f"<div style='margin-bottom:15px; margin-top: 10px;'>"
             f"<h4 style='color:#a0b0c0;font-size:0.8rem;letter-spacing:2px;font-weight:800;margin:0 0 15px 0;text-transform:uppercase;'>DECADES OF CINEMA</h4>"
             f"</div>"
