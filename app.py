@@ -266,7 +266,7 @@ with col_right:
                 f"<div class='tm-info'>"
                 f"<div class='tm-date'>THE {decade_val}s</div>"
                 f"<div class='tm-title'>{m_name}</div>"
-                f"<p style='color:#fff;font-size:1.5rem;font-weight:300;margin:0;white-space:nowrap;'><span style='color:#c5a059;'>★</span> {m_rating} / 5.0 &nbsp;<span style='font-size:0.6rem;color:#6c757d;font-weight:700;letter-spacing:2px;text-transform:uppercase;'>RATED BY BURAK</span></p>"
+                f"<p style='color:#fff;font-size:1.5rem;font-weight:300;margin:0;'><span style='color:#c5a059;'>★</span> {m_rating} / 5.0 <span class='rated-badge'>RATED BY BURAK</span></p>"
                 f"</div>"
                 f"</div>"
             )
@@ -280,11 +280,12 @@ with col_right:
             css_rules += f"#rd-dec-{i}:checked ~ .tm-nav-wrapper .tm-nav-track [for='rd-dec-{i}']::after {{ opacity: 1; transform: scaleX(1); }}"
             css_rules += f"#rd-dec-{i}:checked ~ .tm-nav-wrapper .tm-nav-track {{ transform: translateX(-{shift_px}px); }}"
             
-            if i > 0:
-                css_rules += f"#rd-dec-{i}:checked ~ .tm-bg-container .tm-bg-0 {{ opacity: 0 !important; transform: scale(1) !important; z-index: 1 !important; }}"
-                css_rules += f"#rd-dec-{i}:checked ~ .tm-slides-container .tm-slide-0 {{ opacity: 0 !important; transform: translateX(40px) !important; pointer-events: none !important; z-index: 1 !important; }}"
-                css_rules += f"#rd-dec-{i}:checked ~ .tm-nav-wrapper .tm-nav-track [for='rd-dec-0'] {{ color: #5a6b7c !important; font-weight: 600 !important; opacity: 0.5 !important; transform: scale(1) !important; }}"
-                css_rules += f"#rd-dec-{i}:checked ~ .tm-nav-wrapper .tm-nav-track [for='rd-dec-0']::after {{ opacity: 0 !important; transform: scaleX(0) !important; }}"
+            for j in range(len(top_per_decade)):
+                if j != i:
+                    css_rules += f"#rd-dec-{i}:checked ~ .tm-bg-container .tm-bg-{j} {{ opacity: 0 !important; transform: scale(1) !important; z-index: 1 !important; }}"
+                    css_rules += f"#rd-dec-{i}:checked ~ .tm-slides-container .tm-slide-{j} {{ opacity: 0 !important; transform: translateX(40px) !important; pointer-events: none !important; z-index: 1 !important; }}"
+                    css_rules += f"#rd-dec-{i}:checked ~ .tm-nav-wrapper .tm-nav-track [for='rd-dec-{j}'] {{ color: #5a6b7c !important; font-weight: 600 !important; opacity: 0.5 !important; transform: scale(1) !important; }}"
+                    css_rules += f"#rd-dec-{i}:checked ~ .tm-nav-wrapper .tm-nav-track [for='rd-dec-{j}']::after {{ opacity: 0 !important; transform: scaleX(0) !important; }}"
 
 
 
@@ -317,7 +318,9 @@ with col_right:
             .tm-date { font-size: 0.75rem; }
             .tm-nav-item { width: 60px; font-size: 1rem; }
             .tm-nav-wrapper { mask-image: none; -webkit-mask-image: none; }
+            .rated-badge { display: none; }
         }
+        .rated-badge { font-size: 0.6rem; color: #6c757d; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-left: 8px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 8px; vertical-align: middle; }
         </style>
         """
 
