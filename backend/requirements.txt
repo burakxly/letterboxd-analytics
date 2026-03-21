@@ -1,7 +1,7 @@
 --extra-index-url https://pypi.org/simple
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
-pandas==2.0.3 --only-binary=:all:
+pandas==3.0.1
 requests==2.32.3
 beautifulsoup4==4.12.3
 python-multipart==0.0.9
