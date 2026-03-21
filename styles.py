@@ -1,4 +1,4 @@
-﻿import streamlit as st
+import streamlit as st
 
 def inject_custom_css():
     st.markdown("""
@@ -42,7 +42,7 @@ def inject_custom_css():
         .week-date { color: #556677; font-size: 0.85rem; font-family: monospace; text-align: right; margin: 0; letter-spacing: 0.5px; }
 
         /* --- 3. MOST RECENT WATCH (AFİŞ KARTI) CSS --- */
-        .ins-poster-card { border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); height: 420px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; box-shadow: 0 10px 30px rgba(0,0,0,0.8); transition: 0.3s; }
+        .ins-poster-card { border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); height: 420px; width: 280px; margin: 0 auto; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; box-shadow: 0 10px 30px rgba(0,0,0,0.8); transition: 0.3s; }
         .ins-poster-card:hover { border-color: rgba(255, 255, 255, 0.25); transform: translateY(-3px); }
         .poster-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: blur(2px) brightness(0.4); z-index: 1; transition: filter 0.3s ease; }
         .ins-poster-card:hover .poster-bg { filter: blur(0px) brightness(0.5); }
