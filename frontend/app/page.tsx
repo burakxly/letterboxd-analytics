@@ -55,7 +55,7 @@ function HeroSection() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/another.jpeg" alt="The Face of Another" className="hero-img" />
         {/* right fade overlay */}
-        <div style={{
+        <div className="hero-overlay" style={{
           position: "absolute", inset: 0,
           background: "linear-gradient(to right, transparent 25%, black 60%)",
           pointerEvents: "none",

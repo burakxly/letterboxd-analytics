@@ -198,34 +198,46 @@ a:hover { opacity: 0.75; }
     padding: 20px 16px 48px;
   }
 
-  /* Hero: image fills top portion, text overlays bottom */
+  /* Hero: full-width cover image, text overlaid at bottom */
   .hero-banner {
-    height: 500px;
+    height: 480px;
     margin-left: -16px;
     margin-right: -16px;
     width: calc(100% + 32px);
   }
 
+  /* Reset desktop positioning, switch to cover fill */
   .hero-img {
-    filter: grayscale(15%) contrast(110%) brightness(0.35) !important;
+    left: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: 35% center !important;
+    filter: grayscale(15%) contrast(110%) !important;
   }
 
-  .hero-text-panel {
-    position: absolute;
-    top: auto !important;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    width: 100% !important;
-    height: auto !important;
-    padding: 32px 20px 28px !important;
-    justify-content: flex-end;
+  /* Replace right-to-left gradient with bottom-to-top */
+  .hero-overlay {
     background: linear-gradient(
       to top,
-      rgba(10,12,15,0.97) 0%,
-      rgba(10,12,15,0.85) 55%,
+      rgba(0,0,0,0.92) 0%,
+      rgba(0,0,0,0.4) 50%,
       transparent 100%
-    );
+    ) !important;
+  }
+
+  /* Text panel slides to bottom */
+  .hero-text-panel {
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 28px 20px 24px !important;
+    justify-content: flex-end !important;
+    background: none !important;
   }
 
   /* KPI: 2×2 grid */
