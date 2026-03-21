@@ -273,4 +273,15 @@ a:hover { opacity: 0.75; }
     gap: 20px;
     height: auto;
   }
+
+  .hero-manifesto {
+    font-size: 1rem !important;
+    color: rgba(200,212,222,0.9) !important;
+  }
+
+  .hero-byline {
+    font-size: 0.72rem !important;
+    color: rgba(200,212,222,0.85) !important;
+    letter-spacing: 4px !important;
+  }
 }

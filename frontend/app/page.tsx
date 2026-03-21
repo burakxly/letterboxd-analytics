@@ -62,7 +62,7 @@ function HeroSection() {
           zIndex: 2,
         }} />
         <div className="hero-text-panel">
-          <p style={{
+          <p className="hero-manifesto" style={{
             color: "rgba(200,212,222,0.82)", fontSize: "0.92rem",
             lineHeight: 1.85, fontFamily: "Georgia, serif", margin: "0 0 20px 0",
           }}>
@@ -72,7 +72,7 @@ function HeroSection() {
             GitHub automation, I construct my archive exactly how I want it —
             visualizing and tracking my cinematic history strictly on my own terms.
           </p>
-          <p style={{
+          <p className="hero-byline" style={{
             color: "rgba(200,212,222,0.7)", fontSize: "0.62rem", fontWeight: 700,
             letterSpacing: "3px", textTransform: "uppercase", fontStyle: "italic",
             fontFamily: "Georgia, serif",
