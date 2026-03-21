@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
@@ -19,8 +20,6 @@ from data_core import (
 )
 
 app = FastAPI(title="Letterboxd Analytics API", version="1.0.0")
-
-import os
 
 ALLOWED_ORIGINS = [
     "http://localhost:3000",

@@ -14,7 +14,7 @@ def fetch_poster_url(movie_page_url: str) -> str:
     try:
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
         response = requests.get(movie_page_url, headers=headers, timeout=5)
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = BeautifulSoup(response.text, "html.parser")  # lxml removed for Railway compat
 
         script_tag = soup.find("script", type="application/ld+json")
         if script_tag:

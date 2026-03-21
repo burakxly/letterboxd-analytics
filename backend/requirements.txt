@@ -3,5 +3,4 @@ uvicorn[standard]
 pandas
 requests
 beautifulsoup4
-lxml
 python-multipart
