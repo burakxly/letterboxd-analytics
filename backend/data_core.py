@@ -219,7 +219,7 @@ def get_week_activity(df: pd.DataFrame) -> dict:
     week_runtime = int(df_week["Runtime"].sum())
 
     movies = []
-    for _, row in df_week.sort_values(["Watched Date", "rowid"], ascending=[False, False]).head(10).iterrows():
+    for _, row in df_week.sort_values(["Watched Date", "rowid"], ascending=[False, False]).iterrows():
         movies.append({
             "name": str(row.get("Name", "")),
             "year": int(row.get("Year", 0) or 0),

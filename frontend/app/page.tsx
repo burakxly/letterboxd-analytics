@@ -205,7 +205,7 @@ function WeekActivity({ week }: { week: WeekActivity }) {
       </div>
 
       <div style={{ flex: 1, borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "16px" }}>
-        {week.movies.slice(0, 8).map((m, i) => (
+        {week.movies.map((m, i) => (
           <p key={i} style={{ margin: "0 0 6px 0", fontSize: "0.8rem" }}>
             <span style={{ color: "#445566", marginRight: "6px" }}>▪</span>
             <a href={m.letterboxd_url} target="_blank" rel="noopener noreferrer" style={{ color: "#a0b0c0" }}>
@@ -214,11 +214,6 @@ function WeekActivity({ week }: { week: WeekActivity }) {
             </a>
           </p>
         ))}
-        {week.movies.length > 8 && (
-          <p style={{ color: "#5a6b7c", fontSize: "0.7rem", fontStyle: "italic", margin: "6px 0 0 0" }}>
-            + {week.movies.length - 8} more films…
-          </p>
-        )}
       </div>
     </div>
   );
