@@ -1,4 +1,7 @@
 import os
+import threading
+import time
+import requests as _requests
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
@@ -20,6 +23,20 @@ from data_core import (
 )
 
 app = FastAPI(title="Letterboxd Analytics API", version="1.0.0")
+
+
+def _keep_alive():
+    port = os.environ.get("PORT", "8000")
+    url = f"http://localhost:{port}/api/health"
+    while True:
+        time.sleep(60)
+        try:
+            _requests.get(url, timeout=5)
+        except Exception:
+            pass
+
+_t = threading.Thread(target=_keep_alive, daemon=True)
+_t.start()
 
 ALLOWED_ORIGINS = [
     "http://localhost:3000",
