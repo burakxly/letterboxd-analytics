@@ -1,0 +1,546 @@
+import Image from "next/image";
+import {
+  fetchKPIs,
+  fetchLatest,
+  fetchWeek,
+  fetchGoal,
+  fetchHallOfFame,
+  fetchInsights,
+  fetchDecades,
+  type KPIs,
+  type LatestMovie,
+  type WeekActivity,
+  type Goal,
+  type HallOfFameEntry,
+  type Insights,
+  type DecadeEntry,
+} from "@/lib/api";
+import DecadesSlider from "@/components/DecadesSlider";
+
+// ─── helpers ──────────────────────────────────────────────────────────────
+
+function Stars({ rating }: { rating: number }) {
+  if (!rating) return <span style={{ color: "#5a6b7c", fontSize: "0.85rem" }}>No Rating</span>;
+  const full = Math.floor(rating);
+  const half = rating % 1 !== 0;
+  const empty = 5 - full - (half ? 1 : 0);
+  return (
+    <span style={{ color: "#c5a059", fontSize: "1.25rem", letterSpacing: "3px" }}>
+      {"★".repeat(full)}
+      {half ? "½" : ""}
+      {"☆".repeat(empty)}
+    </span>
+  );
+}
+
+// ─── Hero ─────────────────────────────────────────────────────────────────
+
+function HeroSection() {
+  return (
+    <>
+      <p style={{
+        color: "rgba(255,255,255,0.45)",
+        fontSize: "0.95rem",
+        fontStyle: "italic",
+        fontFamily: "Georgia, serif",
+        letterSpacing: "0.1em",
+        marginBottom: "14px",
+      }}>
+        some masks come off, some don&rsquo;t
+      </p>
+
+      <div className="hero-banner">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/another.jpeg" alt="The Face of Another" className="hero-img" />
+        {/* right fade overlay */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(to right, transparent 25%, black 60%)",
+          pointerEvents: "none",
+          zIndex: 2,
+        }} />
+        <div className="hero-text-panel">
+          <p style={{
+            color: "rgba(200,212,222,0.82)", fontSize: "0.92rem",
+            lineHeight: 1.85, fontFamily: "Georgia, serif", margin: "0 0 20px 0",
+          }}>
+            This project was born from a mix of pure boredom and absolute freedom.
+            I built this system as a direct response to the absurdity of Letterboxd
+            processing my own data just to sell it back to me. Now, fueled by a 24/7
+            GitHub automation, I construct my archive exactly how I want it —
+            visualizing and tracking my cinematic history strictly on my own terms.
+          </p>
+          <p style={{
+            color: "rgba(200,212,222,0.7)", fontSize: "0.62rem", fontWeight: 700,
+            letterSpacing: "3px", textTransform: "uppercase", fontStyle: "italic",
+            fontFamily: "Georgia, serif",
+          }}>
+            created by burak
+          </p>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ─── KPI Strip ────────────────────────────────────────────────────────────
+
+function KPIStrip({ kpis }: { kpis: KPIs }) {
+  const dirSlug = kpis.best_director.toLowerCase().replace(/ /g, "-");
+  return (
+    <div className="kpi-strip">
+      {/* Total Films */}
+      <div className="kpi-item" style={{ flex: 1, borderRight: "1px solid rgba(255,255,255,0.05)" }}>
+        <p style={{ color: "#7a8b99", fontSize: "0.68rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 6px 0" }}>Total Films</p>
+        <p style={{ color: "#e0e6ed", fontSize: "2.2rem", fontWeight: 700, lineHeight: 1, margin: 0 }}>{kpis.total_films.toLocaleString()}</p>
+      </div>
+      {/* Total Hours */}
+      <div className="kpi-item" style={{ flex: 1, borderRight: "1px solid rgba(255,255,255,0.05)" }}>
+        <p style={{ color: "#7a8b99", fontSize: "0.68rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 6px 0" }}>Total Hours</p>
+        <p style={{ color: "#e0e6ed", fontSize: "2.2rem", fontWeight: 700, lineHeight: 1, margin: 0 }}>
+          {kpis.total_hours.toLocaleString("en", { maximumFractionDigits: 0 })}
+          <span style={{ fontSize: "1rem", color: "#5a6b7c", fontWeight: 500, marginLeft: 6 }}>hrs</span>
+        </p>
+      </div>
+      {/* Top Director */}
+      <div className="kpi-item" style={{ flex: 1.8, borderRight: "1px solid rgba(255,255,255,0.05)" }}>
+        <p style={{ color: "#7a8b99", fontSize: "0.68rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 6px 0" }}>
+          Top Director <span style={{ color: "#445566", fontWeight: 400 }}>(Min 5)</span>
+        </p>
+        <a href={`https://letterboxd.com/director/${dirSlug}/`} target="_blank" rel="noopener noreferrer"
+          style={{ color: "#c5a059", fontSize: "1.35rem", fontWeight: 700, lineHeight: 1.2, display: "block" }}>
+          {kpis.best_director}
+        </a>
+        <p style={{ color: "#a0b0c0", fontSize: "0.78rem", margin: "4px 0 0 0", fontStyle: "italic" }}>
+          {kpis.best_director_avg.toFixed(2)} Avg Rating
+        </p>
+      </div>
+      {/* Top Genre */}
+      <div className="kpi-item" style={{ flex: 1.8 }}>
+        <p style={{ color: "#7a8b99", fontSize: "0.68rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 6px 0" }}>
+          Top Genre <span style={{ color: "#445566", fontWeight: 400 }}>(Weighted)</span>
+        </p>
+        <p style={{ color: "#c5a059", fontSize: "1.35rem", fontWeight: 700, lineHeight: 1.2, margin: 0 }}>{kpis.best_genre}</p>
+        <p style={{ color: "#a0b0c0", fontSize: "0.78rem", margin: "4px 0 0 0", fontStyle: "italic" }}>
+          {kpis.best_genre_avg.toFixed(2)} Avg • {kpis.best_genre_count} Films
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Goal Bar ─────────────────────────────────────────────────────────────
+
+function GoalBar({ goal }: { goal: Goal }) {
+  const pct = goal.progress_pct;
+  return (
+    <div style={{ marginBottom: "48px", paddingTop: "10px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "16px" }}>
+        <div>
+          <p style={{ color: "#8E8E93", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", margin: "0 0 8px 0" }}>
+            {goal.year} Campaign
+          </p>
+          <p style={{ color: "#F2F2F7", fontSize: "1.8rem", fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1, margin: 0 }}>
+            Annual Goal
+          </p>
+        </div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: "6px" }}>
+          <span style={{ color: "#FFFFFF", fontSize: "4rem", fontWeight: 200, letterSpacing: "-0.05em", lineHeight: 0.8 }}>{goal.count}</span>
+          <span style={{ color: "#636366", fontSize: "1.2rem", fontWeight: 500 }}>/ {goal.goal}</span>
+        </div>
+      </div>
+      <div style={{ position: "relative", width: "100%", height: "4px", background: "rgba(255,255,255,0.06)", borderRadius: "4px" }}>
+        <div style={{
+          position: "absolute", top: 0, left: 0, width: `${pct}%`, height: "100%",
+          background: "linear-gradient(90deg, #D4AF37, #FDE08B)",
+          borderRadius: "4px",
+          boxShadow: "0 0 12px rgba(253,224,139,0.4)",
+        }} />
+        <div style={{
+          position: "absolute", top: "50%", left: `${pct}%`,
+          transform: "translate(-50%, -50%)",
+          width: "10px", height: "10px",
+          background: "#FFFFFF", borderRadius: "50%",
+          boxShadow: "0 0 8px rgba(255,255,255,0.8)",
+        }} />
+      </div>
+      <p style={{ color: "#5a6b7c", fontSize: "0.7rem", marginTop: "10px", textAlign: "right", letterSpacing: "1px" }}>
+        {pct.toFixed(1)}% complete
+      </p>
+    </div>
+  );
+}
+
+// ─── Week Activity ────────────────────────────────────────────────────────
+
+function WeekActivity({ week }: { week: WeekActivity }) {
+  return (
+    <div style={{
+      background: "#0d0f12", border: "1px solid rgba(255,255,255,0.06)",
+      borderRadius: "10px", padding: "24px",
+      display: "flex", flexDirection: "column", minHeight: "360px",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+        <p style={{ color: "#a0b0c0", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", margin: 0 }}>
+          <span className="pulse-dot" />Recording
+        </p>
+        <p style={{ color: "#5a6b7c", fontSize: "0.75rem", margin: 0 }}>
+          [{week.start_date} — {week.end_date}]
+        </p>
+      </div>
+
+      <div style={{ display: "flex", gap: "24px", marginBottom: "20px" }}>
+        {[
+          { label: "Films", val: week.count },
+          { label: "Avg Rating", val: week.avg_rating > 0 ? week.avg_rating.toFixed(2) : "—" },
+          { label: "Total Mins", val: week.runtime_mins.toLocaleString() },
+        ].map((s) => (
+          <div key={s.label}>
+            <p style={{ color: "#5a6b7c", fontSize: "0.65rem", fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase", margin: "0 0 4px 0" }}>{s.label}</p>
+            <p style={{ color: "#e0e6ed", fontSize: "1.6rem", fontWeight: 700, margin: 0, lineHeight: 1 }}>{s.val}</p>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ flex: 1, borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "16px" }}>
+        {week.movies.slice(0, 8).map((m, i) => (
+          <p key={i} style={{ margin: "0 0 6px 0", fontSize: "0.8rem" }}>
+            <span style={{ color: "#445566", marginRight: "6px" }}>▪</span>
+            <a href={m.letterboxd_url} target="_blank" rel="noopener noreferrer" style={{ color: "#a0b0c0" }}>
+              {m.name.length > 32 ? m.name.slice(0, 29) + "…" : m.name}
+              {m.year > 0 && <span style={{ color: "#5a6b7c", fontSize: "0.73rem", marginLeft: "5px" }}>({m.year})</span>}
+            </a>
+          </p>
+        ))}
+        {week.movies.length > 8 && (
+          <p style={{ color: "#5a6b7c", fontSize: "0.7rem", fontStyle: "italic", margin: "6px 0 0 0" }}>
+            + {week.movies.length - 8} more films…
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Latest Movie ─────────────────────────────────────────────────────────
+
+function LatestMovieCard({ latest }: { latest: LatestMovie }) {
+  return (
+    <div style={{ alignSelf: "flex-start" }}>
+      <p style={{ color: "#a0b0c0", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 12px 0" }}>
+        Most Recent Watch
+      </p>
+      <a href={latest.letterboxd_url} target="_blank" rel="noopener noreferrer"
+        style={{
+          display: "block", position: "relative",
+          width: "260px", height: "390px",
+          flexShrink: 0,
+          borderRadius: "10px", overflow: "hidden",
+          border: "1px solid rgba(255,255,255,0.06)",
+        }}>
+        {latest.poster_url && (
+          <Image
+            src={latest.poster_url} alt={latest.name} fill
+            style={{ objectFit: "cover", objectPosition: "center top" }}
+            unoptimized
+          />
+        )}
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0,
+          background: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, transparent 100%)",
+          padding: "16px", zIndex: 10,
+        }}>
+          <h2 style={{ color: "#f0f0f0", fontSize: "0.85rem", fontWeight: 800, textTransform: "uppercase", margin: "0 0 4px 0", lineHeight: 1.3 }}>{latest.name}</h2>
+          <p style={{ color: "#ccd6dd", fontSize: "0.7rem", fontStyle: "italic", margin: "0 0 8px 0" }}>{latest.director}</p>
+          <Stars rating={latest.rating} />
+        </div>
+      </a>
+    </div>
+  );
+}
+
+// ─── Hall of Fame ─────────────────────────────────────────────────────────
+
+function HallOfFame({ films }: { films: HallOfFameEntry[] }) {
+  if (!films.length) return null;
+  const doubled = [...films, ...films];
+
+  return (
+    <div style={{
+      background: "linear-gradient(180deg, #181c20 0%, #111315 100%)",
+      border: "1px solid rgba(255,255,255,0.05)",
+      borderRadius: "10px",
+      padding: "24px 24px 24px 28px",
+      marginBottom: "48px",
+      height: "260px",
+      display: "flex", flexDirection: "column", justifyContent: "center",
+      overflow: "hidden",
+    }}>
+      <h4 style={{ color: "#a0b0c0", fontSize: "0.78rem", letterSpacing: "2px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 16px 0" }}>
+        Hall of Fame <span style={{ color: "#5a6b7c", fontWeight: 400, fontSize: "0.68rem" }}>(Masterpieces)</span>
+      </h4>
+      <div className="marquee-wrapper">
+        <div className="marquee-track">
+          {doubled.map((film, i) => (
+            <a key={i} href={film.letterboxd_url} target="_blank" rel="noopener noreferrer" title={film.name}
+              style={{ display: "block", flexShrink: 0 }}>
+              <div style={{
+                width: "110px", height: "165px",
+                borderRadius: "6px", overflow: "hidden",
+                position: "relative",
+                border: "1px solid rgba(255,255,255,0.08)",
+              }}>
+                <Image
+                  src={film.poster_url || "https://s.ltrbxd.com/static/img/empty-poster-1000.v3.jpg"}
+                  alt={film.name} fill
+                  style={{ objectFit: "cover" }}
+                  unoptimized
+                />
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Insights: Marathon + Time Wasted ─────────────────────────────────────
+
+function MarathonCard({ insights }: { insights: Insights }) {
+  const { marathon, time_wasted } = insights;
+
+  return (
+    <div style={{
+      background: "#0d0f11", border: "1px solid rgba(255,255,255,0.06)",
+      borderLeft: "3px solid #e0e6ed",
+      borderRadius: "8px", padding: "32px",
+      position: "relative", overflow: "hidden",
+    }}>
+      {marathon?.bg_poster && (
+        <div style={{
+          position: "absolute", inset: 0,
+          backgroundImage: `url('${marathon.bg_poster}')`,
+          backgroundSize: "cover", backgroundPosition: "center",
+          filter: "blur(55px) brightness(0.1)", zIndex: 0,
+        }} />
+      )}
+      <div style={{ position: "relative", zIndex: 1 }}>
+        {marathon && (
+          <div style={{
+            position: "absolute", top: "-30px", right: "-10px",
+            fontSize: "13rem", fontWeight: 900, color: "rgba(255,255,255,0.04)",
+            lineHeight: 1, pointerEvents: "none", fontFamily: "Georgia, serif",
+          }}>
+            {marathon.film_count}
+          </div>
+        )}
+
+        <p style={{ color: "#5a6b7c", fontSize: "0.62rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 20px 0" }}>
+          Longest Marathon
+        </p>
+
+        {marathon ? (
+          <>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: "24px", marginBottom: "8px" }}>
+              <div>
+                <span style={{ fontSize: "7rem", fontWeight: 900, color: "#f0f0f0", lineHeight: 1, letterSpacing: "-5px" }}>{marathon.film_count}</span>
+                <span style={{ fontSize: "1.4rem", color: "#7a8b99", fontWeight: 400, marginLeft: "8px" }}>films</span>
+              </div>
+              <div style={{ paddingBottom: "12px" }}>
+                <p style={{ fontSize: "2.4rem", fontWeight: 700, color: "#c5a059", margin: 0, lineHeight: 1 }}>
+                  {Math.floor(marathon.total_runtime_mins / 60)}H {marathon.total_runtime_mins % 60}M
+                </p>
+                <p style={{ color: "#445566", fontSize: "0.68rem", letterSpacing: "1px", margin: "4px 0 0 0", textTransform: "uppercase" }}>total runtime</p>
+              </div>
+            </div>
+            <p style={{ color: "#556677", fontSize: "0.82rem", margin: "0 0 24px 0", fontFamily: "monospace" }}>
+              {new Date(marathon.date + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+            </p>
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: "16px" }}>
+              <p style={{ color: "#445566", fontSize: "0.62rem", letterSpacing: "2px", textTransform: "uppercase", margin: "0 0 8px 0" }}>Films watched</p>
+              {marathon.films.map((f, i) => (
+                <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
+                  style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#8090a0", fontSize: "0.82rem", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                  <span>{f.name && f.name.length > 45 ? f.name.slice(0, 42) + "…" : f.name}</span>
+                  <span style={{ color: "#5a6b7c", fontSize: "0.7rem" }}>{f.runtime ? `${f.runtime} min` : ""}</span>
+                </a>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p style={{ color: "#5a6b7c" }}>No marathon data available</p>
+        )}
+
+        {/* Time Wasted */}
+        <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1px solid rgba(139,42,42,0.2)" }}>
+          <p style={{ color: "#6a3333", fontSize: "0.6rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 4px 0" }}>
+            &ldquo;Time Wasted&rdquo; Index
+          </p>
+          <p style={{ fontSize: "1.8rem", fontWeight: 800, color: "#a53838", margin: "0 0 4px 0", fontFamily: "'Courier New', monospace", letterSpacing: "-1px", lineHeight: 1 }}>
+            {Math.floor(time_wasted.total_mins / 60)}h {time_wasted.total_mins % 60}m
+          </p>
+          <p style={{ color: "#4a3333", fontSize: "0.68rem", margin: "0 0 10px 0" }}>on films rated below 2.0 stars</p>
+          {time_wasted.films.map((f, i) => (
+            <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#7a5555", fontSize: "0.75rem", padding: "4px 0", borderBottom: "1px solid rgba(139,42,42,0.12)" }}>
+              <span>{f.name && f.name.length > 36 ? f.name.slice(0, 33) + "…" : f.name}</span>
+              <span style={{ fontWeight: 700, color: "#a53838", marginLeft: "8px" }}>{f.rating}★</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Insights: Peak Month + Best Decade + Fav Day ─────────────────────────
+
+function InsightsRight({ insights }: { insights: Insights }) {
+  const { peak_month, best_decade, favorite_day } = insights;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      {peak_month && (
+        <div style={{
+          background: "#0e0c08", border: "1px solid rgba(197,160,89,0.2)",
+          borderBottom: "2px solid #c5a059",
+          borderRadius: "6px", padding: "20px",
+          textAlign: "center", position: "relative", overflow: "hidden",
+        }}>
+          {peak_month.bg_poster && (
+            <div style={{
+              position: "absolute", inset: 0,
+              backgroundImage: `url('${peak_month.bg_poster}')`,
+              backgroundSize: "cover", backgroundPosition: "center",
+              filter: "blur(50px) brightness(0.08)", zIndex: 0,
+            }} />
+          )}
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <p style={{ color: "#5a4a20", fontSize: "0.62rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 4px 0" }}>Peak Cinema Month</p>
+            <p style={{ color: "#4a3a18", fontSize: "0.78rem", fontStyle: "italic", fontFamily: "Georgia, serif", margin: "0 0 10px 0" }}>
+              The month you were most in tune with cinema
+            </p>
+            <p style={{ fontSize: "2rem", fontWeight: 800, color: "#e8d090", margin: 0, lineHeight: 1.1 }}>{peak_month.month}</p>
+            <p style={{ fontSize: "1rem", fontWeight: 500, color: "#7a6a30", margin: "0 0 8px 0" }}>{peak_month.year}</p>
+            <span style={{ background: "rgba(197,160,89,0.12)", border: "1px solid rgba(197,160,89,0.3)", color: "#c5a059", padding: "3px 12px", borderRadius: "20px", fontWeight: 800, fontSize: "0.9rem" }}>
+              {peak_month.avg_rating.toFixed(2)} AVG · {peak_month.film_count} films
+            </span>
+            <div style={{ borderTop: "1px solid rgba(197,160,89,0.12)", paddingTop: "12px", marginTop: "14px", textAlign: "left" }}>
+              {peak_month.top_films.map((f, i) => (
+                <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
+                  style={{ display: "block", color: "#7a6a30", fontSize: "0.78rem", padding: "5px 0", borderBottom: "1px solid rgba(197,160,89,0.1)" }}>
+                  {f.name && f.name.length > 45 ? f.name.slice(0, 42) + "…" : f.name}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {best_decade && (
+        <div style={{
+          background: "#0d0f11", border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: "8px", padding: "24px",
+          position: "relative", overflow: "hidden",
+        }}>
+          {best_decade.bg_poster && (
+            <div style={{
+              position: "absolute", inset: 0,
+              backgroundImage: `url('${best_decade.bg_poster}')`,
+              backgroundSize: "cover", backgroundPosition: "center",
+              filter: "blur(50px) brightness(0.1)", zIndex: 0,
+            }} />
+          )}
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <p style={{ color: "#5a6b7c", fontSize: "0.62rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 12px 0" }}>Most Generous Era</p>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "16px", marginBottom: "16px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+              <p style={{ fontSize: "4.5rem", fontWeight: 900, color: "#e0e6ed", lineHeight: 1, margin: 0, letterSpacing: "-3px", fontFamily: "Georgia, serif" }}>
+                {best_decade.decade}s
+              </p>
+              <div>
+                <p style={{ fontSize: "1.2rem", fontWeight: 700, color: "#c5a059", margin: 0, lineHeight: 1 }}>{best_decade.avg_rating.toFixed(2)}</p>
+                <p style={{ fontSize: "0.7rem", color: "#5a6b7c", margin: "2px 0 0 0", letterSpacing: "1px", textTransform: "uppercase" }}>avg rating</p>
+                <p style={{ fontSize: "0.7rem", color: "#5a6b7c", margin: "2px 0 0 0", letterSpacing: "1px", textTransform: "uppercase" }}>{best_decade.film_count} films watched</p>
+              </div>
+            </div>
+            <p style={{ color: "#445566", fontSize: "0.62rem", letterSpacing: "2px", textTransform: "uppercase", margin: "0 0 4px 0" }}>Top Films</p>
+            {best_decade.top_films.map((f, i) => (
+              <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "7px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                <span style={{ color: "#c8d4dc", fontSize: "0.82rem", fontStyle: "italic", fontFamily: "Georgia, serif" }}>
+                  {f.name && f.name.length > 42 ? f.name.slice(0, 39) + "…" : f.name}
+                </span>
+                <span style={{ color: "#c5a059", fontSize: "0.75rem", fontWeight: 700, marginLeft: "10px", whiteSpace: "nowrap" }}>{f.year}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {favorite_day && (
+        <div style={{
+          background: "#0d0f11", border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: "8px", padding: "18px 24px",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+        }}>
+          <p style={{ color: "#5a6b7c", fontSize: "0.7rem", letterSpacing: "2px", textTransform: "uppercase", margin: 0 }}>Favorite Recent Day</p>
+          <p style={{ color: "#c5a059", fontSize: "1.4rem", fontWeight: 700, margin: 0 }}>{favorite_day}s</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────
+
+export default async function HomePage() {
+  const [kpis, latest, week, goal, hallOfFame, insights, decades] = await Promise.all([
+    fetchKPIs(),
+    fetchLatest(),
+    fetchWeek(),
+    fetchGoal(),
+    fetchHallOfFame(),
+    fetchInsights(),
+    fetchDecades(),
+  ]);
+
+  return (
+    <main className="page-main">
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
+        <a href="https://letterboxd.com/burakxly/" target="_blank" rel="noopener noreferrer"
+          style={{ color: "#5a6b7c", fontSize: "0.78rem", fontWeight: 600, letterSpacing: "1px" }}>
+          @burakxly on Letterboxd ↗
+        </a>
+      </div>
+
+      <HeroSection />
+      <KPIStrip kpis={kpis} />
+      <GoalBar goal={goal} />
+
+      <div className="grid-week">
+        <WeekActivity week={week} />
+        <LatestMovieCard latest={latest} />
+      </div>
+
+      <HallOfFame films={hallOfFame} />
+
+      <div style={{ marginBottom: "48px" }}>
+        <h4 style={{ color: "#a0b0c0", fontSize: "0.85rem", letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 28px 0" }}>
+          Deep Insights
+        </h4>
+        <div className="grid-insights">
+          <MarathonCard insights={insights} />
+          <InsightsRight insights={insights} />
+        </div>
+      </div>
+
+      <div>
+        <h4 style={{ color: "#a0b0c0", fontSize: "0.85rem", letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 28px 0" }}>
+          Decades of Cinema
+        </h4>
+        <DecadesSlider decades={decades} />
+      </div>
+    </main>
+  );
+}
