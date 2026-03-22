@@ -280,6 +280,8 @@ a:hover { opacity: 0.75; }
   max-width: none;
   filter: grayscale(15%) contrast(110%);
   will-change: transform;
+  -webkit-mask-image: linear-gradient(to right, black 50%, transparent 82%);
+  mask-image: linear-gradient(to right, black 50%, transparent 82%);
 }
 
 .hero-text-panel {
@@ -432,6 +434,8 @@ a:hover { opacity: 0.75; }
     object-fit: cover !important;
     object-position: 35% center !important;
     filter: grayscale(15%) contrast(110%) !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
   }
 
   .hero-overlay {

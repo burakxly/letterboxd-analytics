@@ -60,10 +60,10 @@ function HeroSection() {
 
       <div className="hero-banner">
         <HeroParallaxImage />
-        {/* cinematic right fade — image left, black right */}
+        {/* mobile only — bottom-up overlay (desktop: mask-image on .hero-img) */}
         <div className="hero-overlay" style={{
           position: "absolute", inset: 0,
-          background: "linear-gradient(to right, transparent 65%, #0a0c0f 100%)",
+          background: "transparent",
           pointerEvents: "none",
           zIndex: 2,
         }} />
