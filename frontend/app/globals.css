@@ -275,13 +275,16 @@ a:hover { opacity: 0.75; }
   }
 
   .hero-manifesto {
-    font-size: 1rem !important;
-    color: rgba(200,212,222,0.9) !important;
+    font-size: 1.05rem !important;
+    color: #e8eef3 !important;
+    line-height: 1.9 !important;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.9) !important;
   }
 
   .hero-byline {
-    font-size: 0.72rem !important;
-    color: rgba(200,212,222,0.85) !important;
+    font-size: 0.75rem !important;
+    color: #c8d4dc !important;
     letter-spacing: 4px !important;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.9) !important;
   }
 }
