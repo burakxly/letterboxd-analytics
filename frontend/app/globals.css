@@ -86,19 +86,22 @@ a:hover { opacity: 0.75; }
 /* ── Custom Cursor ──────────────────────────────────── */
 .cursor-ring {
   position: fixed;
-  top: 0; left: 0;
-  width: 20px; height: 20px;
-  border: 1px solid rgba(197,160,89,0.55);
+  top: -9px; left: -9px;
+  width: 18px; height: 18px;
+  border: 1.5px solid rgba(197,160,89,0.7);
   border-radius: 50%;
   pointer-events: none;
   z-index: 99999;
   will-change: transform;
-  transition: width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+  transition: width 0.15s ease, height 0.15s ease,
+              top 0.15s ease, left 0.15s ease,
+              border-color 0.15s ease;
 }
 
 .cursor-ring.hovering {
-  width: 36px; height: 36px;
-  border-color: rgba(197,160,89,0.9);
+  width: 30px; height: 30px;
+  top: -15px; left: -15px;
+  border-color: rgba(197,160,89,1);
 }
 
 /* ── Scroll Progress Bar ────────────────────────────── */
