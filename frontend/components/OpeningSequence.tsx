@@ -6,7 +6,7 @@ export default function OpeningSequence() {
   const [phase, setPhase] = useState<"hold" | "fade" | "done">("hold");
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("fade"), 900);
+    const t1 = setTimeout(() => setPhase("fade"), 700);
     const t2 = setTimeout(() => setPhase("done"), 2100);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
