@@ -18,6 +18,9 @@ import {
   type DecadeEntry,
 } from "@/lib/api";
 import DecadesSlider from "@/components/DecadesSlider";
+import ScrollReveal from "@/components/ScrollReveal";
+import AnimatedNumber from "@/components/AnimatedNumber";
+import HeroParallaxImage from "@/components/HeroParallaxImage";
 
 // ─── helpers ──────────────────────────────────────────────────────────────
 
@@ -53,8 +56,7 @@ function HeroSection() {
       </p>
 
       <div className="hero-banner">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/another.jpeg" alt="The Face of Another" className="hero-img" />
+        <HeroParallaxImage />
         {/* vignette + right fade overlay */}
         <div className="hero-overlay" style={{
           position: "absolute", inset: 0,
@@ -70,10 +72,12 @@ function HeroSection() {
           zIndex: 3,
         }} />
         <div className="hero-text-panel">
-          <p className="hero-manifesto" style={{
+          <p className="hero-manifesto hero-text-enter" style={{
             color: "rgba(200,212,222,0.82)", fontSize: "1.05rem",
             lineHeight: 1.9, fontFamily: "var(--font-cormorant), Georgia, serif",
             fontWeight: 400, margin: "0 0 20px 0",
+            animationDelay: "0.3s",
+            fontFeatureSettings: '"liga" 1, "kern" 1',
           }}>
             This project was born from a mix of pure boredom and absolute freedom.
             I built this system as a direct response to the absurdity of Letterboxd
@@ -81,10 +85,11 @@ function HeroSection() {
             GitHub automation, I construct my archive exactly how I want it —
             visualizing and tracking my cinematic history strictly on my own terms.
           </p>
-          <p className="hero-byline" style={{
+          <p className="hero-byline hero-text-enter" style={{
             color: "rgba(200,212,222,0.7)", fontSize: "0.65rem", fontWeight: 600,
             letterSpacing: "4px", textTransform: "uppercase", fontStyle: "italic",
             fontFamily: "var(--font-cormorant), Georgia, serif",
+            animationDelay: "0.7s",
           }}>
             created by burak
           </p>
@@ -103,14 +108,15 @@ function KPIStrip({ kpis }: { kpis: KPIs }) {
       {/* Total Films */}
       <div className="kpi-item" style={{ flex: 1, borderRight: "1px solid rgba(255,255,255,0.05)" }}>
         <p style={{ color: "#7a8b99", fontSize: "0.68rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 6px 0" }}>Total Films</p>
-        <p style={{ color: "#e0e6ed", fontSize: "2.2rem", fontWeight: 700, lineHeight: 1, margin: 0 }}>{kpis.total_films.toLocaleString()}</p>
+        <p style={{ color: "#e0e6ed", fontSize: "2.2rem", fontWeight: 700, lineHeight: 1, margin: 0 }}>
+          <AnimatedNumber value={kpis.total_films} />
+        </p>
       </div>
       {/* Total Hours */}
       <div className="kpi-item" style={{ flex: 1, borderRight: "1px solid rgba(255,255,255,0.05)" }}>
         <p style={{ color: "#7a8b99", fontSize: "0.68rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 6px 0" }}>Total Hours</p>
         <p style={{ color: "#e0e6ed", fontSize: "2.2rem", fontWeight: 700, lineHeight: 1, margin: 0 }}>
-          {kpis.total_hours.toLocaleString("en", { maximumFractionDigits: 0 })}
-          <span style={{ fontSize: "1rem", color: "#5a6b7c", fontWeight: 500, marginLeft: 6 }}>hrs</span>
+          <AnimatedNumber value={kpis.total_hours} suffix="hrs" />
         </p>
       </div>
       {/* Top Director */}
@@ -291,9 +297,8 @@ function HallOfFame({ films }: { films: HallOfFameEntry[] }) {
       <div className="marquee-wrapper">
         <div className="marquee-track">
           {doubled.map((film, i) => (
-            <a key={i} href={film.letterboxd_url} target="_blank" rel="noopener noreferrer" title={film.name}
-              className="hof-poster"
-              style={{ display: "block", flexShrink: 0, borderRadius: "6px", overflow: "hidden", position: "relative" }}>
+            <a key={i} href={film.letterboxd_url} target="_blank" rel="noopener noreferrer"
+              className="hof-poster">
               <div style={{
                 width: "110px", height: "165px",
                 borderRadius: "6px", overflow: "hidden",
@@ -306,6 +311,14 @@ function HallOfFame({ films }: { films: HallOfFameEntry[] }) {
                   style={{ objectFit: "cover" }}
                   unoptimized
                 />
+              </div>
+              <div className="hof-overlay">
+                <p style={{ color: "#f0f0f0", fontSize: "0.6rem", fontWeight: 700, margin: 0, lineHeight: 1.3, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  {film.name.length > 18 ? film.name.slice(0, 16) + "…" : film.name}
+                </p>
+                {film.year > 0 && (
+                  <p style={{ color: "#c5a059", fontSize: "0.58rem", margin: "2px 0 0 0", fontWeight: 600 }}>{film.year}</p>
+                )}
               </div>
             </a>
           ))}
@@ -522,36 +535,50 @@ export default async function HomePage() {
       </div>
 
       <HeroSection />
-      <KPIStrip kpis={kpis} />
-      <GoalBar goal={goal} />
 
-      <div className="grid-week">
-        <WeekActivity week={week} />
-        <LatestMovieCard latest={latest} />
-      </div>
+      <ScrollReveal>
+        <KPIStrip kpis={kpis} />
+      </ScrollReveal>
 
-      <HallOfFame films={hallOfFame} />
+      <ScrollReveal delay={80}>
+        <GoalBar goal={goal} />
+      </ScrollReveal>
 
-      <hr className="section-sep" />
-
-      <div style={{ marginBottom: "48px" }}>
-        <h4 style={{ color: "#a0b0c0", fontSize: "0.68rem", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, margin: "0 0 28px 0", fontFamily: "var(--font-geist-sans), sans-serif" }}>
-          Deep Insights
-        </h4>
-        <div className="grid-insights">
-          <MarathonCard insights={insights} />
-          <InsightsRight insights={insights} />
+      <ScrollReveal delay={60}>
+        <div className="grid-week">
+          <WeekActivity week={week} />
+          <LatestMovieCard latest={latest} />
         </div>
-      </div>
+      </ScrollReveal>
+
+      <ScrollReveal>
+        <HallOfFame films={hallOfFame} />
+      </ScrollReveal>
 
       <hr className="section-sep" />
 
-      <div>
-        <h4 style={{ color: "#a0b0c0", fontSize: "0.68rem", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, margin: "0 0 28px 0", fontFamily: "var(--font-geist-sans), sans-serif" }}>
-          Decades of Cinema
-        </h4>
-        <DecadesSlider decades={decades} />
-      </div>
+      <ScrollReveal>
+        <div style={{ marginBottom: "48px" }}>
+          <h4 style={{ color: "#a0b0c0", fontSize: "0.68rem", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, margin: "0 0 28px 0", fontFamily: "var(--font-geist-sans), sans-serif" }}>
+            Deep Insights
+          </h4>
+          <div className="grid-insights">
+            <MarathonCard insights={insights} />
+            <InsightsRight insights={insights} />
+          </div>
+        </div>
+      </ScrollReveal>
+
+      <hr className="section-sep" />
+
+      <ScrollReveal>
+        <div>
+          <h4 style={{ color: "#a0b0c0", fontSize: "0.68rem", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, margin: "0 0 28px 0", fontFamily: "var(--font-geist-sans), sans-serif" }}>
+            Decades of Cinema
+          </h4>
+          <DecadesSlider decades={decades} />
+        </div>
+      </ScrollReveal>
     </main>
   );
 }

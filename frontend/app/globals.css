@@ -26,7 +26,6 @@
   font-family: var(--font-cormorant), Georgia, serif;
 }
 
-/* Section labels — uppercase tracked small caps */
 .section-label {
   font-family: var(--font-geist-sans), sans-serif;
   font-size: 0.68rem;
@@ -36,28 +35,36 @@
   color: #7a8b99;
 }
 
-/* Display headings — Cormorant editorial style */
 .display-heading {
   font-family: var(--font-cormorant), Georgia, serif;
   font-weight: 300;
   letter-spacing: 0.02em;
   line-height: 1.1;
+  font-feature-settings: "liga" 1, "kern" 1, "onum" 1;
 }
 
-/* Cormorant italic accent — for quotes / manifesto */
 .display-italic {
   font-family: var(--font-cormorant), Georgia, serif;
   font-style: italic;
   font-weight: 400;
+  font-feature-settings: "liga" 1, "kern" 1;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
 html, body {
-  background: #0a0c0f;
   color: #e0e6ed;
   min-height: 100%;
   -webkit-font-smoothing: antialiased;
+  cursor: none;
+}
+
+/* ── Ambient background ─────────────────────────────── */
+body {
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(197,160,89,0.045) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 30% at 85% 55%, rgba(197,160,89,0.02) 0%, transparent 50%),
+    #0a0c0f;
 }
 
 /* ── Grain overlay ─────────────────────────────────── */
@@ -67,14 +74,78 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.028;
+  opacity: 0.052;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 128px 128px;
 }
 
-a { color: inherit; text-decoration: none; }
+a, button { cursor: none; }
 a:hover { opacity: 0.75; }
+
+/* ── Custom Cursor ──────────────────────────────────── */
+.cursor-dot {
+  position: fixed;
+  top: 0; left: 0;
+  width: 7px; height: 7px;
+  background: #c5a059;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s ease, height 0.2s ease;
+}
+
+.cursor-ring {
+  position: fixed;
+  top: 0; left: 0;
+  width: 30px; height: 30px;
+  border: 1px solid rgba(197,160,89,0.45);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  transform: translate(-50%, -50%);
+  transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease;
+}
+
+.cursor-ring.hovering {
+  width: 50px; height: 50px;
+  border-color: rgba(197,160,89,0.75);
+}
+
+/* ── Scroll Progress Bar ────────────────────────────── */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #b8924a, #e8cc80, #c5a059);
+  z-index: 99997;
+  box-shadow: 0 0 10px rgba(197,160,89,0.5);
+  transition: width 0.05s linear;
+}
+
+/* ── Scroll Reveal ──────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.75s ease, transform 0.75s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Hero text entrance ─────────────────────────────── */
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-text-enter {
+  animation: heroFadeIn 1.2s ease forwards;
+  opacity: 0;
+}
 
 /* ── Marquee ───────────────────────────────────────── */
 @keyframes marquee {
@@ -91,7 +162,7 @@ a:hover { opacity: 0.75; }
   display: flex;
   width: max-content;
   animation: marquee 45s linear infinite;
-  gap: 12px;
+  gap: 16px;
 }
 
 .marquee-track:hover {
@@ -119,13 +190,36 @@ a:hover { opacity: 0.75; }
 /* ── Hall of Fame poster hover ─────────────────────── */
 .hof-poster {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .hof-poster:hover {
-  transform: scale(1.06) translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.7), 0 0 0 1px rgba(197,160,89,0.35);
+  transform: scale(1.06) translateY(-5px);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.75), 0 0 0 1px rgba(197,160,89,0.4);
   z-index: 10;
-  position: relative;
+}
+
+.hof-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.3) 55%, transparent 100%);
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 8px 6px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.hof-poster:hover .hof-overlay {
+  opacity: 1;
 }
 
 /* ── Section separator ─────────────────────────────── */
@@ -154,7 +248,7 @@ a:hover { opacity: 0.75; }
 
 /* ── Page ──────────────────────────────────────────── */
 .page-main {
-  background: #0a0c0f;
+  background: transparent;
   min-height: 100vh;
   padding: 28px 48px 60px;
 }
@@ -175,10 +269,11 @@ a:hover { opacity: 0.75; }
   left: 50%;
   transform: translateX(-65%);
   top: 0;
-  height: 100%;
+  height: 110%;
   width: auto;
   max-width: none;
   filter: grayscale(15%) contrast(110%);
+  will-change: transform;
 }
 
 .hero-text-panel {
@@ -226,7 +321,7 @@ a:hover { opacity: 0.75; }
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.06);
   border-radius: 10px;
 }
 
@@ -236,7 +331,7 @@ a:hover { opacity: 0.75; }
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.06);
   border-radius: 10px;
   overflow: hidden;
   display: flex;
@@ -263,7 +358,7 @@ a:hover { opacity: 0.75; }
   border: none;
   border-bottom: 3px solid transparent;
   border-top: 3px solid transparent;
-  cursor: pointer;
+  cursor: none;
   padding: 14px 20px;
   text-align: center;
   position: relative;
@@ -289,11 +384,14 @@ a:hover { opacity: 0.75; }
 /* ── Mobile (≤ 768px) ──────────────────────────────── */
 @media (max-width: 768px) {
 
+  html, body { cursor: auto; }
+  a, button  { cursor: auto; }
+  .cursor-dot, .cursor-ring { display: none; }
+
   .page-main {
     padding: 20px 16px 48px;
   }
 
-  /* Hero: full-width cover image, text overlaid at bottom */
   .hero-banner {
     height: 480px;
     margin-left: -16px;
@@ -301,7 +399,6 @@ a:hover { opacity: 0.75; }
     width: calc(100% + 32px);
   }
 
-  /* Reset desktop positioning, switch to cover fill */
   .hero-img {
     left: 0 !important;
     transform: none !important;
@@ -312,7 +409,6 @@ a:hover { opacity: 0.75; }
     filter: grayscale(15%) contrast(110%) !important;
   }
 
-  /* Replace right-to-left gradient with bottom-to-top */
   .hero-overlay {
     background: linear-gradient(
       to top,
@@ -322,7 +418,6 @@ a:hover { opacity: 0.75; }
     ) !important;
   }
 
-  /* Text panel slides to bottom */
   .hero-text-panel {
     top: auto !important;
     bottom: 0 !important;
@@ -335,7 +430,6 @@ a:hover { opacity: 0.75; }
     background: none !important;
   }
 
-  /* KPI: 2×2 grid */
   .kpi-strip {
     flex-wrap: wrap;
     gap: 0;
@@ -352,11 +446,9 @@ a:hover { opacity: 0.75; }
     border-bottom: none;
   }
 
-  /* Grids → single column */
   .grid-week    { grid-template-columns: 1fr; }
   .grid-insights { grid-template-columns: 1fr; }
 
-  /* Decades: already horizontal, just tighten padding */
   .decades-nav-btn {
     padding: 12px 14px;
   }
