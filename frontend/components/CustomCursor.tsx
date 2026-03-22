@@ -3,58 +3,43 @@
 import { useEffect, useRef } from "react";
 
 export default function CustomCursor() {
-  const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
-  const mouse = useRef({ x: 0, y: 0 });
-  const ring = useRef({ x: 0, y: 0 });
+  const pos = useRef({ x: -100, y: -100 });
+  const target = useRef({ x: -100, y: -100 });
   const raf = useRef<number>(0);
 
   useEffect(() => {
-    const dot = dotRef.current;
-    const ringEl = ringRef.current;
-    if (!dot || !ringEl) return;
+    const ring = ringRef.current;
+    if (!ring) return;
 
     function onMove(e: MouseEvent) {
-      mouse.current = { x: e.clientX, y: e.clientY };
-      dot!.style.left = e.clientX + "px";
-      dot!.style.top = e.clientY + "px";
+      target.current = { x: e.clientX, y: e.clientY };
     }
 
-    function onEnterLink() { ringEl!.classList.add("hovering"); }
-    function onLeaveLink() { ringEl!.classList.remove("hovering"); }
+    function onEnter() { ring!.classList.add("hovering"); }
+    function onLeave() { ring!.classList.remove("hovering"); }
 
     function loop() {
-      ring.current.x += (mouse.current.x - ring.current.x) * 0.12;
-      ring.current.y += (mouse.current.y - ring.current.y) * 0.12;
-      ringEl!.style.left = ring.current.x + "px";
-      ringEl!.style.top = ring.current.y + "px";
+      pos.current.x += (target.current.x - pos.current.x) * 0.1;
+      pos.current.y += (target.current.y - pos.current.y) * 0.1;
+      const half = ring!.offsetWidth / 2;
+      ring!.style.transform = `translate(${pos.current.x - half}px, ${pos.current.y - half}px)`;
       raf.current = requestAnimationFrame(loop);
     }
 
     document.addEventListener("mousemove", onMove);
-
-    const interactives = document.querySelectorAll("a, button");
-    interactives.forEach((el) => {
-      el.addEventListener("mouseenter", onEnterLink);
-      el.addEventListener("mouseleave", onLeaveLink);
+    document.querySelectorAll("a, button").forEach((el) => {
+      el.addEventListener("mouseenter", onEnter);
+      el.addEventListener("mouseleave", onLeave);
     });
 
     raf.current = requestAnimationFrame(loop);
 
     return () => {
       document.removeEventListener("mousemove", onMove);
-      interactives.forEach((el) => {
-        el.removeEventListener("mouseenter", onEnterLink);
-        el.removeEventListener("mouseleave", onLeaveLink);
-      });
       cancelAnimationFrame(raf.current);
     };
   }, []);
 
-  return (
-    <>
-      <div ref={dotRef} className="cursor-dot" />
-      <div ref={ringRef} className="cursor-ring" />
-    </>
-  );
+  return <div ref={ringRef} className="cursor-ring" />;
 }

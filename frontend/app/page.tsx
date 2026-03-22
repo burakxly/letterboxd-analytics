@@ -57,10 +57,10 @@ function HeroSection() {
 
       <div className="hero-banner">
         <HeroParallaxImage />
-        {/* vignette + right fade overlay */}
+        {/* cinematic right fade — image left, black right */}
         <div className="hero-overlay" style={{
           position: "absolute", inset: 0,
-          background: "linear-gradient(to right, rgba(0,0,0,0.15) 0%, transparent 20%, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.75) 65%, #0a0c0f 100%)",
+          background: "linear-gradient(to right, transparent 0%, transparent 22%, rgba(0,0,0,0.12) 34%, rgba(0,0,0,0.38) 46%, rgba(0,0,0,0.65) 57%, rgba(0,0,0,0.84) 68%, rgba(0,0,0,0.94) 78%, #0a0c0f 88%)",
           pointerEvents: "none",
           zIndex: 2,
         }} />
