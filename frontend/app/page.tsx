@@ -76,9 +76,9 @@ function HeroSection() {
         }} />
         <div className="hero-text-panel">
           <p className="hero-manifesto hero-text-enter" style={{
-            color: "rgba(200,212,222,0.82)", fontSize: "1.05rem",
-            lineHeight: 1.9, fontFamily: "var(--font-cormorant), Georgia, serif",
-            fontWeight: 400, margin: "0 0 20px 0",
+            color: "rgba(235,242,248,0.96)", fontSize: "1.12rem",
+            lineHeight: 1.85, fontFamily: "var(--font-cormorant), Georgia, serif",
+            fontWeight: 500, margin: "0 0 20px 0",
             animationDelay: "0.3s",
             fontFeatureSettings: '"liga" 1, "kern" 1',
           }}>
