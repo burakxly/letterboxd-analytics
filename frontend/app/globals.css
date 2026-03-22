@@ -56,7 +56,6 @@ html, body {
   color: #e0e6ed;
   min-height: 100%;
   -webkit-font-smoothing: antialiased;
-  cursor: none;
 }
 
 /* ── Ambient background ─────────────────────────────── */
@@ -80,28 +79,8 @@ body::before {
   background-size: 128px 128px;
 }
 
-a, button { cursor: none; }
 a:hover { opacity: 0.75; }
 
-/* ── Custom Cursor ──────────────────────────────────── */
-.cursor-dot {
-  position: fixed;
-  top: -3px; left: -3px;
-  width: 6px; height: 6px;
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99999;
-  will-change: transform;
-  transition: width 0.12s ease, height 0.12s ease,
-              top 0.12s ease, left 0.12s ease;
-}
-
-.cursor-dot.hovering {
-  width: 10px; height: 10px;
-  top: -5px; left: -5px;
-  background: rgba(255, 255, 255, 1);
-}
 
 /* ── Scroll Progress Bar ────────────────────────────── */
 .scroll-progress {
@@ -411,9 +390,6 @@ a:hover { opacity: 0.75; }
 /* ── Mobile (≤ 768px) ──────────────────────────────── */
 @media (max-width: 768px) {
 
-  html, body { cursor: auto; }
-  a, button  { cursor: auto; }
-  .cursor-dot { display: none; }
 
   .page-main {
     padding: 20px 16px 48px;

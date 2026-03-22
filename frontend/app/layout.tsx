@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import KeepAlive from "@/components/KeepAlive";
-import CustomCursor from "@/components/CustomCursor";
 import ScrollProgress from "@/components/ScrollProgress";
 import OpeningSequence from "@/components/OpeningSequence";
 
@@ -25,7 +24,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable}`}>
       <body>
         <OpeningSequence />
-        <CustomCursor />
         <ScrollProgress />
         <KeepAlive />
         {children}
