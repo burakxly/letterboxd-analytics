@@ -89,8 +89,8 @@ function HeroSection() {
             visualizing and tracking my cinematic history strictly on my own terms.
           </p>
           <p className="hero-byline hero-text-enter" style={{
-            color: "rgba(200,212,222,0.7)", fontSize: "0.65rem", fontWeight: 600,
-            letterSpacing: "4px", textTransform: "uppercase", fontStyle: "italic",
+            color: "rgba(235,242,248,0.95)", fontSize: "0.82rem", fontWeight: 600,
+            letterSpacing: "5px", textTransform: "uppercase", fontStyle: "italic",
             fontFamily: "var(--font-cormorant), Georgia, serif",
             animationDelay: "0.7s",
           }}>
