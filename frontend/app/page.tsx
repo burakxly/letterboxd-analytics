@@ -12,7 +12,6 @@ import {
   type KPIs,
   type LatestMovie,
   type WeekActivity,
-  type Goal,
   type HallOfFameEntry,
   type Insights,
   type DecadeEntry,
@@ -21,6 +20,10 @@ import DecadesSlider from "@/components/DecadesSlider";
 import ScrollReveal from "@/components/ScrollReveal";
 import AnimatedNumber from "@/components/AnimatedNumber";
 import HeroParallaxImage from "@/components/HeroParallaxImage";
+import AnimatedGoalBar from "@/components/AnimatedGoalBar";
+import PosterTilt from "@/components/PosterTilt";
+import WeekFilmList from "@/components/WeekFilmList";
+import HofMosaic from "@/components/HofMosaic";
 
 // ─── helpers ──────────────────────────────────────────────────────────────
 
@@ -147,47 +150,7 @@ function KPIStrip({ kpis }: { kpis: KPIs }) {
   );
 }
 
-// ─── Goal Bar ─────────────────────────────────────────────────────────────
-
-function GoalBar({ goal }: { goal: Goal }) {
-  const pct = goal.progress_pct;
-  return (
-    <div style={{ marginBottom: "48px", paddingTop: "10px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "16px" }}>
-        <div>
-          <p style={{ color: "#8E8E93", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", margin: "0 0 8px 0" }}>
-            {goal.year} Campaign
-          </p>
-          <p style={{ color: "#F2F2F7", fontSize: "2.2rem", fontWeight: 300, letterSpacing: "0.02em", lineHeight: 1, margin: 0, fontFamily: "var(--font-cormorant), Georgia, serif" }}>
-            Annual Goal
-          </p>
-        </div>
-        <div style={{ display: "flex", alignItems: "baseline", gap: "6px" }}>
-          <span style={{ color: "#FFFFFF", fontSize: "4rem", fontWeight: 200, letterSpacing: "-0.05em", lineHeight: 0.8 }}>{goal.count}</span>
-          <span style={{ color: "#636366", fontSize: "1.2rem", fontWeight: 500 }}>/ {goal.goal}</span>
-        </div>
-      </div>
-      <div style={{ position: "relative", width: "100%", height: "4px", background: "rgba(255,255,255,0.06)", borderRadius: "4px" }}>
-        <div style={{
-          position: "absolute", top: 0, left: 0, width: `${pct}%`, height: "100%",
-          background: "linear-gradient(90deg, #D4AF37, #FDE08B)",
-          borderRadius: "4px",
-          boxShadow: "0 0 12px rgba(253,224,139,0.4)",
-        }} />
-        <div style={{
-          position: "absolute", top: "50%", left: `${pct}%`,
-          transform: "translate(-50%, -50%)",
-          width: "10px", height: "10px",
-          background: "#FFFFFF", borderRadius: "50%",
-          boxShadow: "0 0 8px rgba(255,255,255,0.8)",
-        }} />
-      </div>
-      <p style={{ color: "#5a6b7c", fontSize: "0.7rem", marginTop: "10px", textAlign: "right", letterSpacing: "1px" }}>
-        {pct.toFixed(1)}% complete
-      </p>
-    </div>
-  );
-}
+// GoalBar → AnimatedGoalBar (client component, see components/AnimatedGoalBar.tsx)
 
 // ─── Week Activity ────────────────────────────────────────────────────────
 
@@ -219,22 +182,7 @@ function WeekActivity({ week }: { week: WeekActivity }) {
         ))}
       </div>
 
-      <div style={{ flex: 1, borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "16px" }}>
-        {week.movies.slice(0, 10).map((m, i) => (
-          <p key={i} style={{ margin: "0 0 6px 0", fontSize: "0.8rem" }}>
-            <span style={{ color: "#445566", marginRight: "6px" }}>▪</span>
-            <a href={m.letterboxd_url} target="_blank" rel="noopener noreferrer" style={{ color: "#a0b0c0" }}>
-              {m.name.length > 32 ? m.name.slice(0, 29) + "…" : m.name}
-              {m.year > 0 && <span style={{ color: "#5a6b7c", fontSize: "0.73rem", marginLeft: "5px" }}>({m.year})</span>}
-            </a>
-          </p>
-        ))}
-        {week.movies.length > 10 && (
-          <p style={{ color: "#5a6b7c", fontSize: "0.7rem", fontStyle: "italic", margin: "6px 0 0 0" }}>
-            + {week.movies.length - 10} more films…
-          </p>
-        )}
-      </div>
+      <WeekFilmList movies={week.movies} />
     </div>
   );
 }
@@ -247,15 +195,14 @@ function LatestMovieCard({ latest }: { latest: LatestMovie }) {
       <p style={{ color: "#a0b0c0", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 12px 0" }}>
         Most Recent Watch
       </p>
-      <a href={latest.letterboxd_url} target="_blank" rel="noopener noreferrer"
-        style={{
-          display: "block", position: "relative",
-          width: "260px", height: "390px",
-          flexShrink: 0,
-          borderRadius: "10px", overflow: "hidden",
-          border: "1px solid rgba(255,255,255,0.1)",
-          boxShadow: "0 12px 40px rgba(0,0,0,0.6)",
-        }}>
+      <PosterTilt href={latest.letterboxd_url} style={{
+        position: "relative",
+        width: "260px", height: "390px",
+        flexShrink: 0,
+        borderRadius: "10px", overflow: "hidden",
+        border: "1px solid rgba(255,255,255,0.1)",
+        boxShadow: "0 12px 40px rgba(0,0,0,0.6)",
+      }}>
         {latest.poster_url && (
           <Image
             src={latest.poster_url} alt={latest.name} fill
@@ -272,7 +219,7 @@ function LatestMovieCard({ latest }: { latest: LatestMovie }) {
           <p style={{ color: "#ccd6dd", fontSize: "0.7rem", fontStyle: "italic", margin: "0 0 8px 0" }}>{latest.director}</p>
           <Stars rating={latest.rating} />
         </div>
-      </a>
+      </PosterTilt>
     </div>
   );
 }
@@ -526,11 +473,19 @@ export default async function HomePage() {
   ]);
 
   return (
-    <main className="page-main">
+    <>
+      <HofMosaic films={hallOfFame} />
+      <main className="page-main">
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
         <a href="https://letterboxd.com/burakxly/" target="_blank" rel="noopener noreferrer"
-          style={{ color: "#5a6b7c", fontSize: "0.78rem", fontWeight: 600, letterSpacing: "1px" }}>
-          @burakxly on Letterboxd ↗
+          style={{
+            color: "#8a9ab0", fontSize: "0.72rem", fontWeight: 500,
+            letterSpacing: "2px", display: "flex", alignItems: "center", gap: "7px",
+            borderBottom: "1px solid rgba(197,160,89,0.2)", paddingBottom: "2px",
+          }}>
+          <span style={{ color: "#c5a059", fontSize: "0.42rem", lineHeight: 1 }}>◆</span>
+          @burakxly on Letterboxd
+          <span style={{ color: "#c5a059", fontSize: "0.68rem" }}>↗</span>
         </a>
       </div>
 
@@ -541,7 +496,7 @@ export default async function HomePage() {
       </ScrollReveal>
 
       <ScrollReveal delay={80}>
-        <GoalBar goal={goal} />
+        <AnimatedGoalBar goal={goal} />
       </ScrollReveal>
 
       <ScrollReveal delay={60}>
@@ -580,5 +535,6 @@ export default async function HomePage() {
         </div>
       </ScrollReveal>
     </main>
+    </>
   );
 }

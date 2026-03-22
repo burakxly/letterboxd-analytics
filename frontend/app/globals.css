@@ -157,6 +157,20 @@ a:hover { opacity: 0.75; }
   animation-play-state: paused;
 }
 
+/* ── Week film list stagger ─────────────────────────── */
+@keyframes filmIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.film-item-hidden {
+  opacity: 0;
+}
+
+.film-item-visible {
+  animation: filmIn 0.35s ease forwards;
+}
+
 /* ── Pulse dot ─────────────────────────────────────── */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -239,6 +253,8 @@ a:hover { opacity: 0.75; }
   background: transparent;
   min-height: 100vh;
   padding: 28px 48px 60px;
+  position: relative;
+  z-index: 3;
 }
 
 /* ── Hero ──────────────────────────────────────────── */
@@ -308,8 +324,13 @@ a:hover { opacity: 0.75; }
   background: rgba(255, 255, 255, 0.025);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255,255,255,0.13),
+    inset 0 -1px 0 rgba(255,255,255,0.03),
+    inset 1px 0 0 rgba(255,255,255,0.07),
+    inset -1px 0 0 rgba(255,255,255,0.03);
   border-radius: 10px;
 }
 
@@ -318,12 +339,26 @@ a:hover { opacity: 0.75; }
   background: rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255,255,255,0.13),
+    inset 0 -1px 0 rgba(255,255,255,0.03),
+    inset 1px 0 0 rgba(255,255,255,0.07),
+    inset -1px 0 0 rgba(255,255,255,0.03);
   border-radius: 10px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+/* ── Decades content transition ─────────────────────── */
+.decades-content-inner {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.decades-content-inner.transitioning {
+  opacity: 0;
+  transform: translateX(10px);
 }
 
 .decades-nav {

@@ -1,18 +1,30 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import type { DecadeEntry } from "@/lib/api";
 
 export default function DecadesSlider({ decades }: { decades: DecadeEntry[] }) {
   const [active, setActive] = useState(0);
+  const [prev, setPrev] = useState(0);
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   if (!decades.length) return null;
 
   const current = decades[active];
 
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el || active === prev) return;
+    el.classList.add("transitioning");
+    const t = setTimeout(() => el.classList.remove("transitioning"), 260);
+    return () => clearTimeout(t);
+  }, [active, prev]);
+
   function handleTabClick(i: number) {
+    if (i === active) return;
+    setPrev(active);
     setActive(i);
     btnRefs.current[i]?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
   }
@@ -32,7 +44,7 @@ export default function DecadesSlider({ decades }: { decades: DecadeEntry[] }) {
           }} />
         )}
 
-        <div className="decades-content-inner">
+        <div className="decades-content-inner" ref={contentRef}>
           {/* Poster */}
           <a href={current.letterboxd_url} target="_blank" rel="noopener noreferrer"
             style={{ flexShrink: 0, display: "block" }}>
