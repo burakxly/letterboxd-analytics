@@ -63,7 +63,7 @@ function HeroSection() {
         {/* cinematic right fade — image left, black right */}
         <div className="hero-overlay" style={{
           position: "absolute", inset: 0,
-          background: "linear-gradient(to right, transparent 0%, transparent 63%, rgba(0,0,0,0.18) 70%, rgba(0,0,0,0.52) 78%, rgba(0,0,0,0.82) 86%, #0a0c0f 95%)",
+          background: "linear-gradient(to right, transparent 65%, #0a0c0f 100%)",
           pointerEvents: "none",
           zIndex: 2,
         }} />
