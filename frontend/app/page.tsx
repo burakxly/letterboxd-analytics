@@ -42,10 +42,11 @@ function HeroSection() {
     <>
       <p style={{
         color: "rgba(255,255,255,0.45)",
-        fontSize: "0.95rem",
+        fontSize: "1.1rem",
         fontStyle: "italic",
-        fontFamily: "Georgia, serif",
-        letterSpacing: "0.1em",
+        fontFamily: "var(--font-cormorant), Georgia, serif",
+        letterSpacing: "0.06em",
+        fontWeight: 400,
         marginBottom: "14px",
       }}>
         some masks come off, some don&rsquo;t
@@ -54,17 +55,25 @@ function HeroSection() {
       <div className="hero-banner">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/another.jpeg" alt="The Face of Another" className="hero-img" />
-        {/* right fade overlay */}
+        {/* vignette + right fade overlay */}
         <div className="hero-overlay" style={{
           position: "absolute", inset: 0,
-          background: "linear-gradient(to right, transparent 25%, black 60%)",
+          background: "linear-gradient(to right, rgba(0,0,0,0.15) 0%, transparent 20%, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.75) 65%, #0a0c0f 100%)",
           pointerEvents: "none",
           zIndex: 2,
         }} />
+        {/* top vignette */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(to bottom, rgba(10,12,15,0.6) 0%, transparent 20%, transparent 75%, rgba(10,12,15,0.4) 100%)",
+          pointerEvents: "none",
+          zIndex: 3,
+        }} />
         <div className="hero-text-panel">
           <p className="hero-manifesto" style={{
-            color: "rgba(200,212,222,0.82)", fontSize: "0.92rem",
-            lineHeight: 1.85, fontFamily: "Georgia, serif", margin: "0 0 20px 0",
+            color: "rgba(200,212,222,0.82)", fontSize: "1.05rem",
+            lineHeight: 1.9, fontFamily: "var(--font-cormorant), Georgia, serif",
+            fontWeight: 400, margin: "0 0 20px 0",
           }}>
             This project was born from a mix of pure boredom and absolute freedom.
             I built this system as a direct response to the absurdity of Letterboxd
@@ -73,9 +82,9 @@ function HeroSection() {
             visualizing and tracking my cinematic history strictly on my own terms.
           </p>
           <p className="hero-byline" style={{
-            color: "rgba(200,212,222,0.7)", fontSize: "0.62rem", fontWeight: 700,
-            letterSpacing: "3px", textTransform: "uppercase", fontStyle: "italic",
-            fontFamily: "Georgia, serif",
+            color: "rgba(200,212,222,0.7)", fontSize: "0.65rem", fontWeight: 600,
+            letterSpacing: "4px", textTransform: "uppercase", fontStyle: "italic",
+            fontFamily: "var(--font-cormorant), Georgia, serif",
           }}>
             created by burak
           </p>
@@ -110,7 +119,8 @@ function KPIStrip({ kpis }: { kpis: KPIs }) {
           Top Director <span style={{ color: "#445566", fontWeight: 400 }}>(Min 5)</span>
         </p>
         <a href={`https://letterboxd.com/director/${dirSlug}/`} target="_blank" rel="noopener noreferrer"
-          style={{ color: "#c5a059", fontSize: "1.35rem", fontWeight: 700, lineHeight: 1.2, display: "block" }}>
+          className="gold-gradient"
+          style={{ fontSize: "1.35rem", fontWeight: 700, lineHeight: 1.2, display: "block" }}>
           {kpis.best_director}
         </a>
         <p style={{ color: "#a0b0c0", fontSize: "0.78rem", margin: "4px 0 0 0", fontStyle: "italic" }}>
@@ -122,7 +132,7 @@ function KPIStrip({ kpis }: { kpis: KPIs }) {
         <p style={{ color: "#7a8b99", fontSize: "0.68rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 6px 0" }}>
           Top Genre <span style={{ color: "#445566", fontWeight: 400 }}>(Weighted)</span>
         </p>
-        <p style={{ color: "#c5a059", fontSize: "1.35rem", fontWeight: 700, lineHeight: 1.2, margin: 0 }}>{kpis.best_genre}</p>
+        <p className="gold-gradient" style={{ fontSize: "1.35rem", fontWeight: 700, lineHeight: 1.2, margin: 0 }}>{kpis.best_genre}</p>
         <p style={{ color: "#a0b0c0", fontSize: "0.78rem", margin: "4px 0 0 0", fontStyle: "italic" }}>
           {kpis.best_genre_avg.toFixed(2)} Avg • {kpis.best_genre_count} Films
         </p>
@@ -142,7 +152,7 @@ function GoalBar({ goal }: { goal: Goal }) {
           <p style={{ color: "#8E8E93", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", margin: "0 0 8px 0" }}>
             {goal.year} Campaign
           </p>
-          <p style={{ color: "#F2F2F7", fontSize: "1.8rem", fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1, margin: 0 }}>
+          <p style={{ color: "#F2F2F7", fontSize: "2.2rem", fontWeight: 300, letterSpacing: "0.02em", lineHeight: 1, margin: 0, fontFamily: "var(--font-cormorant), Georgia, serif" }}>
             Annual Goal
           </p>
         </div>
@@ -177,9 +187,8 @@ function GoalBar({ goal }: { goal: Goal }) {
 
 function WeekActivity({ week }: { week: WeekActivity }) {
   return (
-    <div style={{
-      background: "#0d0f12", border: "1px solid rgba(255,255,255,0.06)",
-      borderRadius: "10px", padding: "24px",
+    <div className="glass-card card-hover" style={{
+      padding: "24px",
       display: "flex", flexDirection: "column", minHeight: "360px",
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
@@ -238,7 +247,8 @@ function LatestMovieCard({ latest }: { latest: LatestMovie }) {
           width: "260px", height: "390px",
           flexShrink: 0,
           borderRadius: "10px", overflow: "hidden",
-          border: "1px solid rgba(255,255,255,0.06)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          boxShadow: "0 12px 40px rgba(0,0,0,0.6)",
         }}>
         {latest.poster_url && (
           <Image
@@ -268,10 +278,7 @@ function HallOfFame({ films }: { films: HallOfFameEntry[] }) {
   const doubled = [...films, ...films];
 
   return (
-    <div style={{
-      background: "linear-gradient(180deg, #181c20 0%, #111315 100%)",
-      border: "1px solid rgba(255,255,255,0.05)",
-      borderRadius: "10px",
+    <div className="glass-card" style={{
       padding: "24px 24px 24px 28px",
       marginBottom: "48px",
       height: "260px",
@@ -285,7 +292,8 @@ function HallOfFame({ films }: { films: HallOfFameEntry[] }) {
         <div className="marquee-track">
           {doubled.map((film, i) => (
             <a key={i} href={film.letterboxd_url} target="_blank" rel="noopener noreferrer" title={film.name}
-              style={{ display: "block", flexShrink: 0 }}>
+              className="hof-poster"
+              style={{ display: "block", flexShrink: 0, borderRadius: "6px", overflow: "hidden", position: "relative" }}>
               <div style={{
                 width: "110px", height: "165px",
                 borderRadius: "6px", overflow: "hidden",
@@ -313,10 +321,9 @@ function MarathonCard({ insights }: { insights: Insights }) {
   const { marathon, time_wasted } = insights;
 
   return (
-    <div style={{
-      background: "#0d0f11", border: "1px solid rgba(255,255,255,0.06)",
-      borderLeft: "3px solid #e0e6ed",
-      borderRadius: "8px", padding: "32px",
+    <div className="glass-card card-hover" style={{
+      borderLeft: "3px solid rgba(224,230,237,0.4)",
+      padding: "32px",
       position: "relative", overflow: "hidden",
     }}>
       {marathon?.bg_poster && (
@@ -331,8 +338,8 @@ function MarathonCard({ insights }: { insights: Insights }) {
         {marathon && (
           <div style={{
             position: "absolute", top: "-30px", right: "-10px",
-            fontSize: "13rem", fontWeight: 900, color: "rgba(255,255,255,0.04)",
-            lineHeight: 1, pointerEvents: "none", fontFamily: "Georgia, serif",
+            fontSize: "13rem", fontWeight: 700, color: "rgba(255,255,255,0.04)",
+            lineHeight: 1, pointerEvents: "none", fontFamily: "var(--font-cormorant), Georgia, serif",
           }}>
             {marathon.film_count}
           </div>
@@ -404,8 +411,8 @@ function InsightsRight({ insights }: { insights: Insights }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       {peak_month && (
-        <div style={{
-          background: "#0e0c08", border: "1px solid rgba(197,160,89,0.2)",
+        <div className="glass-card card-hover" style={{
+          border: "1px solid rgba(197,160,89,0.2)",
           borderBottom: "2px solid #c5a059",
           borderRadius: "6px", padding: "20px",
           textAlign: "center", position: "relative", overflow: "hidden",
@@ -420,7 +427,7 @@ function InsightsRight({ insights }: { insights: Insights }) {
           )}
           <div style={{ position: "relative", zIndex: 1 }}>
             <p style={{ color: "#5a4a20", fontSize: "0.62rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 4px 0" }}>Peak Cinema Month</p>
-            <p style={{ color: "#4a3a18", fontSize: "0.78rem", fontStyle: "italic", fontFamily: "Georgia, serif", margin: "0 0 10px 0" }}>
+            <p style={{ color: "#4a3a18", fontSize: "0.92rem", fontStyle: "italic", fontFamily: "var(--font-cormorant), Georgia, serif", margin: "0 0 10px 0" }}>
               The month you were most in tune with cinema
             </p>
             <p style={{ fontSize: "2rem", fontWeight: 800, color: "#e8d090", margin: 0, lineHeight: 1.1 }}>{peak_month.month}</p>
@@ -441,8 +448,7 @@ function InsightsRight({ insights }: { insights: Insights }) {
       )}
 
       {best_decade && (
-        <div style={{
-          background: "#0d0f11", border: "1px solid rgba(255,255,255,0.06)",
+        <div className="glass-card card-hover" style={{
           borderRadius: "8px", padding: "24px",
           position: "relative", overflow: "hidden",
         }}>
@@ -457,7 +463,7 @@ function InsightsRight({ insights }: { insights: Insights }) {
           <div style={{ position: "relative", zIndex: 1 }}>
             <p style={{ color: "#5a6b7c", fontSize: "0.62rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 12px 0" }}>Most Generous Era</p>
             <div style={{ display: "flex", alignItems: "baseline", gap: "16px", marginBottom: "16px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-              <p style={{ fontSize: "4.5rem", fontWeight: 900, color: "#e0e6ed", lineHeight: 1, margin: 0, letterSpacing: "-3px", fontFamily: "Georgia, serif" }}>
+              <p style={{ fontSize: "5rem", fontWeight: 300, color: "#e0e6ed", lineHeight: 1, margin: 0, letterSpacing: "-1px", fontFamily: "var(--font-cormorant), Georgia, serif" }}>
                 {best_decade.decade}s
               </p>
               <div>
@@ -470,7 +476,7 @@ function InsightsRight({ insights }: { insights: Insights }) {
             {best_decade.top_films.map((f, i) => (
               <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
                 style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "7px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                <span style={{ color: "#c8d4dc", fontSize: "0.82rem", fontStyle: "italic", fontFamily: "Georgia, serif" }}>
+                <span style={{ color: "#c8d4dc", fontSize: "0.9rem", fontStyle: "italic", fontFamily: "var(--font-cormorant), Georgia, serif" }}>
                   {f.name && f.name.length > 42 ? f.name.slice(0, 39) + "…" : f.name}
                 </span>
                 <span style={{ color: "#c5a059", fontSize: "0.75rem", fontWeight: 700, marginLeft: "10px", whiteSpace: "nowrap" }}>{f.year}</span>
@@ -481,13 +487,12 @@ function InsightsRight({ insights }: { insights: Insights }) {
       )}
 
       {favorite_day && (
-        <div style={{
-          background: "#0d0f11", border: "1px solid rgba(255,255,255,0.06)",
+        <div className="glass-card" style={{
           borderRadius: "8px", padding: "18px 24px",
           display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
           <p style={{ color: "#5a6b7c", fontSize: "0.7rem", letterSpacing: "2px", textTransform: "uppercase", margin: 0 }}>Favorite Recent Day</p>
-          <p style={{ color: "#c5a059", fontSize: "1.4rem", fontWeight: 700, margin: 0 }}>{favorite_day}s</p>
+          <p className="gold-gradient" style={{ fontSize: "1.4rem", fontWeight: 700, margin: 0 }}>{favorite_day}s</p>
         </div>
       )}
     </div>
@@ -527,8 +532,10 @@ export default async function HomePage() {
 
       <HallOfFame films={hallOfFame} />
 
+      <hr className="section-sep" />
+
       <div style={{ marginBottom: "48px" }}>
-        <h4 style={{ color: "#a0b0c0", fontSize: "0.85rem", letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 28px 0" }}>
+        <h4 style={{ color: "#a0b0c0", fontSize: "0.68rem", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, margin: "0 0 28px 0", fontFamily: "var(--font-geist-sans), sans-serif" }}>
           Deep Insights
         </h4>
         <div className="grid-insights">
@@ -537,8 +544,10 @@ export default async function HomePage() {
         </div>
       </div>
 
+      <hr className="section-sep" />
+
       <div>
-        <h4 style={{ color: "#a0b0c0", fontSize: "0.85rem", letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 28px 0" }}>
+        <h4 style={{ color: "#a0b0c0", fontSize: "0.68rem", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, margin: "0 0 28px 0", fontFamily: "var(--font-geist-sans), sans-serif" }}>
           Decades of Cinema
         </h4>
         <DecadesSlider decades={decades} />

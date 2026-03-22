@@ -13,6 +13,44 @@
   --color-border:         rgba(255,255,255,0.06);
 }
 
+/* ── Gold gradient text ────────────────────────────── */
+.gold-gradient {
+  background: linear-gradient(135deg, #b8924a 0%, #e8cc80 45%, #c5a059 70%, #a07830 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Typography ────────────────────────────────────── */
+.font-display {
+  font-family: var(--font-cormorant), Georgia, serif;
+}
+
+/* Section labels — uppercase tracked small caps */
+.section-label {
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7a8b99;
+}
+
+/* Display headings — Cormorant editorial style */
+.display-heading {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+/* Cormorant italic accent — for quotes / manifesto */
+.display-italic {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 
 html, body {
@@ -20,6 +58,19 @@ html, body {
   color: #e0e6ed;
   min-height: 100%;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ── Grain overlay ─────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -63,6 +114,37 @@ a:hover { opacity: 0.75; }
   margin-right: 8px;
   animation: pulse 1.8s ease-in-out infinite;
   vertical-align: middle;
+}
+
+/* ── Hall of Fame poster hover ─────────────────────── */
+.hof-poster {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hof-poster:hover {
+  transform: scale(1.06) translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.7), 0 0 0 1px rgba(197,160,89,0.35);
+  z-index: 10;
+  position: relative;
+}
+
+/* ── Section separator ─────────────────────────────── */
+.section-sep {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(197,160,89,0.18) 30%, rgba(197,160,89,0.18) 70%, transparent 100%);
+  margin: 0 0 48px 0;
+}
+
+/* ── Card hover lift ───────────────────────────────── */
+.card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(197, 160, 89, 0.12);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* ── Scrollbar ─────────────────────────────────────── */
@@ -138,10 +220,23 @@ a:hover { opacity: 0.75; }
   gap: 32px;
 }
 
+/* ── Glass card ────────────────────────────────────── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.05);
+  border-radius: 10px;
+}
+
 /* ── Decades ───────────────────────────────────────── */
 .decades-outer {
-  background: #0d0f11;
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.05);
   border-radius: 10px;
   overflow: hidden;
   display: flex;
