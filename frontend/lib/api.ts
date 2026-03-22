@@ -39,6 +39,7 @@ export interface WeekMovie {
   runtime: number;
   letterboxd_url: string;
   poster_url: string;
+  community_rating: number;
 }
 
 export interface WeekActivity {
@@ -123,6 +124,55 @@ export interface DecadeEntry {
   letterboxd_url: string;
 }
 
+export interface LanguageStat {
+  language: string;
+  label: string;
+  count: number;
+  avg_rating: number;
+}
+
+export interface ComparisonFilm {
+  name: string;
+  year: number;
+  user_rating: number;
+  community_rating?: number;
+  imdb_rating?: number;
+  diff: number;
+  letterboxd_url: string;
+  poster_url: string;
+}
+
+export interface CommunityComparison {
+  avg_diff: number;
+  total_compared: number;
+  underrated: ComparisonFilm[];
+  overrated: ComparisonFilm[];
+}
+
+export interface ImdbComparison {
+  avg_diff: number;
+  total_compared: number;
+  agreements: ComparisonFilm[];
+  disagreements: ComparisonFilm[];
+}
+
+export interface OscarFilm {
+  name: string;
+  year: number;
+  oscar_wins: number;
+  oscar_noms: number;
+  user_rating: number;
+  poster_url: string;
+  letterboxd_url: string;
+}
+
+export interface OscarStats {
+  total_oscar_films: number;
+  total_wins: number;
+  total_noms: number;
+  top_winners: OscarFilm[];
+}
+
 // ── Fetchers ───────────────────────────────────────────────
 
 export const fetchKPIs = () => get<KPIs>("/api/kpis");
@@ -132,3 +182,7 @@ export const fetchGoal = () => get<Goal>("/api/goal");
 export const fetchHallOfFame = () => get<HallOfFameEntry[]>("/api/hall_of_fame");
 export const fetchInsights = () => get<Insights>("/api/insights");
 export const fetchDecades = () => get<DecadeEntry[]>("/api/decades");
+export const fetchLanguages = () => get<LanguageStat[]>("/api/languages");
+export const fetchCommunity = () => get<CommunityComparison>("/api/community");
+export const fetchImdb = () => get<ImdbComparison>("/api/imdb");
+export const fetchOscar = () => get<OscarStats>("/api/oscar");

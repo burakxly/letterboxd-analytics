@@ -20,6 +20,10 @@ from data_core import (
     get_hall_of_fame,
     get_insights,
     get_decades,
+    get_language_stats,
+    get_community_comparison,
+    get_imdb_comparison,
+    get_oscar_stats,
 )
 
 app = FastAPI(title="Letterboxd Analytics API", version="1.0.0")
@@ -206,6 +210,42 @@ def insights():
 def decades():
     df = load_data()
     return get_decades(df)
+
+
+# ──────────────────────────────────────────
+# /api/languages
+# ──────────────────────────────────────────
+@app.get("/api/languages")
+def languages():
+    df = load_data()
+    return get_language_stats(df)
+
+
+# ──────────────────────────────────────────
+# /api/community
+# ──────────────────────────────────────────
+@app.get("/api/community")
+def community():
+    df = load_data()
+    return get_community_comparison(df)
+
+
+# ──────────────────────────────────────────
+# /api/imdb
+# ──────────────────────────────────────────
+@app.get("/api/imdb")
+def imdb():
+    df = load_data()
+    return get_imdb_comparison(df)
+
+
+# ──────────────────────────────────────────
+# /api/oscar
+# ──────────────────────────────────────────
+@app.get("/api/oscar")
+def oscar():
+    df = load_data()
+    return get_oscar_stats(df)
 
 
 # ──────────────────────────────────────────

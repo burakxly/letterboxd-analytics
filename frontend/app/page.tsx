@@ -9,12 +9,20 @@ import {
   fetchHallOfFame,
   fetchInsights,
   fetchDecades,
+  fetchLanguages,
+  fetchCommunity,
+  fetchImdb,
+  fetchOscar,
   type KPIs,
   type LatestMovie,
   type WeekActivity,
   type HallOfFameEntry,
   type Insights,
   type DecadeEntry,
+  type LanguageStat,
+  type CommunityComparison,
+  type ImdbComparison,
+  type OscarStats,
 } from "@/lib/api";
 import DecadesSlider from "@/components/DecadesSlider";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -459,10 +467,207 @@ function InsightsRight({ insights }: { insights: Insights }) {
   );
 }
 
+// ─── Language Stats ───────────────────────────────────────────────────────
+
+function LanguageSection({ languages }: { languages: LanguageStat[] }) {
+  if (!languages.length) return null;
+  const max = languages[0].count;
+  return (
+    <div className="glass-card card-hover" style={{ padding: "28px 32px" }}>
+      <p style={{ color: "#5a6b7c", fontSize: "0.62rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 20px 0" }}>
+        Sinema Dili
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        {languages.map((l) => (
+          <div key={l.language}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+              <span style={{ color: "#c8d4dc", fontSize: "0.82rem" }}>{l.label}</span>
+              <span style={{ color: "#7a8b99", fontSize: "0.72rem" }}>
+                {l.count} films · <span style={{ color: "#c5a059" }}>{l.avg_rating.toFixed(2)}★</span>
+              </span>
+            </div>
+            <div style={{ height: "3px", background: "rgba(255,255,255,0.05)", borderRadius: "2px", overflow: "hidden" }}>
+              <div style={{
+                height: "100%",
+                width: `${(l.count / max) * 100}%`,
+                background: "linear-gradient(90deg, #b8924a, #e8cc80)",
+                borderRadius: "2px",
+              }} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Community Comparison ─────────────────────────────────────────────────
+
+function CommunitySection({ data }: { data: CommunityComparison }) {
+  if (!data.total_compared) return null;
+  const diffLabel = data.avg_diff > 0 ? `+${data.avg_diff.toFixed(2)}` : data.avg_diff.toFixed(2);
+  const diffColor = data.avg_diff > 0 ? "#6db86d" : data.avg_diff < 0 ? "#c06060" : "#7a8b99";
+
+  return (
+    <div className="glass-card card-hover" style={{ padding: "28px 32px" }}>
+      <p style={{ color: "#5a6b7c", fontSize: "0.62rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 4px 0" }}>
+        Letterboxd Community vs Sen
+      </p>
+      <p style={{ color: "#445566", fontSize: "0.75rem", fontStyle: "italic", fontFamily: "var(--font-cormorant), Georgia, serif", margin: "0 0 16px 0" }}>
+        {data.total_compared} film karşılaştırıldı
+      </p>
+      <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "20px" }}>
+        <span style={{ fontSize: "3rem", fontWeight: 700, color: diffColor, lineHeight: 1 }}>{diffLabel}</span>
+        <span style={{ color: "#5a6b7c", fontSize: "0.78rem" }}>ortalama fark</span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+        <div>
+          <p style={{ color: "#6db86d", fontSize: "0.6rem", letterSpacing: "2px", textTransform: "uppercase", margin: "0 0 8px 0", fontWeight: 700 }}>
+            Senin Keşiflerin
+          </p>
+          {data.underrated.map((f, i) => (
+            <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#8090a0", fontSize: "0.75rem", padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "120px" }}>
+                {f.name.length > 18 ? f.name.slice(0, 16) + "…" : f.name}
+              </span>
+              <span style={{ flexShrink: 0, marginLeft: "6px" }}>
+                <span style={{ color: "#6db86d", fontWeight: 700 }}>{f.user_rating}★</span>
+                <span style={{ color: "#445566", fontSize: "0.65rem", margin: "0 3px" }}>vs</span>
+                <span style={{ color: "#5a6b7c" }}>{f.community_rating?.toFixed(1)}</span>
+              </span>
+            </a>
+          ))}
+        </div>
+        <div>
+          <p style={{ color: "#c06060", fontSize: "0.6rem", letterSpacing: "2px", textTransform: "uppercase", margin: "0 0 8px 0", fontWeight: 700 }}>
+            Abartmışlar
+          </p>
+          {data.overrated.map((f, i) => (
+            <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#8090a0", fontSize: "0.75rem", padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "120px" }}>
+                {f.name.length > 18 ? f.name.slice(0, 16) + "…" : f.name}
+              </span>
+              <span style={{ flexShrink: 0, marginLeft: "6px" }}>
+                <span style={{ color: "#c06060", fontWeight: 700 }}>{f.user_rating}★</span>
+                <span style={{ color: "#445566", fontSize: "0.65rem", margin: "0 3px" }}>vs</span>
+                <span style={{ color: "#5a6b7c" }}>{f.community_rating?.toFixed(1)}</span>
+              </span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── IMDb Comparison ──────────────────────────────────────────────────────
+
+function ImdbSection({ data }: { data: ImdbComparison }) {
+  if (!data.total_compared) return null;
+  const diffLabel = data.avg_diff > 0 ? `+${data.avg_diff.toFixed(2)}` : data.avg_diff.toFixed(2);
+  const diffColor = data.avg_diff > 0 ? "#c5a059" : data.avg_diff < 0 ? "#8090a0" : "#7a8b99";
+
+  return (
+    <div className="glass-card card-hover" style={{ padding: "28px 32px" }}>
+      <p style={{ color: "#5a6b7c", fontSize: "0.62rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 4px 0" }}>
+        IMDb vs Sen
+      </p>
+      <p style={{ color: "#445566", fontSize: "0.75rem", fontStyle: "italic", fontFamily: "var(--font-cormorant), Georgia, serif", margin: "0 0 16px 0" }}>
+        {data.total_compared} film · IMDb/10 ÷ 2 = /5 skalası
+      </p>
+      <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "20px" }}>
+        <span style={{ fontSize: "3rem", fontWeight: 700, color: diffColor, lineHeight: 1 }}>{diffLabel}</span>
+        <span style={{ color: "#5a6b7c", fontSize: "0.78rem" }}>sen IMDb&rsquo;ye kıyasla</span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+        <div>
+          <p style={{ color: "#c5a059", fontSize: "0.6rem", letterSpacing: "2px", textTransform: "uppercase", margin: "0 0 8px 0", fontWeight: 700 }}>
+            En Büyük Anlaşmazlık
+          </p>
+          {data.disagreements.map((f, i) => (
+            <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#8090a0", fontSize: "0.75rem", padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "110px" }}>
+                {f.name.length > 16 ? f.name.slice(0, 14) + "…" : f.name}
+              </span>
+              <span style={{ flexShrink: 0, marginLeft: "6px" }}>
+                <span style={{ color: "#c5a059", fontWeight: 700 }}>{f.user_rating}★</span>
+                <span style={{ color: "#445566", fontSize: "0.65rem", margin: "0 3px" }}>|</span>
+                <span style={{ color: "#5a6b7c" }}>{f.imdb_rating}</span>
+              </span>
+            </a>
+          ))}
+        </div>
+        <div>
+          <p style={{ color: "#6db86d", fontSize: "0.6rem", letterSpacing: "2px", textTransform: "uppercase", margin: "0 0 8px 0", fontWeight: 700 }}>
+            Tam Uyum
+          </p>
+          {data.agreements.map((f, i) => (
+            <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#8090a0", fontSize: "0.75rem", padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "110px" }}>
+                {f.name.length > 16 ? f.name.slice(0, 14) + "…" : f.name}
+              </span>
+              <span style={{ flexShrink: 0, marginLeft: "6px" }}>
+                <span style={{ color: "#c5a059", fontWeight: 700 }}>{f.user_rating}★</span>
+                <span style={{ color: "#445566", fontSize: "0.65rem", margin: "0 3px" }}>|</span>
+                <span style={{ color: "#5a6b7c" }}>{f.imdb_rating}</span>
+              </span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Oscar Stats ──────────────────────────────────────────────────────────
+
+function OscarSection({ data }: { data: OscarStats }) {
+  if (!data.total_oscar_films) return null;
+  return (
+    <div className="glass-card card-hover" style={{ padding: "28px 32px" }}>
+      <p style={{ color: "#5a6b7c", fontSize: "0.62rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 16px 0" }}>
+        Akademi ile Uyum
+      </p>
+      <div style={{ display: "flex", gap: "28px", marginBottom: "20px" }}>
+        {[
+          { label: "Oscar Filmi", val: data.total_oscar_films },
+          { label: "Toplam Ödül", val: data.total_wins },
+          { label: "Adaylık", val: data.total_noms },
+        ].map((s) => (
+          <div key={s.label}>
+            <p style={{ color: "#5a6b7c", fontSize: "0.6rem", fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase", margin: "0 0 4px 0" }}>{s.label}</p>
+            <p style={{ color: "#e8d090", fontSize: "2rem", fontWeight: 700, margin: 0, lineHeight: 1 }}>{s.val}</p>
+          </div>
+        ))}
+      </div>
+      <p style={{ color: "#445566", fontSize: "0.6rem", letterSpacing: "2px", textTransform: "uppercase", margin: "0 0 8px 0", fontWeight: 700 }}>En Çok Ödüllü</p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+        {data.top_winners.map((f, i) => (
+          <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
+            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#8090a0", fontSize: "0.78rem", padding: "7px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+            <span>
+              {f.name.length > 36 ? f.name.slice(0, 33) + "…" : f.name}
+              <span style={{ color: "#5a6b7c", fontSize: "0.7rem", marginLeft: "6px" }}>({f.year})</span>
+            </span>
+            <span style={{ flexShrink: 0, marginLeft: "10px", display: "flex", gap: "8px", alignItems: "center" }}>
+              <span style={{ color: "#e8d090", fontWeight: 700, fontSize: "0.75rem" }}>🏆 {f.oscar_wins}</span>
+              {f.user_rating > 0 && <span style={{ color: "#c5a059", fontSize: "0.72rem" }}>{f.user_rating}★</span>}
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-  const [kpis, latest, week, goal, hallOfFame, insights, decades] = await Promise.all([
+  const [kpis, latest, week, goal, hallOfFame, insights, decades, languages, community, imdb, oscar] = await Promise.all([
     fetchKPIs(),
     fetchLatest(),
     fetchWeek(),
@@ -470,6 +675,10 @@ export default async function HomePage() {
     fetchHallOfFame(),
     fetchInsights(),
     fetchDecades(),
+    fetchLanguages().catch(() => []),
+    fetchCommunity().catch(() => ({ avg_diff: 0, total_compared: 0, underrated: [], overrated: [] })),
+    fetchImdb().catch(() => ({ avg_diff: 0, total_compared: 0, agreements: [], disagreements: [] })),
+    fetchOscar().catch(() => ({ total_oscar_films: 0, total_wins: 0, total_noms: 0, top_winners: [] })),
   ]);
 
   return (
@@ -534,6 +743,25 @@ export default async function HomePage() {
           <DecadesSlider decades={decades} />
         </div>
       </ScrollReveal>
+
+      {(languages.length > 0 || community.total_compared > 0 || imdb.total_compared > 0 || oscar.total_oscar_films > 0) && (
+        <>
+          <hr className="section-sep" style={{ marginTop: "48px" }} />
+          <ScrollReveal>
+            <div style={{ marginBottom: "48px" }}>
+              <h4 style={{ color: "#a0b0c0", fontSize: "0.68rem", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, margin: "0 0 28px 0", fontFamily: "var(--font-geist-sans), sans-serif" }}>
+                Data & Analytics
+              </h4>
+              <div className="grid-insights" style={{ rowGap: "28px" }}>
+                {languages.length > 0 && <LanguageSection languages={languages} />}
+                {oscar.total_oscar_films > 0 && <OscarSection data={oscar} />}
+                {community.total_compared > 0 && <CommunitySection data={community} />}
+                {imdb.total_compared > 0 && <ImdbSection data={imdb} />}
+              </div>
+            </div>
+          </ScrollReveal>
+        </>
+      )}
     </main>
     </>
   );

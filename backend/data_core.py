@@ -227,6 +227,7 @@ def get_week_activity(df: pd.DataFrame) -> dict:
             "runtime": int(row.get("Runtime", 0) or 0),
             "letterboxd_url": str(row.get("Letterboxd URI", "") or ""),
             "poster_url": str(row.get("Poster_URL", "") or ""),
+            "community_rating": float(row.get("Community_Rating", 0) or 0),
         })
 
     return {
@@ -417,3 +418,167 @@ def get_decades(df: pd.DataFrame) -> list[dict]:
             "letterboxd_url": str(row.get("Letterboxd URI", "") or ""),
         })
     return result
+
+
+# ─── Language → human-readable label ──────────────────────
+_LANG_LABELS = {
+    "en": "English", "fr": "French", "de": "German", "it": "Italian",
+    "es": "Spanish", "ja": "Japanese", "ko": "Korean", "zh": "Chinese",
+    "pt": "Portuguese", "ru": "Russian", "tr": "Turkish", "sv": "Swedish",
+    "da": "Danish", "nl": "Dutch", "pl": "Polish", "fa": "Persian",
+    "ar": "Arabic", "hi": "Hindi", "no": "Norwegian", "fi": "Finnish",
+    "cs": "Czech", "hu": "Hungarian", "ro": "Romanian", "he": "Hebrew",
+    "th": "Thai", "id": "Indonesian", "uk": "Ukrainian", "el": "Greek",
+}
+
+
+def get_language_stats(df: pd.DataFrame) -> list[dict]:
+    if "Original_Language" not in df.columns:
+        return []
+    df_lang = df[df["Original_Language"].notna() & (df["Original_Language"] != "")].copy()
+    if df_lang.empty:
+        return []
+    lang_stats = (
+        df_lang.groupby("Original_Language")
+        .agg(count=("Name", "count"), avg_rating=("Rating", "mean"))
+        .reset_index()
+        .sort_values("count", ascending=False)
+        .head(12)
+    )
+    return [
+        {
+            "language": str(row["Original_Language"]),
+            "label": _LANG_LABELS.get(str(row["Original_Language"]), str(row["Original_Language"]).upper()),
+            "count": int(row["count"]),
+            "avg_rating": round(float(row["avg_rating"]), 2),
+        }
+        for _, row in lang_stats.iterrows()
+    ]
+
+
+def get_community_comparison(df: pd.DataFrame) -> dict:
+    if "Community_Rating" not in df.columns:
+        return {"avg_diff": 0, "total_compared": 0, "underrated": [], "overrated": []}
+
+    df_both = df[
+        (df["Rating"] > 0) &
+        (df["Community_Rating"] > 0)
+    ].copy()
+
+    if df_both.empty:
+        return {"avg_diff": 0, "total_compared": 0, "underrated": [], "overrated": []}
+
+    # Convert community rating from /5 scale (Letterboxd) to match user rating /5
+    df_both["diff"] = df_both["Rating"] - df_both["Community_Rating"]
+    avg_diff = round(float(df_both["diff"].mean()), 3)
+
+    # Films you loved more than community (underrated by community)
+    underrated = (
+        df_both.sort_values("diff", ascending=False)
+        .head(5)
+    )
+    # Films you liked less than community (overrated by community)
+    overrated = (
+        df_both.sort_values("diff", ascending=True)
+        .head(5)
+    )
+
+    def film_row(row):
+        return {
+            "name": str(row.get("Name", "")),
+            "year": int(row.get("Year", 0) or 0),
+            "user_rating": float(row.get("Rating", 0) or 0),
+            "community_rating": float(row.get("Community_Rating", 0) or 0),
+            "diff": round(float(row.get("diff", 0)), 2),
+            "letterboxd_url": str(row.get("Letterboxd URI", "") or ""),
+            "poster_url": str(row.get("Poster_URL", "") or ""),
+        }
+
+    return {
+        "avg_diff": avg_diff,
+        "total_compared": len(df_both),
+        "underrated": [film_row(r) for _, r in underrated.iterrows()],
+        "overrated": [film_row(r) for _, r in overrated.iterrows()],
+    }
+
+
+def get_imdb_comparison(df: pd.DataFrame) -> dict:
+    if "IMDb_Rating" not in df.columns:
+        return {"avg_diff": 0, "total_compared": 0, "agreements": [], "disagreements": []}
+
+    df_both = df[
+        (df["Rating"] > 0) &
+        (df["IMDb_Rating"] > 0)
+    ].copy()
+
+    if df_both.empty:
+        return {"avg_diff": 0, "total_compared": 0, "agreements": [], "disagreements": []}
+
+    # Normalize IMDb /10 → /5 scale for comparison
+    df_both["imdb_norm"] = df_both["IMDb_Rating"] / 2.0
+    df_both["diff"] = df_both["Rating"] - df_both["imdb_norm"]
+
+    avg_diff = round(float(df_both["diff"].mean()), 3)
+
+    # Biggest agreements (diff closest to 0)
+    df_both["abs_diff"] = df_both["diff"].abs()
+    agreements = df_both.sort_values("abs_diff").head(5)
+    # Biggest disagreements
+    disagreements = df_both.sort_values("abs_diff", ascending=False).head(5)
+
+    def film_row(row):
+        return {
+            "name": str(row.get("Name", "")),
+            "year": int(row.get("Year", 0) or 0),
+            "user_rating": float(row.get("Rating", 0) or 0),
+            "imdb_rating": float(row.get("IMDb_Rating", 0) or 0),
+            "diff": round(float(row.get("diff", 0)), 2),
+            "letterboxd_url": str(row.get("Letterboxd URI", "") or ""),
+            "poster_url": str(row.get("Poster_URL", "") or ""),
+        }
+
+    return {
+        "avg_diff": avg_diff,
+        "total_compared": len(df_both),
+        "agreements": [film_row(r) for _, r in agreements.iterrows()],
+        "disagreements": [film_row(r) for _, r in disagreements.iterrows()],
+    }
+
+
+def get_oscar_stats(df: pd.DataFrame) -> dict:
+    if "Oscar_Wins" not in df.columns:
+        return {"total_oscar_films": 0, "total_wins": 0, "total_noms": 0, "top_winners": []}
+
+    df_oscar = df[
+        ((df["Oscar_Wins"] > 0) | (df["Oscar_Noms"] > 0))
+    ].copy()
+
+    if df_oscar.empty:
+        return {"total_oscar_films": 0, "total_wins": 0, "total_noms": 0, "top_winners": []}
+
+    total_wins = int(df_oscar["Oscar_Wins"].sum())
+    total_noms = int(df_oscar["Oscar_Noms"].sum())
+
+    top_winners = (
+        df_oscar[df_oscar["Oscar_Wins"] > 0]
+        .sort_values(["Oscar_Wins", "Oscar_Noms"], ascending=[False, False])
+        .head(8)
+    )
+
+    return {
+        "total_oscar_films": len(df_oscar),
+        "total_wins": total_wins,
+        "total_noms": total_noms,
+        "top_winners": [
+            {
+                "name": str(r.get("Name", "")),
+                "year": int(r.get("Year", 0) or 0),
+                "oscar_wins": int(r.get("Oscar_Wins", 0) or 0),
+                "oscar_noms": int(r.get("Oscar_Noms", 0) or 0),
+                "user_rating": float(r.get("Rating", 0) or 0),
+                "poster_url": str(r.get("Poster_URL", "") or ""),
+                "letterboxd_url": str(r.get("Letterboxd URI", "") or ""),
+            }
+            for _, r in top_winners.iterrows()
+        ],
+    }
