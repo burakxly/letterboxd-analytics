@@ -744,24 +744,21 @@ export default async function HomePage() {
         </div>
       </ScrollReveal>
 
-      {(languages.length > 0 || community.total_compared > 0 || imdb.total_compared > 0 || oscar.total_oscar_films > 0) && (
-        <>
-          <hr className="section-sep" style={{ marginTop: "48px" }} />
-          <ScrollReveal>
-            <div style={{ marginBottom: "48px" }}>
-              <h4 style={{ color: "#a0b0c0", fontSize: "0.68rem", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, margin: "0 0 28px 0", fontFamily: "var(--font-geist-sans), sans-serif" }}>
-                Data & Analytics
-              </h4>
-              <div className="grid-insights" style={{ rowGap: "28px" }}>
-                {languages.length > 0 && <LanguageSection languages={languages} />}
-                {oscar.total_oscar_films > 0 && <OscarSection data={oscar} />}
-                {community.total_compared > 0 && <CommunitySection data={community} />}
-                {imdb.total_compared > 0 && <ImdbSection data={imdb} />}
-              </div>
-            </div>
-          </ScrollReveal>
-        </>
-      )}
+      <hr className="section-sep" style={{ marginTop: "48px" }} />
+
+      <ScrollReveal>
+        <div style={{ marginBottom: "48px" }}>
+          <h4 style={{ color: "#a0b0c0", fontSize: "0.68rem", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, margin: "0 0 28px 0", fontFamily: "var(--font-geist-sans), sans-serif" }}>
+            Data & Analytics
+          </h4>
+          <div className="grid-insights" style={{ rowGap: "28px" }}>
+            <LanguageSection languages={languages} />
+            <OscarSection data={oscar} />
+            <CommunitySection data={community} />
+            <ImdbSection data={imdb} />
+          </div>
+        </div>
+      </ScrollReveal>
     </main>
     </>
   );

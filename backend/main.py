@@ -26,7 +26,7 @@ from data_core import (
     get_oscar_stats,
 )
 
-app = FastAPI(title="Letterboxd Analytics API", version="1.0.0")
+app = FastAPI(title="Letterboxd Analytics API", version="1.1.0")
 
 
 def _keep_alive():
