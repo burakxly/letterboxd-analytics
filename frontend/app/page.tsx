@@ -488,7 +488,7 @@ function LanguageSection({ languages }: { languages: LanguageStat[] }) {
           return (
             <div key={l.language}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "5px" }}>
-                <span style={{ color: "#c8d4dc", fontSize: "0.9rem", fontFamily: "var(--font-cormorant), Georgia, serif", fontStyle: "italic" }}>
+                <span style={{ color: "#c8d4dc", fontSize: "1.05rem", fontFamily: "var(--font-cormorant), Georgia, serif", fontStyle: "italic" }}>
                   {l.label}
                 </span>
                 <span style={{ color: "#5a6b7c", fontSize: "0.72rem", display: "flex", gap: "10px", alignItems: "center" }}>
@@ -513,98 +513,84 @@ function LanguageSection({ languages }: { languages: LanguageStat[] }) {
   );
 }
 
-// ─── Film comparison row ──────────────────────────────────────────────────
-
-function CompFilmRow({ name, year, left, right, diff, url, leftColor, rightColor }: {
-  name: string; year: number;
-  left: string; right: string; diff: string;
-  url: string; leftColor: string; rightColor: string;
-}) {
-  return (
-    <a href={url} target="_blank" rel="noopener noreferrer" style={{
-      display: "grid", gridTemplateColumns: "1fr auto",
-      gap: "12px", alignItems: "center",
-      padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.05)",
-      textDecoration: "none",
-    }}>
-      <span style={{ minWidth: 0 }}>
-        <span style={{ color: "#c8d4dc", fontSize: "0.88rem", fontFamily: "var(--font-cormorant), Georgia, serif", fontStyle: "italic", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {name}
-        </span>
-        <span style={{ color: "#445566", fontSize: "0.68rem" }}>{year}</span>
-      </span>
-      <span style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
-        <span style={{ color: leftColor, fontWeight: 700, fontSize: "0.9rem", minWidth: "28px", textAlign: "right" }}>{left}</span>
-        <span style={{ color: "#334455", fontSize: "0.7rem" }}>vs</span>
-        <span style={{ color: rightColor, fontSize: "0.9rem", minWidth: "28px" }}>{right}</span>
-        <span style={{
-          fontSize: "0.7rem", fontWeight: 700, minWidth: "36px", textAlign: "right",
-          color: diff.startsWith("+") ? "#6db86d" : "#c06060",
-        }}>{diff}</span>
-      </span>
-    </a>
-  );
-}
-
 // ─── Community Comparison ─────────────────────────────────────────────────
+// Full-width, two-column editorial. Max 4 films per side.
 
 function CommunitySection({ data }: { data: CommunityComparison }) {
   if (!data.total_compared) return null;
   const diffLabel = data.avg_diff > 0 ? `+${data.avg_diff.toFixed(2)}` : data.avg_diff.toFixed(2);
   const diffColor = data.avg_diff > 0 ? "#6db86d" : "#c06060";
+  const serif = "var(--font-cormorant), Georgia, serif";
 
   return (
-    <div className="glass-card card-hover" style={{ padding: "28px 32px" }}>
-      <p className="section-label" style={{ margin: "0 0 4px 0" }}>Community vs Sen</p>
-      <p style={{ color: "#6a7a8a", fontSize: "1rem", fontStyle: "italic", fontFamily: "var(--font-cormorant), Georgia, serif", margin: "0 0 20px 0", lineHeight: 1.4 }}>
-        Letterboxd ortalamasıyla {data.total_compared} film kıyaslandı
-      </p>
-
-      <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginBottom: "24px", paddingBottom: "20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <span style={{ fontSize: "3.5rem", fontWeight: 300, color: diffColor, lineHeight: 1, fontFamily: "var(--font-cormorant), Georgia, serif" }}>{diffLabel}</span>
+    <div className="glass-card card-hover" style={{ padding: "32px 36px", gridColumn: "1 / -1" }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "28px", paddingBottom: "20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div>
-          <p style={{ color: "#c8d4dc", fontSize: "0.85rem", margin: 0 }}>ortalama fark</p>
-          <p style={{ color: "#5a6b7c", fontSize: "0.75rem", margin: "2px 0 0 0", fontStyle: "italic" }}>
-            {data.avg_diff < 0 ? "Community genelde senden yüksek puanlıyor" : "Sen community'den genelde yüksek puanlıyorsun"}
+          <p className="section-label" style={{ margin: "0 0 6px 0" }}>Community vs Sen</p>
+          <p style={{ color: "#8090a0", fontSize: "1.1rem", fontStyle: "italic", fontFamily: serif, margin: 0, lineHeight: 1.3 }}>
+            Letterboxd ortalamasıyla {data.total_compared} film kıyaslandı
+          </p>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <span style={{ fontSize: "4rem", fontWeight: 300, color: diffColor, lineHeight: 1, fontFamily: serif }}>{diffLabel}</span>
+          <p style={{ color: "#5a6b7c", fontSize: "0.78rem", margin: "4px 0 0 0" }}>
+            {data.avg_diff < 0 ? "Community genelde senden yüksek puanlıyor" : "Sen community&apos;den genelde yüksek puanlıyorsun"}
           </p>
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+      {/* Two columns — max 4 films each */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "40px" }}>
         <div>
-          <p className="section-label" style={{ color: "#6db86d", margin: "0 0 4px 0" }}>Senin Keşiflerin</p>
-          <p style={{ color: "#445566", fontSize: "0.75rem", fontStyle: "italic", margin: "0 0 10px 0" }}>Sen daha yüksek verdin</p>
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: "6px", marginBottom: "4px" }}>
-            <span style={{ color: "#556677", fontSize: "0.6rem", minWidth: "28px", textAlign: "right" }}>Sen</span>
-            <span style={{ color: "#334455", fontSize: "0.7rem" }}>vs</span>
-            <span style={{ color: "#445566", fontSize: "0.6rem", minWidth: "28px" }}>Ort.</span>
-            <span style={{ color: "#334455", fontSize: "0.6rem", minWidth: "36px", textAlign: "right" }}>Fark</span>
-          </div>
-          {data.underrated.map((f, i) => (
-            <CompFilmRow key={i}
-              name={f.name} year={f.year} url={f.letterboxd_url}
-              left={String(f.user_rating)} right={f.community_rating?.toFixed(1) ?? "—"}
-              diff={`+${f.diff.toFixed(1)}`}
-              leftColor="#6db86d" rightColor="#5a6b7c"
-            />
+          <p className="section-label" style={{ color: "#6db86d", margin: "0 0 2px 0" }}>Senin Keşiflerin</p>
+          <p style={{ color: "#445566", fontSize: "0.82rem", fontStyle: "italic", fontFamily: serif, margin: "0 0 16px 0" }}>
+            Community&apos;nin görmezden geldiği filmler
+          </p>
+          {data.underrated.slice(0, 4).map((f, i) => (
+            <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
+              style={{ display: "block", padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", textDecoration: "none" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "5px" }}>
+                <span style={{ color: "#d0dce6", fontSize: "1.05rem", fontFamily: serif, fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "72%" }}>
+                  {f.name}
+                </span>
+                <span style={{ color: "#6db86d", fontSize: "1.1rem", fontWeight: 700, fontFamily: serif, flexShrink: 0 }}>
+                  +{f.diff.toFixed(1)}
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: "14px" }}>
+                <span style={{ color: "#6db86d", fontSize: "0.76rem" }}>Sen {f.user_rating}</span>
+                <span style={{ color: "#334455", fontSize: "0.76rem" }}>·</span>
+                <span style={{ color: "#5a6b7c", fontSize: "0.76rem" }}>Community {f.community_rating?.toFixed(1)}</span>
+                <span style={{ color: "#3a4a58", fontSize: "0.7rem", marginLeft: "auto" }}>{f.year}</span>
+              </div>
+            </a>
           ))}
         </div>
+
         <div>
-          <p className="section-label" style={{ color: "#c06060", margin: "0 0 4px 0" }}>Abartmışlar</p>
-          <p style={{ color: "#445566", fontSize: "0.75rem", fontStyle: "italic", margin: "0 0 10px 0" }}>Community daha yüksek verdi</p>
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: "6px", marginBottom: "4px" }}>
-            <span style={{ color: "#556677", fontSize: "0.6rem", minWidth: "28px", textAlign: "right" }}>Sen</span>
-            <span style={{ color: "#334455", fontSize: "0.7rem" }}>vs</span>
-            <span style={{ color: "#445566", fontSize: "0.6rem", minWidth: "28px" }}>Ort.</span>
-            <span style={{ color: "#334455", fontSize: "0.6rem", minWidth: "36px", textAlign: "right" }}>Fark</span>
-          </div>
-          {data.overrated.map((f, i) => (
-            <CompFilmRow key={i}
-              name={f.name} year={f.year} url={f.letterboxd_url}
-              left={String(f.user_rating)} right={f.community_rating?.toFixed(1) ?? "—"}
-              diff={f.diff.toFixed(1)}
-              leftColor="#c06060" rightColor="#5a6b7c"
-            />
+          <p className="section-label" style={{ color: "#c06060", margin: "0 0 2px 0" }}>Abartmışlar</p>
+          <p style={{ color: "#445566", fontSize: "0.82rem", fontStyle: "italic", fontFamily: serif, margin: "0 0 16px 0" }}>
+            Community&apos;nin senin üstünde puanladığı filmler
+          </p>
+          {data.overrated.slice(0, 4).map((f, i) => (
+            <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
+              style={{ display: "block", padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", textDecoration: "none" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "5px" }}>
+                <span style={{ color: "#d0dce6", fontSize: "1.05rem", fontFamily: serif, fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "72%" }}>
+                  {f.name}
+                </span>
+                <span style={{ color: "#c06060", fontSize: "1.1rem", fontWeight: 700, fontFamily: serif, flexShrink: 0 }}>
+                  {f.diff.toFixed(1)}
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: "14px" }}>
+                <span style={{ color: "#c06060", fontSize: "0.76rem" }}>Sen {f.user_rating}</span>
+                <span style={{ color: "#334455", fontSize: "0.76rem" }}>·</span>
+                <span style={{ color: "#5a6b7c", fontSize: "0.76rem" }}>Community {f.community_rating?.toFixed(1)}</span>
+                <span style={{ color: "#3a4a58", fontSize: "0.7rem", marginLeft: "auto" }}>{f.year}</span>
+              </div>
+            </a>
           ))}
         </div>
       </div>
@@ -613,69 +599,90 @@ function CommunitySection({ data }: { data: CommunityComparison }) {
 }
 
 // ─── IMDb Comparison ──────────────────────────────────────────────────────
+// Half-width. Featured #1 disagreement as hero card, then compact list.
 
 function ImdbSection({ data }: { data: ImdbComparison }) {
   if (!data.total_compared) return null;
   const diffLabel = data.avg_diff > 0 ? `+${data.avg_diff.toFixed(2)}` : data.avg_diff.toFixed(2);
-  const diffColor = data.avg_diff > 0 ? "#c5a059" : "#8090a0";
+  const serif = "var(--font-cormorant), Georgia, serif";
+  const [top, ...rest] = data.disagreements;
 
   return (
     <div className="glass-card card-hover" style={{ padding: "28px 32px" }}>
-      <p className="section-label" style={{ margin: "0 0 4px 0" }}>IMDb vs Sen</p>
-      <p style={{ color: "#6a7a8a", fontSize: "1rem", fontStyle: "italic", fontFamily: "var(--font-cormorant), Georgia, serif", margin: "0 0 20px 0", lineHeight: 1.4 }}>
-        {data.total_compared} film · IMDb puanı 10 üzerinden 5&apos;e normalize edildi
-      </p>
-
-      <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginBottom: "24px", paddingBottom: "20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <span style={{ fontSize: "3.5rem", fontWeight: 300, color: diffColor, lineHeight: 1, fontFamily: "var(--font-cormorant), Georgia, serif" }}>{diffLabel}</span>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
         <div>
-          <p style={{ color: "#c8d4dc", fontSize: "0.85rem", margin: 0 }}>ortalama fark</p>
-          <p style={{ color: "#5a6b7c", fontSize: "0.75rem", margin: "2px 0 0 0", fontStyle: "italic" }}>
-            {data.avg_diff < 0 ? "IMDb senin üstünde puanlıyor" : "Sen IMDb'nin üstünde puanlıyorsun"}
+          <p className="section-label" style={{ margin: "0 0 4px 0" }}>IMDb vs Sen</p>
+          <p style={{ color: "#8090a0", fontSize: "1.0rem", fontStyle: "italic", fontFamily: serif, margin: 0, lineHeight: 1.3 }}>
+            {data.total_compared} filmde en büyük ayrışmalar
           </p>
         </div>
+        <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "16px" }}>
+          <span style={{ fontSize: "2.8rem", fontWeight: 300, color: "#c5a059", lineHeight: 1, fontFamily: serif, display: "block" }}>{diffLabel}</span>
+          <span style={{ color: "#5a6b7c", fontSize: "0.7rem" }}>
+            {data.avg_diff < 0 ? "IMDb senin üstünde" : "Sen IMDb&apos;nin üstünde"}
+          </span>
+        </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-        <div>
-          <p className="section-label" style={{ color: "#c06060", margin: "0 0 4px 0" }}>En Büyük Anlaşmazlık</p>
-          <p style={{ color: "#445566", fontSize: "0.75rem", fontStyle: "italic", margin: "0 0 10px 0" }}>Puanlar birbirinden en uzak</p>
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: "6px", marginBottom: "4px" }}>
-            <span style={{ color: "#556677", fontSize: "0.6rem", minWidth: "28px", textAlign: "right" }}>Sen</span>
-            <span style={{ color: "#334455", fontSize: "0.7rem" }}>vs</span>
-            <span style={{ color: "#445566", fontSize: "0.6rem", minWidth: "28px" }}>IMDb</span>
-            <span style={{ color: "#334455", fontSize: "0.6rem", minWidth: "36px", textAlign: "right" }}>Fark</span>
-          </div>
-          {data.disagreements.map((f, i) => (
-            <CompFilmRow key={i}
-              name={f.name} year={f.year} url={f.letterboxd_url}
-              left={String(f.user_rating)}
-              right={((f.imdb_rating ?? 0) / 2).toFixed(1)}
-              diff={f.diff > 0 ? `+${f.diff.toFixed(1)}` : f.diff.toFixed(1)}
-              leftColor="#c5a059" rightColor="#5a6b7c"
-            />
-          ))}
-        </div>
-        <div>
-          <p className="section-label" style={{ color: "#6db86d", margin: "0 0 4px 0" }}>Tam Uyum</p>
-          <p style={{ color: "#445566", fontSize: "0.75rem", fontStyle: "italic", margin: "0 0 10px 0" }}>Puanlar birbirine en yakın</p>
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: "6px", marginBottom: "4px" }}>
-            <span style={{ color: "#556677", fontSize: "0.6rem", minWidth: "28px", textAlign: "right" }}>Sen</span>
-            <span style={{ color: "#334455", fontSize: "0.7rem" }}>vs</span>
-            <span style={{ color: "#445566", fontSize: "0.6rem", minWidth: "28px" }}>IMDb</span>
-            <span style={{ color: "#334455", fontSize: "0.6rem", minWidth: "36px", textAlign: "right" }}>Fark</span>
-          </div>
-          {data.agreements.map((f, i) => (
-            <CompFilmRow key={i}
-              name={f.name} year={f.year} url={f.letterboxd_url}
-              left={String(f.user_rating)}
-              right={((f.imdb_rating ?? 0) / 2).toFixed(1)}
-              diff={f.diff > 0 ? `+${f.diff.toFixed(1)}` : f.diff.toFixed(1)}
-              leftColor="#c5a059" rightColor="#5a6b7c"
-            />
-          ))}
-        </div>
-      </div>
+      {/* Featured #1 disagreement */}
+      {top && (() => {
+        const myScore = top.user_rating;
+        const imdbNorm = (top.imdb_rating ?? 0) / 2;
+        const iLikedMore = top.diff > 0;
+        return (
+          <a href={top.letterboxd_url} target="_blank" rel="noopener noreferrer"
+            style={{ display: "block", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "10px", padding: "18px 20px", marginBottom: "14px", textDecoration: "none" }}>
+            <p style={{ color: "#445566", fontSize: "0.58rem", letterSpacing: "2.5px", textTransform: "uppercase", fontWeight: 700, margin: "0 0 10px 0" }}>
+              En Büyük Ayrışma
+            </p>
+            <p style={{ color: "#d0dce6", fontSize: "1.45rem", fontFamily: serif, fontStyle: "italic", margin: "0 0 14px 0", lineHeight: 1.2 }}>
+              {top.name}
+              <span style={{ color: "#3a4a58", fontSize: "0.85rem", marginLeft: "10px" }}>{top.year}</span>
+            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: "2rem", fontWeight: 700, color: iLikedMore ? "#c5a059" : "#8090a0", fontFamily: serif, lineHeight: 1 }}>{myScore}</div>
+                <div style={{ fontSize: "0.56rem", letterSpacing: "1.5px", color: "#445566", marginTop: "3px" }}>SEN</div>
+              </div>
+              <div style={{ color: "#2a3a48", fontSize: "1rem", fontWeight: 300 }}>vs</div>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: "2rem", fontWeight: 300, color: "#4a5a6a", fontFamily: serif, lineHeight: 1 }}>{imdbNorm.toFixed(1)}</div>
+                <div style={{ fontSize: "0.56rem", letterSpacing: "1.5px", color: "#445566", marginTop: "3px" }}>IMDb</div>
+              </div>
+              <span style={{
+                marginLeft: "auto", fontSize: "0.85rem", fontWeight: 700, padding: "4px 14px", borderRadius: "20px",
+                color: iLikedMore ? "#c5a059" : "#8090a0",
+                background: iLikedMore ? "rgba(197,160,89,0.12)" : "rgba(128,144,160,0.12)",
+                border: `1px solid ${iLikedMore ? "rgba(197,160,89,0.3)" : "rgba(128,144,160,0.2)"}`,
+              }}>
+                {iLikedMore ? `+${top.diff.toFixed(1)}` : top.diff.toFixed(1)}
+              </span>
+            </div>
+          </a>
+        );
+      })()}
+
+      {/* Compact list for the rest */}
+      {rest.slice(0, 4).map((f, i) => {
+        const myScore = f.user_rating;
+        const imdbNorm = ((f.imdb_rating ?? 0) / 2);
+        const iLikedMore = f.diff > 0;
+        return (
+          <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
+            style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", textDecoration: "none" }}>
+            <span style={{ color: iLikedMore ? "#c5a059" : "#7a8b99", fontSize: "1.1rem", fontWeight: 700, fontFamily: serif, minWidth: "24px", textAlign: "center" }}>{myScore}</span>
+            <span style={{ color: "#2a3a48", fontSize: "0.68rem" }}>vs</span>
+            <span style={{ color: "#445566", fontSize: "1.0rem", fontWeight: 300, fontFamily: serif, minWidth: "28px", textAlign: "center" }}>{imdbNorm.toFixed(1)}</span>
+            <span style={{ flex: 1, color: "#c0ccd8", fontSize: "1.02rem", fontFamily: serif, fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {f.name}
+            </span>
+            <span style={{ flexShrink: 0, fontSize: "0.75rem", fontWeight: 700, color: iLikedMore ? "#c5a059" : "#7a8b99" }}>
+              {iLikedMore ? `+${f.diff.toFixed(1)}` : f.diff.toFixed(1)}
+            </span>
+          </a>
+        );
+      })}
     </div>
   );
 }
@@ -711,7 +718,7 @@ function OscarSection({ data }: { data: OscarStats }) {
         <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
           style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "12px", alignItems: "center", padding: "9px 0", borderBottom: "1px solid rgba(255,255,255,0.05)", textDecoration: "none" }}>
           <span style={{ minWidth: 0 }}>
-            <span style={{ color: "#c8d4dc", fontSize: "0.88rem", fontFamily: "var(--font-cormorant), Georgia, serif", fontStyle: "italic", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <span style={{ color: "#c8d4dc", fontSize: "1.05rem", fontFamily: "var(--font-cormorant), Georgia, serif", fontStyle: "italic", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {f.name}
             </span>
             <span style={{ color: "#445566", fontSize: "0.68rem" }}>{f.year}</span>
