@@ -175,7 +175,7 @@ def enrich_movie_data():
                   community_rating, community_votes,
                   row['Name'], original_url))
             conn.commit()
-            print(f"✓ {director_name} | {genre_name} | {runtime}dk | community={community_rating}")
+            print(f"[OK] {director_name} | {genre_name} | {runtime}dk | community={community_rating}")
 
             time.sleep(1)
 
@@ -296,12 +296,12 @@ def enrich_extra_data():
         conn.commit()
 
         parts = []
-        if backdrop_url: parts.append("backdrop ✓")
+        if backdrop_url: parts.append("backdrop+")
         if language:     parts.append(f"lang={language}")
         if imdb_rating:  parts.append(f"imdb={imdb_rating}")
         if oscar_wins or oscar_noms: parts.append(f"oscar={oscar_wins}W/{oscar_noms}N")
         if parts:
-            print(f"✓ {name}: {' | '.join(parts)}")
+            print(f"[OK] {name}: {' | '.join(parts)}")
 
     conn.close()
     print("[extra] Tamamlandı.")
