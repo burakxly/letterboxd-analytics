@@ -491,7 +491,7 @@ function LanguageSection({ languages }: { languages: LanguageStat[] }) {
                 <span style={{ color: "#c8d4dc", fontSize: "1.05rem", fontFamily: "var(--font-cormorant), Georgia, serif", fontStyle: "italic" }}>
                   {l.label}
                 </span>
-                <span style={{ color: "#5a6b7c", fontSize: "0.72rem", display: "flex", gap: "10px", alignItems: "center" }}>
+                <span style={{ color: "#5a6b7c", fontSize: "0.8rem", display: "flex", gap: "10px", alignItems: "center" }}>
                   <span style={{ color: "#a0b0c0", fontWeight: 600 }}>{pct}%</span>
                   <span>{l.count} film</span>
                   <span style={{ color: "#c5a059", fontWeight: 700 }}>{l.avg_rating.toFixed(2)} ort.</span>
@@ -544,7 +544,7 @@ function CommunitySection({ data }: { data: CommunityComparison }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "40px" }}>
         <div>
           <p className="section-label" style={{ color: "#6db86d", margin: "0 0 2px 0" }}>Senin Keşiflerin</p>
-          <p style={{ color: "#445566", fontSize: "0.82rem", fontStyle: "italic", fontFamily: serif, margin: "0 0 16px 0" }}>
+          <p style={{ color: "#556677", fontSize: "0.88rem", fontStyle: "italic", fontFamily: serif, margin: "0 0 16px 0" }}>
             Community&apos;nin görmezden geldiği filmler
           </p>
           {data.underrated.slice(0, 4).map((f, i) => (
@@ -559,10 +559,10 @@ function CommunitySection({ data }: { data: CommunityComparison }) {
                 </span>
               </div>
               <div style={{ display: "flex", gap: "14px" }}>
-                <span style={{ color: "#6db86d", fontSize: "0.76rem" }}>Sen {f.user_rating}</span>
-                <span style={{ color: "#334455", fontSize: "0.76rem" }}>·</span>
-                <span style={{ color: "#5a6b7c", fontSize: "0.76rem" }}>Community {f.community_rating?.toFixed(1)}</span>
-                <span style={{ color: "#3a4a58", fontSize: "0.7rem", marginLeft: "auto" }}>{f.year}</span>
+                <span style={{ color: "#6db86d", fontSize: "0.82rem" }}>Sen {f.user_rating}</span>
+                <span style={{ color: "#334455", fontSize: "0.82rem" }}>·</span>
+                <span style={{ color: "#5a6b7c", fontSize: "0.82rem" }}>Community {f.community_rating?.toFixed(1)}</span>
+                <span style={{ color: "#4a5a68", fontSize: "0.76rem", marginLeft: "auto" }}>{f.year}</span>
               </div>
             </a>
           ))}
@@ -570,7 +570,7 @@ function CommunitySection({ data }: { data: CommunityComparison }) {
 
         <div>
           <p className="section-label" style={{ color: "#c06060", margin: "0 0 2px 0" }}>Abartmışlar</p>
-          <p style={{ color: "#445566", fontSize: "0.82rem", fontStyle: "italic", fontFamily: serif, margin: "0 0 16px 0" }}>
+          <p style={{ color: "#556677", fontSize: "0.88rem", fontStyle: "italic", fontFamily: serif, margin: "0 0 16px 0" }}>
             Community&apos;nin senin üstünde puanladığı filmler
           </p>
           {data.overrated.slice(0, 4).map((f, i) => (
@@ -585,10 +585,10 @@ function CommunitySection({ data }: { data: CommunityComparison }) {
                 </span>
               </div>
               <div style={{ display: "flex", gap: "14px" }}>
-                <span style={{ color: "#c06060", fontSize: "0.76rem" }}>Sen {f.user_rating}</span>
-                <span style={{ color: "#334455", fontSize: "0.76rem" }}>·</span>
-                <span style={{ color: "#5a6b7c", fontSize: "0.76rem" }}>Community {f.community_rating?.toFixed(1)}</span>
-                <span style={{ color: "#3a4a58", fontSize: "0.7rem", marginLeft: "auto" }}>{f.year}</span>
+                <span style={{ color: "#c06060", fontSize: "0.82rem" }}>Sen {f.user_rating}</span>
+                <span style={{ color: "#334455", fontSize: "0.82rem" }}>·</span>
+                <span style={{ color: "#5a6b7c", fontSize: "0.82rem" }}>Community {f.community_rating?.toFixed(1)}</span>
+                <span style={{ color: "#4a5a68", fontSize: "0.76rem", marginLeft: "auto" }}>{f.year}</span>
               </div>
             </a>
           ))}
@@ -693,7 +693,7 @@ function OscarSection({ data }: { data: OscarStats }) {
   if (!data.total_oscar_films) return null;
   return (
     <div className="glass-card card-hover" style={{ padding: "28px 32px" }}>
-      <p style={{ color: "#5a6b7c", fontSize: "0.62rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 16px 0" }}>
+      <p style={{ color: "#5a6b7c", fontSize: "0.68rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 16px 0" }}>
         Akademi ile Uyum
       </p>
       <div style={{ display: "flex", gap: "28px", marginBottom: "20px" }}>
@@ -703,16 +703,16 @@ function OscarSection({ data }: { data: OscarStats }) {
           { label: "Adaylık", val: data.total_noms },
         ].map((s) => (
           <div key={s.label}>
-            <p style={{ color: "#5a6b7c", fontSize: "0.6rem", fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase", margin: "0 0 4px 0" }}>{s.label}</p>
+            <p style={{ color: "#5a6b7c", fontSize: "0.68rem", fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase", margin: "0 0 4px 0" }}>{s.label}</p>
             <p style={{ color: "#e8d090", fontSize: "2rem", fontWeight: 700, margin: 0, lineHeight: 1 }}>{s.val}</p>
           </div>
         ))}
       </div>
       <p className="section-label" style={{ margin: "0 0 4px 0" }}>En Çok Ödüllü</p>
-      <p style={{ color: "#445566", fontSize: "0.75rem", fontStyle: "italic", margin: "0 0 10px 0" }}>Izledigin Oscar filmleri</p>
+      <p style={{ color: "#556677", fontSize: "0.82rem", fontStyle: "italic", margin: "0 0 10px 0" }}>İzlediğin Oscar filmleri</p>
       <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginBottom: "4px" }}>
-        <span style={{ color: "#445566", fontSize: "0.6rem", minWidth: "48px", textAlign: "center" }}>Ödül</span>
-        <span style={{ color: "#445566", fontSize: "0.6rem", minWidth: "32px", textAlign: "right" }}>Puan</span>
+        <span style={{ color: "#5a6b7c", fontSize: "0.68rem", minWidth: "48px", textAlign: "center" }}>Ödül</span>
+        <span style={{ color: "#5a6b7c", fontSize: "0.68rem", minWidth: "32px", textAlign: "right" }}>Puan</span>
       </div>
       {data.top_winners.map((f, i) => (
         <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
@@ -721,7 +721,7 @@ function OscarSection({ data }: { data: OscarStats }) {
             <span style={{ color: "#c8d4dc", fontSize: "1.05rem", fontFamily: "var(--font-cormorant), Georgia, serif", fontStyle: "italic", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {f.name}
             </span>
-            <span style={{ color: "#445566", fontSize: "0.68rem" }}>{f.year}</span>
+            <span style={{ color: "#556677", fontSize: "0.75rem" }}>{f.year}</span>
           </span>
           <span style={{ display: "flex", gap: "10px", alignItems: "center", flexShrink: 0 }}>
             <span style={{ color: "#e8d090", fontWeight: 700, fontSize: "0.85rem", minWidth: "48px", textAlign: "center" }}>

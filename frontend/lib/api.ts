@@ -121,6 +121,7 @@ export interface DecadeEntry {
   rating: number;
   director: string;
   poster_url: string;
+  backdrop_url: string;
   letterboxd_url: string;
 }
 

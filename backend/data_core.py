@@ -415,6 +415,7 @@ def get_decades(df: pd.DataFrame) -> list[dict]:
             "rating": float(row.get("Rating", 0) or 0),
             "director": str(row.get("Director", "") or "").split(",")[0].strip(),
             "poster_url": str(row.get("Poster_URL", "") or "https://s.ltrbxd.com/static/img/empty-poster-1000.v3.jpg"),
+            "backdrop_url": str(row.get("Backdrop_URL", "") or ""),
             "letterboxd_url": str(row.get("Letterboxd URI", "") or ""),
         })
     return result

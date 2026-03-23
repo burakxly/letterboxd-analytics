@@ -33,13 +33,13 @@ export default function DecadesSlider({ decades }: { decades: DecadeEntry[] }) {
     <div className="decades-outer">
       {/* Main content */}
       <div style={{ position: "relative", overflow: "hidden", flex: 1 }}>
-        {/* Background poster blur */}
-        {current.poster_url && (
+        {/* Background backdrop/poster blur */}
+        {(current.backdrop_url || current.poster_url) && (
           <div style={{
             position: "absolute", inset: 0,
-            backgroundImage: `url('${current.poster_url}')`,
+            backgroundImage: `url('${current.backdrop_url || current.poster_url}')`,
             backgroundSize: "cover", backgroundPosition: "center",
-            filter: "blur(40px) brightness(0.35)",
+            filter: "blur(18px) brightness(0.42)",
             zIndex: 0,
           }} />
         )}
