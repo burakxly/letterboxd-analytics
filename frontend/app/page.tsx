@@ -533,8 +533,8 @@ function CommunitySection({ data }: { data: CommunityComparison }) {
           </p>
         </div>
         <div style={{ textAlign: "right" }}>
-          <span style={{ fontSize: "4rem", fontWeight: 300, color: diffColor, lineHeight: 1, fontFamily: "var(--font-geist-sans), sans-serif", letterSpacing: "-0.03em" }}>{diffLabel}</span>
-          <p style={{ color: "#5a6b7c", fontSize: "0.86rem", margin: "4px 0 0 0" }}>
+          <span style={{ fontSize: "4rem", fontWeight: 400, color: diffColor, lineHeight: 1, fontFamily: "var(--font-cormorant), Georgia, serif", fontVariantNumeric: "lining-nums", letterSpacing: "-0.01em" }}>{diffLabel}</span>
+          <p style={{ color: "#5a6b7c", fontSize: "0.86rem", margin: "4px 0 0 0", fontFamily: "var(--font-cormorant), Georgia, serif", fontStyle: "italic" }}>
             {data.avg_diff < 0 ? "Community generally rates higher than you" : "You generally rate higher than the community"}
           </p>
         </div>
@@ -618,8 +618,8 @@ function ImdbSection({ data }: { data: ImdbComparison }) {
           </p>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "16px" }}>
-          <span style={{ fontSize: "2.8rem", fontWeight: 300, color: "#c5a059", lineHeight: 1, fontFamily: "var(--font-geist-sans), sans-serif", letterSpacing: "-0.03em", display: "block" }}>{diffLabel}</span>
-          <span style={{ color: "#5a6b7c", fontSize: "0.7rem" }}>
+          <span style={{ fontSize: "2.8rem", fontWeight: 400, color: "#c5a059", lineHeight: 1, fontFamily: "var(--font-cormorant), Georgia, serif", fontVariantNumeric: "lining-nums", letterSpacing: "-0.01em", display: "block" }}>{diffLabel}</span>
+          <span style={{ color: "#5a6b7c", fontSize: "0.7rem", fontFamily: "var(--font-cormorant), Georgia, serif", fontStyle: "italic" }}>
             {data.avg_diff < 0 ? "IMDb rates higher than you" : "You rate higher than IMDb"}
           </span>
         </div>
