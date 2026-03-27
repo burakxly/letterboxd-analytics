@@ -1,60 +1,42 @@
-\#  Letterboxd Auto-Sync Dashboard bot
+# Letterboxd Analytics Dashboard
 
+A fully automated personal movie analytics dashboard built on my Letterboxd watch history.
 
+**Live:** https://letterboxd-analytics-3s9w.vercel.app
 
-This is a custom-built, fully automated data pipeline and web dashboard designed exclusively to track, enrich, and visualize my personal Letterboxd movie logs. By utilizing a daily cron job that reads my RSS feed and scrapes missing metadata, this system completely eliminates manual data entry and serves as a hands-on data engineering project. It runs 24/7 in the cloud, maintaining my movie history on autopilot.
+---
 
+## What it does
 
+- Syncs my Letterboxd diary every night via GitHub Actions
+- Enriches each film with metadata from TMDB, OMDB, and Letterboxd itself
+- Stores everything in a SQLite database committed to the repo
+- Serves stats through a FastAPI backend deployed on Render
+- Displays them in a Next.js frontend deployed on Vercel
 
-\##  Features
+## Stats tracked
 
+Hall of Fame, weekly recap, yearly goal progress, top directors/genres, language breakdown, decade distribution, community rating comparisons, IMDb divergence, Oscar alignment, marathon detection, and more.
 
+## Tech Stack
 
-\* \*\*Personalized Auto-Sync:\*\* A GitHub Actions cron job runs every night to check my specific Letterboxd RSS feed for newly logged movies.
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 16, TypeScript, deployed on Vercel |
+| Backend | FastAPI (Python), deployed on Render |
+| Database | SQLite, committed to git |
+| Sync | GitHub Actions (daily cron at 03:00 UTC) |
+| Scraping | BeautifulSoup4, Feedparser, Requests |
+| Enrichment | TMDB API, OMDB API |
 
-\* \*\*Data Enrichment:\*\* Automatically visits movie pages to scrape missing metadata (Director, Genre, Runtime, Release Year) using `BeautifulSoup` and JSON-LD parsing.
+## How the pipeline works
 
-\* \*\*Database Management:\*\* Maintains a clean, up-to-date `SQLite` database without duplicating my historical entries.
+1. GitHub Actions triggers `web_scraper.py` nightly
+2. Script reads my Letterboxd RSS feed for new diary entries
+3. Missing metadata is fetched from TMDB/OMDB and scraped from Letterboxd
+4. SQLite DB is updated and committed back to the repo
+5. Render redeploys the backend; Vercel serves the updated frontend
 
-\* \*\*Interactive Dashboard:\*\* A dynamic and responsive UI built with `Streamlit` to visualize my movie stats, longest marathons, and favorite genres/directors.
+---
 
-\* \*\*Set \& Forget:\*\* Fully cloud-based automation. The pipeline updates the live Streamlit dashboard instantly without any local execution.
-
-
-
-\##  Tech Stack
-
-
-
-\* \*\*Language:\*\* Python 3.12
-
-\* \*\*Data Processing \& Storage:\*\* Pandas, SQLite3
-
-\* \*\*Web Scraping:\*\* BeautifulSoup4, Feedparser, Requests
-
-\* \*\*Frontend / UI:\*\* Streamlit, Plotly
-
-\* \*\*Automation / CI-CD:\*\* GitHub Actions
-
-
-
-\##  How It Works
-
-
-
-1\. \*\*Trigger:\*\* A GitHub Action (`Daily Sync`) wakes up every day at 03:00 UTC.
-
-2\. \*\*Fetch:\*\* `web\_scraper.py` reads my Letterboxd RSS feed to detect newly logged movies.
-
-3\. \*\*Enrich:\*\* The script visits the specific movie URIs to scrape additional details (Runtime, Director, Genre, etc.).
-
-4\. \*\*Update:\*\* The new, enriched data is inserted into the master `SQLite` database.
-
-5\. \*\*Deploy:\*\* Changes are committed and pushed back to the repository automatically, triggering Streamlit Cloud to update the live dashboard seamlessly.
-
-
-
-\---
-
-\*Built as a personal Data Engineering \& Automation project.\*
-
+*Personal data engineering & full-stack project.*
