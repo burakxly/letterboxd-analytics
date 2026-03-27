@@ -207,8 +207,8 @@ def get_week_activity(df: pd.DataFrame) -> dict:
     if df_dates.empty:
         return {"count": 0, "avg_rating": 0.0, "runtime_mins": 0, "start_date": "", "end_date": "", "movies": []}
 
-    max_date = df_dates["Watched Date"].max()
-    start_of_week = max_date - pd.Timedelta(days=max_date.weekday())
+    today = pd.Timestamp.now().normalize()
+    start_of_week = today - pd.Timedelta(days=today.weekday())
     end_of_week = start_of_week + pd.Timedelta(days=6)
     df_week = df_dates[
         (df_dates["Watched Date"] >= start_of_week) & (df_dates["Watched Date"] <= end_of_week)
