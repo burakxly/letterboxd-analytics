@@ -39,7 +39,7 @@ jobs:
         run: |
           git config --global user.name "GitHub Action Bot"
           git config --global user.email "action@github.com"
-          git add letterboxd_master.db
+          git add letterboxd_master.db letterboxd_data/watched.csv
           if git commit -m "Auto-sync from RSS: $(date)"; then
             git push
             echo "COMMITTED=true" >> $GITHUB_ENV

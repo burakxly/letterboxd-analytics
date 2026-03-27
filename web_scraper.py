@@ -305,10 +305,63 @@ def enrich_extra_data():
 
 
 # ─────────────────────────────────────────────────────────
+# 4. WATCHED-ONLY SYNC — watched.csv'deki filmleri ekler
+#    Diary'de olmayan (Watched Date = NULL) filmler için
+#    sadece total sayısına katkı sağlar, tarih bazlı
+#    metriklere (bu yıl, bu hafta) dahil edilmez.
+# ─────────────────────────────────────────────────────────
+WATCHED_CSV = os.path.join(os.path.dirname(__file__), "letterboxd_data", "watched.csv")
+
+def sync_watched_csv():
+    if not os.path.exists(WATCHED_CSV):
+        print("[watched-csv] watched.csv bulunamadı, atlanıyor.")
+        return
+
+    try:
+        df_csv = pd.read_csv(WATCHED_CSV)
+    except Exception as e:
+        print(f"[watched-csv] CSV okunamadı: {e}")
+        return
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    new_count = 0
+    for _, row in df_csv.iterrows():
+        name = str(row.get("Name", "")).strip()
+        year = int(row.get("Year", 0) or 0)
+        uri  = str(row.get("Letterboxd URI", "")).strip()
+        if not name:
+            continue
+
+        # DB'de bu film zaten var mı? (herhangi bir tarihte)
+        cursor.execute(
+            'SELECT 1 FROM movies WHERE Name = ? AND Year = ?',
+            (name, year)
+        )
+        if cursor.fetchone() is None:
+            # Watched-only: Watched Date = NULL, Watched_Date_Log = CSV tarihi
+            watched_log = str(row.get("Date", "")).strip()
+            cursor.execute("""
+                INSERT INTO movies
+                    (Name, Rating, "Watched Date", "Letterboxd URI",
+                     Runtime, Director, Genre, Year, Watched_Date_Log, Poster_URL)
+                VALUES (?, 0, NULL, ?, 0, '', '', ?, ?, '')
+            """, (name, uri, year, watched_log))
+            new_count += 1
+            print(f"[watched-csv] Eklendi: {name} ({year})")
+
+    conn.commit()
+    conn.close()
+    print(f"[watched-csv] {new_count} yeni watched-only film eklendi.")
+
+
+# ─────────────────────────────────────────────────────────
 # MAIN
 # ─────────────────────────────────────────────────────────
 if __name__ == "__main__":
     migrate_db()
     sync_rss_to_db()
+    sync_watched_csv()
     enrich_movie_data()
     enrich_extra_data()
