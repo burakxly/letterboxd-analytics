@@ -41,7 +41,7 @@ export default function WeekFilmList({ movies }: Props) {
           </span>
           <span style={{ display: "flex", gap: "18px", flexShrink: 0 }}>
             <span style={{ color: "#c5a059", fontSize: "0.6rem", letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 600 }}>
-              Benim
+              Mine
             </span>
             <span style={{ color: "#5a6b7c", fontSize: "0.6rem", letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 600 }}>
               Community
