@@ -5,12 +5,14 @@ from bs4 import BeautifulSoup
 import json
 import os
 import time
+import threading
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "letterboxd_master.db")
 
 _cache_df: pd.DataFrame | None = None
 _cache_time: float = 0.0
 _CACHE_TTL = 3600  # 1 saat
+_cache_lock = threading.Lock()
 
 
 def fetch_poster_url(movie_page_url: str) -> str:
@@ -38,36 +40,43 @@ def fetch_poster_url(movie_page_url: str) -> str:
 
 def load_data() -> pd.DataFrame:
     global _cache_df, _cache_time
+
+    # Hızlı kontrol — lock almadan
     if _cache_df is not None and (time.time() - _cache_time) < _CACHE_TTL:
         return _cache_df.copy()
 
-    conn = sqlite3.connect(DB_PATH)
-    df = pd.read_sql("SELECT rowid, * FROM movies", conn)
-    conn.close()
+    with _cache_lock:
+        # İkinci kontrol lock içinde (double-checked locking)
+        if _cache_df is not None and (time.time() - _cache_time) < _CACHE_TTL:
+            return _cache_df.copy()
 
-    if "Runtime" not in df.columns:
-        df["Runtime"] = 0
-    if "Year" not in df.columns:
-        df["Year"] = 0
-    if "Rating" not in df.columns:
-        df["Rating"] = 0
-    if "Director" not in df.columns:
-        df["Director"] = "Unknown"
-    if "Genre" not in df.columns:
-        df["Genre"] = "Unknown"
+        conn = sqlite3.connect(DB_PATH)
+        df = pd.read_sql("SELECT rowid, * FROM movies", conn)
+        conn.close()
 
-    if "Watched_Date_Log" in df.columns:
-        df["Watched_Date_Log"] = pd.to_datetime(df["Watched_Date_Log"], errors="coerce")
-    if "Watched Date" in df.columns:
-        df["Watched Date"] = pd.to_datetime(df["Watched Date"], errors="coerce")
+        if "Runtime" not in df.columns:
+            df["Runtime"] = 0
+        if "Year" not in df.columns:
+            df["Year"] = 0
+        if "Rating" not in df.columns:
+            df["Rating"] = 0
+        if "Director" not in df.columns:
+            df["Director"] = "Unknown"
+        if "Genre" not in df.columns:
+            df["Genre"] = "Unknown"
 
-    df["Rating"] = pd.to_numeric(df["Rating"], errors="coerce").fillna(0)
-    df["Runtime"] = pd.to_numeric(df["Runtime"], errors="coerce").fillna(0)
-    df["Year"] = pd.to_numeric(df["Year"], errors="coerce").fillna(0)
+        if "Watched_Date_Log" in df.columns:
+            df["Watched_Date_Log"] = pd.to_datetime(df["Watched_Date_Log"], errors="coerce")
+        if "Watched Date" in df.columns:
+            df["Watched Date"] = pd.to_datetime(df["Watched Date"], errors="coerce")
 
-    _cache_df = df
-    _cache_time = time.time()
-    return df.copy()
+        df["Rating"] = pd.to_numeric(df["Rating"], errors="coerce").fillna(0)
+        df["Runtime"] = pd.to_numeric(df["Runtime"], errors="coerce").fillna(0)
+        df["Year"] = pd.to_numeric(df["Year"], errors="coerce").fillna(0)
+
+        _cache_df = df
+        _cache_time = time.time()
+        return df.copy()
 
 
 def get_latest_movie() -> dict:
@@ -281,7 +290,9 @@ def get_insights(df: pd.DataFrame) -> dict:
         .agg(film_count=("Name", "count"), total_runtime=("Runtime", "sum"))
         .reset_index()
     )
-    valid_marathons = marathon_stats[marathon_stats["film_count"] <= 8]
+    valid_marathons = marathon_stats[
+        (marathon_stats["film_count"] >= 2) & (marathon_stats["total_runtime"] <= 1440)
+    ]
     marathon = None
     if not valid_marathons.empty:
         best = valid_marathons.sort_values(by=["film_count", "total_runtime"], ascending=[False, False]).iloc[0]

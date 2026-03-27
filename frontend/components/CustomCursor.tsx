@@ -15,13 +15,21 @@ export default function CustomCursor() {
     function onEnter() { el!.classList.add("hovering"); }
     function onLeave() { el!.classList.remove("hovering"); }
 
+    const targets = Array.from(document.querySelectorAll("a, button"));
+
     document.addEventListener("mousemove", onMove);
-    document.querySelectorAll("a, button").forEach((n) => {
+    targets.forEach((n) => {
       n.addEventListener("mouseenter", onEnter);
       n.addEventListener("mouseleave", onLeave);
     });
 
-    return () => document.removeEventListener("mousemove", onMove);
+    return () => {
+      document.removeEventListener("mousemove", onMove);
+      targets.forEach((n) => {
+        n.removeEventListener("mouseenter", onEnter);
+        n.removeEventListener("mouseleave", onLeave);
+      });
+    };
   }, []);
 
   return <div ref={ref} className="cursor-dot" />;

@@ -741,13 +741,13 @@ function OscarSection({ data }: { data: OscarStats }) {
 
 export default async function HomePage() {
   const [kpis, latest, week, goal, hallOfFame, insights, decades, languages, community, imdb, oscar] = await Promise.all([
-    fetchKPIs(),
-    fetchLatest(),
-    fetchWeek(),
-    fetchGoal(),
-    fetchHallOfFame(),
-    fetchInsights(),
-    fetchDecades(),
+    fetchKPIs().catch(() => ({ total_films: 0, total_hours: 0, avg_rating: 0, best_director: "N/A", best_director_avg: 0, best_genre: "N/A", best_genre_avg: 0, best_genre_count: 0 })),
+    fetchLatest().catch(() => ({ name: "—", director: "—", runtime: 0, rating: 0, genre: "—", year: 0, poster_url: "", letterboxd_url: "#" })),
+    fetchWeek().catch(() => ({ count: 0, avg_rating: 0, runtime_mins: 0, start_date: "—", end_date: "—", movies: [] })),
+    fetchGoal().catch(() => ({ year: new Date().getFullYear(), goal: 200, count: 0, progress_pct: 0 })),
+    fetchHallOfFame().catch(() => [] as import("@/lib/api").HallOfFameEntry[]),
+    fetchInsights().catch(() => ({ marathon: null, time_wasted: { total_mins: 0, films: [] }, peak_month: null, best_decade: null, favorite_day: null })),
+    fetchDecades().catch(() => [] as import("@/lib/api").DecadeEntry[]),
     fetchLanguages().catch(() => []),
     fetchCommunity().catch(() => ({ avg_diff: 0, total_compared: 0, underrated: [], overrated: [] })),
     fetchImdb().catch(() => ({ avg_diff: 0, total_compared: 0, agreements: [], disagreements: [] })),

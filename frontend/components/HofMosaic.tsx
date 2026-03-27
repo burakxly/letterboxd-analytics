@@ -8,8 +8,9 @@ interface Props {
 
 export default function HofMosaic({ films }: Props) {
   if (!films.length) return null;
-  // pick 4 spread across the list for variety
-  const picks = [0, 1, 2, 3].map((i) => films[i % films.length]).filter(Boolean);
+  // pick up to 4 distinct films spread across the list for variety
+  const step = Math.max(1, Math.floor(films.length / 4));
+  const picks = Array.from({ length: Math.min(4, films.length) }, (_, i) => films[i * step]);
 
   return (
     <div
