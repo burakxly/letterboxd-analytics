@@ -67,7 +67,7 @@ export default function DecadesSlider({ decades }: { decades: DecadeEntry[] }) {
 
           {/* Info */}
           <div>
-            <p style={{ color: "#5a6b7c", fontSize: "0.7rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 16px 0" }}>
+            <p style={{ color: "#5a6b7c", fontSize: "0.78rem", letterSpacing: "3px", fontWeight: 600, textTransform: "uppercase", margin: "0 0 16px 0", fontFamily: "var(--font-cormorant), Georgia, serif" }}>
               The {current.decade}s
             </p>
             <a href={current.letterboxd_url} target="_blank" rel="noopener noreferrer">
@@ -116,10 +116,10 @@ export default function DecadesSlider({ decades }: { decades: DecadeEntry[] }) {
           >
             <span style={{
               color: i === active ? "#F2F2F7" : "#5a6b7c",
-              fontSize: i === active ? "1.25rem" : "1rem",
-              fontWeight: i === active ? 800 : 500,
-              fontFamily: "Georgia, serif",
-              letterSpacing: "-0.03em",
+              fontSize: i === active ? "1.35rem" : "1.1rem",
+              fontWeight: i === active ? 700 : 400,
+              fontFamily: "var(--font-cormorant), Georgia, serif",
+              letterSpacing: "0.02em",
               transition: "all 0.2s",
             }}>
               &apos;{String(d.decade).slice(-2)}s

@@ -429,7 +429,7 @@ function InsightsRight({ insights }: { insights: Insights }) {
             }} />
           )}
           <div style={{ position: "relative", zIndex: 1 }}>
-            <p style={{ color: "#5a6b7c", fontSize: "0.62rem", letterSpacing: "3px", fontWeight: 800, textTransform: "uppercase", margin: "0 0 12px 0" }}>Most Generous Era</p>
+            <p style={{ color: "#5a6b7c", fontSize: "0.72rem", letterSpacing: "3px", fontWeight: 600, textTransform: "uppercase", margin: "0 0 12px 0", fontFamily: "var(--font-cormorant), Georgia, serif" }}>Most Generous Era</p>
             <div style={{ display: "flex", alignItems: "baseline", gap: "16px", marginBottom: "16px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
               <p style={{ fontSize: "5rem", fontWeight: 300, color: "#e0e6ed", lineHeight: 1, margin: 0, letterSpacing: "-1px", fontFamily: "var(--font-cormorant), Georgia, serif" }}>
                 {best_decade.decade}s
@@ -528,13 +528,13 @@ function CommunitySection({ data }: { data: CommunityComparison }) {
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "28px", paddingBottom: "20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div>
           <p className="section-label" style={{ margin: "0 0 6px 0" }}>Community vs You</p>
-          <p style={{ color: "#8090a0", fontSize: "1.1rem", fontStyle: "italic", fontFamily: serif, margin: 0, lineHeight: 1.3 }}>
+          <p style={{ color: "#8090a0", fontSize: "1.2rem", fontStyle: "italic", fontFamily: serif, margin: 0, lineHeight: 1.3 }}>
             {data.total_compared} films compared against Letterboxd average
           </p>
         </div>
         <div style={{ textAlign: "right" }}>
           <span style={{ fontSize: "4rem", fontWeight: 300, color: diffColor, lineHeight: 1, fontFamily: serif }}>{diffLabel}</span>
-          <p style={{ color: "#5a6b7c", fontSize: "0.78rem", margin: "4px 0 0 0" }}>
+          <p style={{ color: "#5a6b7c", fontSize: "0.86rem", margin: "4px 0 0 0" }}>
             {data.avg_diff < 0 ? "Community generally rates higher than you" : "You generally rate higher than the community"}
           </p>
         </div>
@@ -544,25 +544,25 @@ function CommunitySection({ data }: { data: CommunityComparison }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "40px" }}>
         <div>
           <p className="section-label" style={{ color: "#6db86d", margin: "0 0 2px 0" }}>Your Hidden Gems</p>
-          <p style={{ color: "#556677", fontSize: "0.88rem", fontStyle: "italic", fontFamily: serif, margin: "0 0 16px 0" }}>
+          <p style={{ color: "#556677", fontSize: "0.97rem", fontStyle: "italic", fontFamily: serif, margin: "0 0 16px 0" }}>
             Films the community underrated
           </p>
           {data.underrated.slice(0, 4).map((f, i) => (
             <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
               style={{ display: "block", padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", textDecoration: "none" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "5px" }}>
-                <span style={{ color: "#d0dce6", fontSize: "1.05rem", fontFamily: serif, fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "72%" }}>
+                <span style={{ color: "#d0dce6", fontSize: "1.15rem", fontFamily: serif, fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "72%" }}>
                   {f.name}
                 </span>
-                <span style={{ color: "#6db86d", fontSize: "1.1rem", fontWeight: 700, fontFamily: serif, flexShrink: 0 }}>
+                <span style={{ color: "#6db86d", fontSize: "1.2rem", fontWeight: 700, fontFamily: serif, flexShrink: 0 }}>
                   +{f.diff.toFixed(1)}
                 </span>
               </div>
               <div style={{ display: "flex", gap: "14px" }}>
-                <span style={{ color: "#6db86d", fontSize: "0.82rem" }}>You {f.user_rating}</span>
-                <span style={{ color: "#334455", fontSize: "0.82rem" }}>·</span>
-                <span style={{ color: "#5a6b7c", fontSize: "0.82rem" }}>Community {f.community_rating?.toFixed(1)}</span>
-                <span style={{ color: "#4a5a68", fontSize: "0.76rem", marginLeft: "auto" }}>{f.year}</span>
+                <span style={{ color: "#6db86d", fontSize: "0.9rem" }}>You {f.user_rating}</span>
+                <span style={{ color: "#334455", fontSize: "0.9rem" }}>·</span>
+                <span style={{ color: "#5a6b7c", fontSize: "0.9rem" }}>Community {f.community_rating?.toFixed(1)}</span>
+                <span style={{ color: "#4a5a68", fontSize: "0.84rem", marginLeft: "auto" }}>{f.year}</span>
               </div>
             </a>
           ))}
@@ -570,25 +570,25 @@ function CommunitySection({ data }: { data: CommunityComparison }) {
 
         <div>
           <p className="section-label" style={{ color: "#c06060", margin: "0 0 2px 0" }}>Overrated by Community</p>
-          <p style={{ color: "#556677", fontSize: "0.88rem", fontStyle: "italic", fontFamily: serif, margin: "0 0 16px 0" }}>
+          <p style={{ color: "#556677", fontSize: "0.97rem", fontStyle: "italic", fontFamily: serif, margin: "0 0 16px 0" }}>
             Films the community rated above you
           </p>
           {data.overrated.slice(0, 4).map((f, i) => (
             <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
               style={{ display: "block", padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", textDecoration: "none" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "5px" }}>
-                <span style={{ color: "#d0dce6", fontSize: "1.05rem", fontFamily: serif, fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "72%" }}>
+                <span style={{ color: "#d0dce6", fontSize: "1.15rem", fontFamily: serif, fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "72%" }}>
                   {f.name}
                 </span>
-                <span style={{ color: "#c06060", fontSize: "1.1rem", fontWeight: 700, fontFamily: serif, flexShrink: 0 }}>
+                <span style={{ color: "#c06060", fontSize: "1.2rem", fontWeight: 700, fontFamily: serif, flexShrink: 0 }}>
                   {f.diff.toFixed(1)}
                 </span>
               </div>
               <div style={{ display: "flex", gap: "14px" }}>
-                <span style={{ color: "#c06060", fontSize: "0.82rem" }}>You {f.user_rating}</span>
-                <span style={{ color: "#334455", fontSize: "0.82rem" }}>·</span>
-                <span style={{ color: "#5a6b7c", fontSize: "0.82rem" }}>Community {f.community_rating?.toFixed(1)}</span>
-                <span style={{ color: "#4a5a68", fontSize: "0.76rem", marginLeft: "auto" }}>{f.year}</span>
+                <span style={{ color: "#c06060", fontSize: "0.9rem" }}>You {f.user_rating}</span>
+                <span style={{ color: "#334455", fontSize: "0.9rem" }}>·</span>
+                <span style={{ color: "#5a6b7c", fontSize: "0.9rem" }}>Community {f.community_rating?.toFixed(1)}</span>
+                <span style={{ color: "#4a5a68", fontSize: "0.84rem", marginLeft: "auto" }}>{f.year}</span>
               </div>
             </a>
           ))}
@@ -613,7 +613,7 @@ function ImdbSection({ data }: { data: ImdbComparison }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
         <div>
           <p className="section-label" style={{ margin: "0 0 4px 0" }}>IMDb vs You</p>
-          <p style={{ color: "#8090a0", fontSize: "1.0rem", fontStyle: "italic", fontFamily: serif, margin: 0, lineHeight: 1.3 }}>
+          <p style={{ color: "#8090a0", fontSize: "1.1rem", fontStyle: "italic", fontFamily: serif, margin: 0, lineHeight: 1.3 }}>
             Biggest gaps across {data.total_compared} films
           </p>
         </div>
@@ -636,9 +636,9 @@ function ImdbSection({ data }: { data: ImdbComparison }) {
             <p style={{ color: "#445566", fontSize: "0.58rem", letterSpacing: "2.5px", textTransform: "uppercase", fontWeight: 700, margin: "0 0 10px 0" }}>
               Biggest Gap
             </p>
-            <p style={{ color: "#d0dce6", fontSize: "1.45rem", fontFamily: serif, fontStyle: "italic", margin: "0 0 14px 0", lineHeight: 1.2 }}>
+            <p style={{ color: "#d0dce6", fontSize: "1.6rem", fontFamily: serif, fontStyle: "italic", margin: "0 0 14px 0", lineHeight: 1.2 }}>
               {top.name}
-              <span style={{ color: "#3a4a58", fontSize: "0.85rem", marginLeft: "10px" }}>{top.year}</span>
+              <span style={{ color: "#3a4a58", fontSize: "0.94rem", marginLeft: "10px" }}>{top.year}</span>
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
               <div style={{ textAlign: "center" }}>
@@ -671,13 +671,13 @@ function ImdbSection({ data }: { data: ImdbComparison }) {
         return (
           <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
             style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", textDecoration: "none" }}>
-            <span style={{ color: iLikedMore ? "#c5a059" : "#7a8b99", fontSize: "1.1rem", fontWeight: 700, fontFamily: serif, minWidth: "24px", textAlign: "center" }}>{myScore}</span>
-            <span style={{ color: "#2a3a48", fontSize: "0.68rem" }}>vs</span>
-            <span style={{ color: "#445566", fontSize: "1.0rem", fontWeight: 300, fontFamily: serif, minWidth: "28px", textAlign: "center" }}>{imdbNorm.toFixed(1)}</span>
-            <span style={{ flex: 1, color: "#c0ccd8", fontSize: "1.02rem", fontFamily: serif, fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <span style={{ color: iLikedMore ? "#c5a059" : "#7a8b99", fontSize: "1.2rem", fontWeight: 700, fontFamily: serif, minWidth: "24px", textAlign: "center" }}>{myScore}</span>
+            <span style={{ color: "#2a3a48", fontSize: "0.75rem" }}>vs</span>
+            <span style={{ color: "#445566", fontSize: "1.1rem", fontWeight: 300, fontFamily: serif, minWidth: "28px", textAlign: "center" }}>{imdbNorm.toFixed(1)}</span>
+            <span style={{ flex: 1, color: "#c0ccd8", fontSize: "1.12rem", fontFamily: serif, fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {f.name}
             </span>
-            <span style={{ flexShrink: 0, fontSize: "0.75rem", fontWeight: 700, color: iLikedMore ? "#c5a059" : "#7a8b99" }}>
+            <span style={{ flexShrink: 0, fontSize: "0.82rem", fontWeight: 700, color: iLikedMore ? "#c5a059" : "#7a8b99" }}>
               {iLikedMore ? `+${f.diff.toFixed(1)}` : f.diff.toFixed(1)}
             </span>
           </a>
