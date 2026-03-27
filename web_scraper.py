@@ -305,58 +305,10 @@ def enrich_extra_data():
 
 
 # ─────────────────────────────────────────────────────────
-# 4. WATCHED-ONLY SYNC — watched.csv'deki filmleri ekler
-#    Diary'de olmayan (Watched Date = NULL) filmler için
-#    sadece total sayısına katkı sağlar, tarih bazlı
-#    metriklere (bu yıl, bu hafta) dahil edilmez.
-# ─────────────────────────────────────────────────────────
-MANUAL_CSV = os.path.join(os.path.dirname(__file__), "manual_watched.csv")
-
-def sync_manual_watched():
-    if not os.path.exists(MANUAL_CSV):
-        return
-
-    try:
-        df = pd.read_csv(MANUAL_CSV)
-    except Exception as e:
-        print(f"[manual] CSV okunamadi: {e}")
-        return
-
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    new_count = 0
-
-    for _, row in df.iterrows():
-        name = str(row.get("Name", "")).strip()
-        year = int(row.get("Year", 0) or 0)
-        uri  = str(row.get("Letterboxd URI", "")).strip()
-        if not name:
-            continue
-        cursor.execute(
-            'SELECT 1 FROM movies WHERE Name = ? AND Year = ?',
-            (name, year)
-        )
-        if cursor.fetchone() is None:
-            cursor.execute("""
-                INSERT INTO movies
-                    (Name, Rating, "Watched Date", "Letterboxd URI",
-                     Runtime, Director, Genre, Year, Watched_Date_Log, Poster_URL)
-                VALUES (?, 0, NULL, ?, 0, '', '', ?, '', '')
-            """, (name, uri, year))
-            new_count += 1
-            print(f"[manual] Eklendi: {name} ({year})")
-
-    conn.commit()
-    conn.close()
-    print(f"[manual] {new_count} film eklendi.")
-
-
-# ─────────────────────────────────────────────────────────
 # MAIN
 # ─────────────────────────────────────────────────────────
 if __name__ == "__main__":
     migrate_db()
     sync_rss_to_db()
-    sync_manual_watched()
     enrich_movie_data()
     enrich_extra_data()
