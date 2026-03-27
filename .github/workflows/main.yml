@@ -40,5 +40,18 @@ jobs:
           git config --global user.name "GitHub Action Bot"
           git config --global user.email "action@github.com"
           git add letterboxd_master.db
-          git commit -m "Auto-sync from RSS: $(date)" || echo "No changes to commit"
-          git push
+          if git commit -m "Auto-sync from RSS: $(date)"; then
+            git push
+            echo "COMMITTED=true" >> $GITHUB_ENV
+          else
+            echo "No changes to commit"
+            echo "COMMITTED=false" >> $GITHUB_ENV
+          fi
+
+      - name: Trigger Render Redeploy
+        if: env.COMMITTED == 'true' && env.RENDER_DEPLOY_HOOK != ''
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" --request POST "$RENDER_DEPLOY_HOOK"
+          echo " → Render redeploy tetiklendi"

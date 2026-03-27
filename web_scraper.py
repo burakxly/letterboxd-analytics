@@ -52,8 +52,10 @@ def sync_rss_to_db():
 
     new_count = 0
     for entry in reversed(feed.entries):
-        movie_name  = entry.letterboxd_filmtitle
-        raw_link    = entry.link
+        movie_name = getattr(entry, 'letterboxd_filmtitle', None)
+        if not movie_name:
+            continue
+        raw_link    = getattr(entry, 'link', '')
         watched_date = getattr(entry, 'letterboxd_watcheddate', "")
         try:
             film_year = int(getattr(entry, 'letterboxd_filmyear', 0))
@@ -107,7 +109,10 @@ def enrich_movie_data():
         return
 
     for _, row in df.iterrows():
-        original_url = row['Letterboxd URI']
+        original_url = row['Letterboxd URI'] or ''
+        if not original_url or str(original_url) in ('nan', 'None'):
+            continue
+        original_url = str(original_url)
         match = re.search(r'/film/([^/]+)/', original_url)
         clean_url = f"https://letterboxd.com/film/{match.group(1)}/" if match else original_url
 
@@ -195,14 +200,6 @@ def enrich_extra_data():
 
     print(f"[{time.ctime()}] TMDB/OMDB verisi çekiliyor...")
     conn = sqlite3.connect(DB_NAME)
-    df = pd.read_sql("""
-        SELECT rowid, Name, Year, "Letterboxd URI"
-        FROM movies
-        WHERE (TMDB_KEY_NEEDED = 1 OR Backdrop_URL IS NULL OR Backdrop_URL = ''
-               OR Original_Language IS NULL OR Original_Language = '')
-           OR (IMDb_Rating IS NULL OR IMDb_Rating = 0)
-    """.replace("TMDB_KEY_NEEDED = 1 OR ", ""), conn)
-    # Sadece eksik olanlara bak
     df = pd.read_sql("""
         SELECT rowid, Name, Year, "Letterboxd URI",
                Backdrop_URL, Original_Language, IMDb_Rating
