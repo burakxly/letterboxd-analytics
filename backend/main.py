@@ -1,8 +1,5 @@
 import os
-import threading
-import time
-import requests as _requests
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 import pandas as pd
@@ -27,20 +24,6 @@ from data_core import (
 )
 
 app = FastAPI(title="Letterboxd Analytics API", version="1.1.0")
-
-
-def _keep_alive():
-    port = os.environ.get("PORT", "8000")
-    url = f"http://localhost:{port}/api/health"
-    while True:
-        time.sleep(60)
-        try:
-            _requests.get(url, timeout=5)
-        except Exception:
-            pass
-
-_t = threading.Thread(target=_keep_alive, daemon=True)
-_t.start()
 
 ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -93,7 +76,7 @@ def movies(
     df = load_data()
 
     if genre:
-        df = df[df["Genre"].str.contains(genre, case=False, na=False)]
+        df = df[df["Genre"].str.contains(genre, case=False, na=False, regex=False)]
     if min_rating is not None:
         df = df[df["Rating"] >= min_rating]
 

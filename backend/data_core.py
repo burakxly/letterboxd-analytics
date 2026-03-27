@@ -4,8 +4,13 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import os
+import time
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "letterboxd_master.db")
+
+_cache_df: pd.DataFrame | None = None
+_cache_time: float = 0.0
+_CACHE_TTL = 3600  # 1 saat
 
 
 def fetch_poster_url(movie_page_url: str) -> str:
@@ -32,6 +37,10 @@ def fetch_poster_url(movie_page_url: str) -> str:
 
 
 def load_data() -> pd.DataFrame:
+    global _cache_df, _cache_time
+    if _cache_df is not None and (time.time() - _cache_time) < _CACHE_TTL:
+        return _cache_df.copy()
+
     conn = sqlite3.connect(DB_PATH)
     df = pd.read_sql("SELECT rowid, * FROM movies", conn)
     conn.close()
@@ -56,7 +65,9 @@ def load_data() -> pd.DataFrame:
     df["Runtime"] = pd.to_numeric(df["Runtime"], errors="coerce").fillna(0)
     df["Year"] = pd.to_numeric(df["Year"], errors="coerce").fillna(0)
 
-    return df
+    _cache_df = df
+    _cache_time = time.time()
+    return df.copy()
 
 
 def get_latest_movie() -> dict:
