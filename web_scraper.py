@@ -30,6 +30,7 @@ def migrate_db():
         ("IMDb_Rating",       "REAL    DEFAULT 0"),
         ("Oscar_Wins",        "INTEGER DEFAULT 0"),
         ("Oscar_Noms",        "INTEGER DEFAULT 0"),
+        ("Enrichment_Tried",  "INTEGER DEFAULT 0"),
     ]
     for col_name, col_def in new_columns:
         try:
@@ -158,9 +159,9 @@ def enrich_movie_data():
             # Year
             released = data.get('releasedEvent', [])
             if isinstance(released, list) and released:
-                year = released[0].get('startDate', '0')[:4]
+                year = int(released[0].get('startDate', '0')[:4] or 0)
             elif isinstance(released, dict):
-                year = released.get('startDate', '0')[:4]
+                year = int(released.get('startDate', '0')[:4] or 0)
             else:
                 year = 0
 
@@ -204,9 +205,13 @@ def enrich_extra_data():
         SELECT rowid, Name, Year, "Letterboxd URI",
                Backdrop_URL, Original_Language, IMDb_Rating
         FROM movies
-        WHERE (Backdrop_URL IS NULL OR Backdrop_URL = '')
+        WHERE (Enrichment_Tried IS NULL OR Enrichment_Tried = 0)
+          AND (
+              (Backdrop_URL IS NULL OR Backdrop_URL = '')
            OR (Original_Language IS NULL OR Original_Language = '')
            OR (IMDb_Rating IS NULL OR IMDb_Rating = 0)
+           OR (Oscar_Wins = 0 AND Oscar_Noms = 0 AND IMDb_Rating > 0)
+          )
     """, conn)
 
     if df.empty:
@@ -286,7 +291,8 @@ def enrich_extra_data():
                 IMDb_ID           = CASE WHEN IMDb_ID  IS NULL OR IMDb_ID  = '' THEN ? ELSE IMDb_ID  END,
                 IMDb_Rating       = CASE WHEN IMDb_Rating = 0   THEN ? ELSE IMDb_Rating       END,
                 Oscar_Wins        = CASE WHEN Oscar_Wins = 0    THEN ? ELSE Oscar_Wins        END,
-                Oscar_Noms        = CASE WHEN Oscar_Noms = 0    THEN ? ELSE Oscar_Noms        END
+                Oscar_Noms        = CASE WHEN Oscar_Noms = 0    THEN ? ELSE Oscar_Noms        END,
+                Enrichment_Tried  = 1
             WHERE rowid = ?
         """, (backdrop_url, language, tmdb_id, imdb_id,
               imdb_rating, oscar_wins, oscar_noms, rowid))
