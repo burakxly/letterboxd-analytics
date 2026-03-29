@@ -23,22 +23,17 @@ function formatDateRange(start: string, end: string): string {
 }
 
 function getChipLabel(offset: number, baseStart: string): string {
-  if (!baseStart) {
+  const base = baseStart ? new Date(baseStart + "T00:00:00") : null;
+  let s: Date;
+  if (base && !isNaN(base.getTime())) {
+    s = new Date(base);
+    s.setDate(base.getDate() - offset * 7);
+  } else {
     const today = new Date();
-    const dow = today.getDay() === 0 ? 6 : today.getDay() - 1; // Mon=0
-    const monday = new Date(today);
-    monday.setDate(today.getDate() - dow - offset * 7);
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-    return formatDateRange(
-      monday.toISOString().slice(0, 10),
-      sunday.toISOString().slice(0, 10)
-    );
+    const dow = today.getDay() === 0 ? 6 : today.getDay() - 1;
+    s = new Date(today);
+    s.setDate(today.getDate() - dow - offset * 7);
   }
-  // Shift the current week's start date back by `offset` weeks
-  const base = new Date(baseStart + "T00:00:00");
-  const s = new Date(base);
-  s.setDate(base.getDate() - offset * 7);
   const e = new Date(s);
   e.setDate(s.getDate() + 6);
   return formatDateRange(
