@@ -123,7 +123,7 @@ def get_kpis(df_all: pd.DataFrame, df_rated: pd.DataFrame) -> dict:
     df_dir = df_rated.assign(Director=df_rated["Director"].str.split(", ")).explode("Director")
     df_dir = df_dir[~df_dir["Director"].isin(["Unknown", "", None])]
     dir_stats = df_dir.groupby("Director").agg(Film_Count=("Name", "count"), Avg_Rating=("Rating", "mean"))
-    valid_dirs = dir_stats[dir_stats["Film_Count"] >= 5]
+    valid_dirs = dir_stats[dir_stats["Film_Count"] >= 6]
 
     if not valid_dirs.empty:
         best_dir_row = valid_dirs.sort_values(by="Avg_Rating", ascending=False).iloc[0]

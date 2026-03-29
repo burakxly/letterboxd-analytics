@@ -133,7 +133,7 @@ function KPIStrip({ kpis }: { kpis: KPIs }) {
       {/* Top Director */}
       <div className="kpi-item" style={{ flex: 1.8, borderRight: "1px solid rgba(255,255,255,0.05)" }}>
         <p style={{ color: "#7a8b99", fontSize: "0.68rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", margin: "0 0 6px 0" }}>
-          Top Director <span style={{ color: "#445566", fontWeight: 400 }}>(Min 5)</span>
+          Top Director <span style={{ color: "#445566", fontWeight: 400 }}>(min 6 watched films)</span>
         </p>
         <a href={`https://letterboxd.com/director/${dirSlug}/`} target="_blank" rel="noopener noreferrer"
           className="gold-gradient"
