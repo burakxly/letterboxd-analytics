@@ -30,7 +30,7 @@ import AnimatedNumber from "@/components/AnimatedNumber";
 import HeroParallaxImage from "@/components/HeroParallaxImage";
 import AnimatedGoalBar from "@/components/AnimatedGoalBar";
 import PosterTilt from "@/components/PosterTilt";
-import WeekFilmList from "@/components/WeekFilmList";
+import WeekSection from "@/components/WeekSection";
 import HofMosaic from "@/components/HofMosaic";
 
 // ─── helpers ──────────────────────────────────────────────────────────────
@@ -160,40 +160,7 @@ function KPIStrip({ kpis }: { kpis: KPIs }) {
 
 // GoalBar → AnimatedGoalBar (client component, see components/AnimatedGoalBar.tsx)
 
-// ─── Week Activity ────────────────────────────────────────────────────────
-
-function WeekActivity({ week }: { week: WeekActivity }) {
-  return (
-    <div className="glass-card card-hover" style={{
-      padding: "24px",
-      display: "flex", flexDirection: "column", minHeight: "360px",
-    }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-        <p style={{ color: "#a0b0c0", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", margin: 0 }}>
-          <span className="pulse-dot" />Recording
-        </p>
-        <p style={{ color: "#5a6b7c", fontSize: "0.75rem", margin: 0 }}>
-          [{week.start_date} — {week.end_date}]
-        </p>
-      </div>
-
-      <div style={{ display: "flex", gap: "24px", marginBottom: "20px" }}>
-        {[
-          { label: "Films", val: week.count },
-          { label: "Avg Rating", val: week.avg_rating > 0 ? week.avg_rating.toFixed(2) : "—" },
-          { label: "Total Mins", val: week.runtime_mins.toLocaleString() },
-        ].map((s) => (
-          <div key={s.label}>
-            <p style={{ color: "#5a6b7c", fontSize: "0.65rem", fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase", margin: "0 0 4px 0" }}>{s.label}</p>
-            <p style={{ color: "#e0e6ed", fontSize: "1.6rem", fontWeight: 700, margin: 0, lineHeight: 1 }}>{s.val}</p>
-          </div>
-        ))}
-      </div>
-
-      <WeekFilmList movies={week.movies} />
-    </div>
-  );
-}
+// WeekActivity → WeekSection (client component, see components/WeekSection.tsx)
 
 // ─── Latest Movie ─────────────────────────────────────────────────────────
 
@@ -781,7 +748,7 @@ export default async function HomePage() {
 
       <ScrollReveal delay={60}>
         <div className="grid-week">
-          <WeekActivity week={week} />
+          <WeekSection initialWeek={week} />
           <LatestMovieCard latest={latest} />
         </div>
       </ScrollReveal>

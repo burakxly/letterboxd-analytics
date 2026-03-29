@@ -246,15 +246,15 @@ def get_goal(df: pd.DataFrame) -> dict:
     return {"year": current_year, "goal": goal, "count": count, "progress_pct": progress_pct}
 
 
-def get_week_activity(df: pd.DataFrame) -> dict:
-    # "Watched Date" = gerçek izleme tarihi
+def get_week_activity(df: pd.DataFrame, offset: int = 0) -> dict:
+    # offset=0 → bu hafta, offset=1 → geçen hafta, vb.
     df_dates = df.dropna(subset=["Watched Date"]).copy()
 
     if df_dates.empty:
         return {"count": 0, "avg_rating": 0.0, "runtime_mins": 0, "start_date": "", "end_date": "", "movies": []}
 
     today = pd.Timestamp.now().normalize()
-    start_of_week = today - pd.Timedelta(days=today.weekday())
+    start_of_week = today - pd.Timedelta(days=today.weekday()) - pd.Timedelta(weeks=offset)
     end_of_week = start_of_week + pd.Timedelta(days=6)
     df_week = df_dates[
         (df_dates["Watched Date"] >= start_of_week) & (df_dates["Watched Date"] <= end_of_week)

@@ -179,7 +179,7 @@ export interface OscarStats {
 
 export const fetchKPIs = () => get<KPIs>("/api/kpis");
 export const fetchLatest = () => get<LatestMovie>("/api/latest");
-export const fetchWeek = () => get<WeekActivity>("/api/week");
+export const fetchWeek = (offset = 0) => get<WeekActivity>(`/api/week?offset=${offset}`);
 export const fetchGoal = () => get<Goal>("/api/goal");
 export const fetchHallOfFame = () => get<HallOfFameEntry[]>("/api/hall_of_fame");
 export const fetchInsights = () => get<Insights>("/api/insights");

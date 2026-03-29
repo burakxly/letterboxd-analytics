@@ -198,9 +198,9 @@ def goal():
 # /api/week
 # ──────────────────────────────────────────
 @app.get("/api/week")
-def week():
+def week(offset: int = Query(0, ge=0, le=12)):
     df = load_data()
-    return get_week_activity(df)
+    return get_week_activity(df, offset=offset)
 
 
 # ──────────────────────────────────────────
