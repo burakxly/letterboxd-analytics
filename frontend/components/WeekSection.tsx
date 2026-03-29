@@ -62,8 +62,9 @@ export default function WeekSection({ initialWeek }: Props) {
     });
   }
 
+  const stripZero = (d: string) => d.replace(/ 0(\d)$/, " $1");
   const title = week.start_date && week.end_date
-    ? `${week.start_date} — ${week.end_date}`
+    ? `${stripZero(week.start_date)} — ${stripZero(week.end_date)}`
     : "No Activity";
 
   return (
