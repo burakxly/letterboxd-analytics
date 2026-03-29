@@ -9,6 +9,30 @@ import threading
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "letterboxd_master.db")
 
+# ─── Business Logic Constants ─────────────────────────────
+# Minimum rated films by a director to qualify for Best Director KPI
+MIN_DIR_FILMS = 6
+# Minimum films in a genre to qualify for Best Genre KPI
+MIN_GENRE_FILMS = 10
+# Annual film watching goal (override via ANNUAL_GOAL env var)
+ANNUAL_GOAL = int(os.environ.get("ANNUAL_GOAL", "200"))
+# Star rating threshold for Hall of Fame
+HALL_OF_FAME_RATING = 5.0
+# Minimum runtime (minutes) to be considered a feature film
+MIN_FEATURE_RUNTIME = 35
+# Minimum films watched in a single day to qualify as a marathon
+MIN_MARATHON_FILMS = 2
+# Maximum total runtime (minutes) in a marathon session (= 24 hours)
+MAX_MARATHON_RUNTIME = 1440
+# Minimum films in a month/decade to qualify for Peak Month / Best Decade
+MIN_PEAK_MONTH_FILMS = 10
+MIN_DECADE_FILMS = 10
+# Earliest valid movie release year for decade/year analyses
+MIN_VALID_YEAR = 1900
+# Ratings below this count as "time wasted"
+MAX_WASTED_RATING = 2.0
+# ──────────────────────────────────────────────────────────
+
 _cache_df: pd.DataFrame | None = None
 _cache_time: float = 0.0
 _CACHE_TTL = 3600  # 1 saat
@@ -123,7 +147,7 @@ def get_kpis(df_all: pd.DataFrame, df_rated: pd.DataFrame) -> dict:
     df_dir = df_rated.assign(Director=df_rated["Director"].str.split(", ")).explode("Director")
     df_dir = df_dir[~df_dir["Director"].isin(["Unknown", "", None])]
     dir_stats = df_dir.groupby("Director").agg(Film_Count=("Name", "count"), Avg_Rating=("Rating", "mean"))
-    valid_dirs = dir_stats[dir_stats["Film_Count"] >= 6]
+    valid_dirs = dir_stats[dir_stats["Film_Count"] >= MIN_DIR_FILMS]
 
     if not valid_dirs.empty:
         best_dir_row = valid_dirs.sort_values(by="Avg_Rating", ascending=False).iloc[0]
@@ -135,7 +159,7 @@ def get_kpis(df_all: pd.DataFrame, df_rated: pd.DataFrame) -> dict:
     df_genre = df_rated.assign(Genre=df_rated["Genre"].str.split(", ")).explode("Genre")
     df_genre = df_genre[~df_genre["Genre"].isin(["Unknown", "", None])]
     genre_stats = df_genre.groupby("Genre").agg(Film_Count=("Name", "count"), Avg_Rating=("Rating", "mean"))
-    valid_genres = genre_stats[genre_stats["Film_Count"] >= 10].copy()
+    valid_genres = genre_stats[genre_stats["Film_Count"] >= MIN_GENRE_FILMS].copy()
 
     if not valid_genres.empty:
         max_c, min_c = valid_genres["Film_Count"].max(), valid_genres["Film_Count"].min()
@@ -211,7 +235,7 @@ def get_movies_by_year(df_all: pd.DataFrame) -> list[dict]:
 
 
 def get_goal(df: pd.DataFrame) -> dict:
-    goal = 200
+    goal = ANNUAL_GOAL
     current_year = pd.Timestamp.now().year
     # "Watched Date" = gerçek izleme tarihi, bunu kullan
     df_year = df[df["Watched Date"].dt.year == current_year]
@@ -263,7 +287,7 @@ def get_week_activity(df: pd.DataFrame) -> dict:
 def get_hall_of_fame(df: pd.DataFrame) -> list[dict]:
     # Gerçek izleme tarihine göre sırala
     df_dates = df.dropna(subset=["Watched Date"]).copy()
-    df_5star = df_dates[(df_dates["Rating"] == 5.0) & (df_dates["Runtime"] >= 35)].sort_values("Watched Date", ascending=False)
+    df_5star = df_dates[(df_dates["Rating"] == HALL_OF_FAME_RATING) & (df_dates["Runtime"] >= MIN_FEATURE_RUNTIME)].sort_values("Watched Date", ascending=False)
 
     result = []
     for _, row in df_5star.iterrows():
@@ -291,7 +315,7 @@ def get_insights(df: pd.DataFrame) -> dict:
         .reset_index()
     )
     valid_marathons = marathon_stats[
-        (marathon_stats["film_count"] >= 2) & (marathon_stats["total_runtime"] <= 1440)
+        (marathon_stats["film_count"] >= MIN_MARATHON_FILMS) & (marathon_stats["total_runtime"] <= MAX_MARATHON_RUNTIME)
     ]
     marathon = None
     if not valid_marathons.empty:
@@ -319,7 +343,7 @@ def get_insights(df: pd.DataFrame) -> dict:
         }
 
     # --- Time Wasted ---
-    wasted_df = df[(df["Rating"] > 0) & (df["Rating"] < 2.0)].copy()
+    wasted_df = df[(df["Rating"] > 0) & (df["Rating"] < MAX_WASTED_RATING)].copy()
     wasted_runtime = int(wasted_df["Runtime"].sum())
     wasted_films = wasted_df.sort_values("Rating").head(5)
     time_wasted = {
@@ -338,7 +362,7 @@ def get_insights(df: pd.DataFrame) -> dict:
     df_rated_months = df[(df["Rating"] > 0) & df["Watched Date"].notna()].copy()
     df_rated_months["YearMonth"] = df_rated_months["Watched Date"].dt.to_period("M")
     month_stats = df_rated_months.groupby("YearMonth").agg(film_count=("Name", "count"), avg_rating=("Rating", "mean")).reset_index()
-    valid_months = month_stats[month_stats["film_count"] >= 10]
+    valid_months = month_stats[month_stats["film_count"] >= MIN_PEAK_MONTH_FILMS]
     peak_month = None
     if not valid_months.empty:
         best_month = valid_months.loc[valid_months["avg_rating"].idxmax()]
@@ -364,7 +388,7 @@ def get_insights(df: pd.DataFrame) -> dict:
     df_generous = df[(df["Year"] > 1800) & (df["Rating"] > 0)].copy()
     df_generous["Decade"] = (df_generous["Year"] // 10) * 10
     decade_stats = df_generous.groupby("Decade").agg(avg_rating=("Rating", "mean"), film_count=("Name", "count")).reset_index()
-    valid_decades = decade_stats[decade_stats["film_count"] >= 10]
+    valid_decades = decade_stats[decade_stats["film_count"] >= MIN_DECADE_FILMS]
     best_decade = None
     if not valid_decades.empty:
         best_dec_row = valid_decades.loc[valid_decades["avg_rating"].idxmax()]
@@ -412,7 +436,7 @@ def get_insights(df: pd.DataFrame) -> dict:
 
 def get_decades(df: pd.DataFrame) -> list[dict]:
     df_rated = df[df["Rating"] > 0].copy()
-    df_decades = df_rated[(df_rated["Year"] >= 1900) & (df_rated["Runtime"] >= 35)].copy()
+    df_decades = df_rated[(df_rated["Year"] >= MIN_VALID_YEAR) & (df_rated["Runtime"] >= MIN_FEATURE_RUNTIME)].copy()
     df_decades["Decade"] = (df_decades["Year"] // 10 * 10).astype(int)
 
     # Her on yıl için: Rating DESC, eşit puanda en son izlenen (Watched Date DESC)

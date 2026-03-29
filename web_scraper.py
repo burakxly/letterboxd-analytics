@@ -32,7 +32,11 @@ def migrate_db():
         ("Oscar_Noms",        "INTEGER DEFAULT 0"),
         ("Enrichment_Tried",  "INTEGER DEFAULT 0"),
     ]
+    allowed_cols = {col for col, _ in new_columns}
     for col_name, col_def in new_columns:
+        if col_name not in allowed_cols:
+            print(f"[migration] Beklenmeyen kolon atlandı: {col_name}")
+            continue
         try:
             conn.execute(f"ALTER TABLE movies ADD COLUMN {col_name} {col_def}")
             print(f"[migration] Kolon eklendi: {col_name}")
@@ -60,7 +64,7 @@ def sync_rss_to_db():
         watched_date = getattr(entry, 'letterboxd_watcheddate', "")
         try:
             film_year = int(getattr(entry, 'letterboxd_filmyear', 0))
-        except:
+        except (ValueError, TypeError):
             film_year = 0
 
         match = re.search(r'/film/([^/]+)/', raw_link)
@@ -68,7 +72,7 @@ def sync_rss_to_db():
 
         try:
             raw_rating = float(entry.letterboxd_memberrating)
-        except:
+        except (ValueError, AttributeError):
             raw_rating = 0.0
 
         cursor.execute(
