@@ -60,7 +60,6 @@ export default function DecadesSlider({ decades }: { decades: DecadeEntry[] }) {
                 alt={current.name}
                 fill
                 style={{ objectFit: "cover" }}
-                unoptimized
               />
             </div>
           </a>

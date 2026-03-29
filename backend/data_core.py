@@ -75,6 +75,7 @@ def load_data() -> pd.DataFrame:
             return _cache_df.copy()
 
         conn = sqlite3.connect(DB_PATH)
+        conn.execute("PRAGMA journal_mode=WAL;")
         df = pd.read_sql("SELECT rowid, * FROM movies", conn)
         conn.close()
 
@@ -105,6 +106,7 @@ def load_data() -> pd.DataFrame:
 
 def get_latest_movie() -> dict:
     conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA journal_mode=WAL;")
     query = """
         SELECT Name, Rating, Director, Runtime, Genre, Year, "Letterboxd URI", Poster_URL
         FROM movies

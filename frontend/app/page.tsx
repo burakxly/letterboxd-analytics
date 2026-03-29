@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // 1 saatte bir Vercel cache'i yenile (veri günlük 1 kez güncelleniyor)
 
 import Image from "next/image";
 import {
@@ -215,7 +215,6 @@ function LatestMovieCard({ latest }: { latest: LatestMovie }) {
           <Image
             src={latest.poster_url} alt={latest.name} fill
             style={{ objectFit: "cover", objectPosition: "center top" }}
-            unoptimized
           />
         )}
         <div style={{
@@ -264,7 +263,6 @@ function HallOfFame({ films }: { films: HallOfFameEntry[] }) {
                   src={film.poster_url || "https://s.ltrbxd.com/static/img/empty-poster-1000.v3.jpg"}
                   alt={film.name} fill
                   style={{ objectFit: "cover" }}
-                  unoptimized
                 />
               </div>
               <div className="hof-overlay">
