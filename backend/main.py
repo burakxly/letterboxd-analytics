@@ -1,4 +1,7 @@
 import os
+import asyncio
+import httpx
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
@@ -23,7 +26,39 @@ from data_core import (
     get_oscar_stats,
 )
 
-app = FastAPI(title="Letterboxd Analytics API", version="1.1.0")
+SELF_URL = os.environ.get("RENDER_EXTERNAL_URL", "")
+KEEPALIVE_INTERVAL = 9 * 60  # 9 dakika (Render 15 dak'ta uyutur)
+
+
+async def _keepalive_loop() -> None:
+    """Render'ın servisi uyutmaması için periyodik self-ping."""
+    if not SELF_URL:
+        return
+    await asyncio.sleep(60)  # startup'tan 1 dakika sonra başlat
+    async with httpx.AsyncClient(timeout=10) as client:
+        while True:
+            try:
+                await client.get(f"{SELF_URL}/api/health")
+            except Exception:
+                pass
+            await asyncio.sleep(KEEPALIVE_INTERVAL)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # ── Startup: cache'i önceden ısıt ──────────────────────
+    try:
+        load_data()
+    except Exception:
+        pass
+    # ── Keep-alive task'ı başlat ────────────────────────────
+    task = asyncio.create_task(_keepalive_loop())
+    yield
+    # ── Shutdown ────────────────────────────────────────────
+    task.cancel()
+
+
+app = FastAPI(title="Letterboxd Analytics API", version="1.1.0", lifespan=lifespan)
 
 ALLOWED_ORIGINS = [
     "http://localhost:3000",
