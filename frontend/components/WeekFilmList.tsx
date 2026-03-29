@@ -40,10 +40,10 @@ export default function WeekFilmList({ movies }: Props) {
             Film
           </span>
           <span style={{ display: "flex", gap: "18px", flexShrink: 0 }}>
-            <span style={{ color: "#c5a059", fontSize: "0.6rem", letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 600 }}>
+            <span style={{ color: "#c5a059", fontSize: "0.6rem", letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 600, minWidth: "28px", textAlign: "right" }}>
               Mine
             </span>
-            <span style={{ color: "#5a6b7c", fontSize: "0.6rem", letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 600 }}>
+            <span style={{ color: "#5a6b7c", fontSize: "0.6rem", letterSpacing: "1.5px", textTransform: "uppercase", fontWeight: 600, minWidth: "60px", textAlign: "right" }}>
               Community
             </span>
           </span>
@@ -80,7 +80,7 @@ export default function WeekFilmList({ movies }: Props) {
                 <span style={{ color: "#c5a059", fontSize: "0.85rem", fontWeight: 700, minWidth: "28px", textAlign: "right" }}>
                   {m.rating}
                 </span>
-                <span style={{ color: "#5a6b7c", fontSize: "0.82rem", minWidth: "28px", textAlign: "right" }}>
+                <span style={{ color: "#5a6b7c", fontSize: "0.82rem", minWidth: "60px", textAlign: "right" }}>
                   {m.community_rating.toFixed(1)}
                   {diff !== null && (
                     <span style={{ color: diffColor, fontSize: "0.65rem", fontWeight: 700, marginLeft: "4px" }}>

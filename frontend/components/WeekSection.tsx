@@ -62,7 +62,9 @@ export default function WeekSection({ initialWeek }: Props) {
     });
   }
 
-  const title = formatDateRange(week.start_date, week.end_date);
+  const title = week.start_date && week.end_date
+    ? `${week.start_date} — ${week.end_date}`
+    : "No Activity";
 
   return (
     <div className="glass-card card-hover" style={{
