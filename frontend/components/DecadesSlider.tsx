@@ -30,101 +30,130 @@ export default function DecadesSlider({ decades }: { decades: DecadeEntry[] }) {
   }
 
   return (
-    <div className="decades-outer">
-      {/* Main content */}
-      <div style={{ position: "relative", overflow: "hidden", flex: 1 }}>
-        {/* Background backdrop/poster blur */}
-        {(current.backdrop_url || current.poster_url) && (
-          <div style={{
-            position: "absolute", inset: 0,
-            backgroundImage: `url('${current.backdrop_url || current.poster_url}')`,
-            backgroundSize: "cover", backgroundPosition: "center",
-            filter: "blur(18px) brightness(0.42)",
-            zIndex: 0,
-          }} />
-        )}
-
-        <div className="decades-content-inner" ref={contentRef}>
-          {/* Poster */}
-          <a href={current.letterboxd_url} target="_blank" rel="noopener noreferrer"
-            style={{ flexShrink: 0, display: "block" }}>
-            <div style={{
-              width: "200px", height: "300px",
-              borderRadius: "8px", overflow: "hidden",
-              position: "relative",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.7)",
-              border: "1px solid rgba(255,255,255,0.1)",
-            }}>
-              <Image
-                src={current.poster_url || "https://s.ltrbxd.com/static/img/empty-poster-1000.v3.jpg"}
-                alt={current.name}
-                fill
-                style={{ objectFit: "cover" }}
-              />
-            </div>
-          </a>
-
-          {/* Info */}
-          <div>
-            <p style={{ color: "#5a6b7c", fontSize: "0.78rem", letterSpacing: "3px", fontWeight: 600, textTransform: "uppercase", margin: "0 0 16px 0", fontFamily: "var(--font-cormorant), Georgia, serif" }}>
-              The {current.decade}s
-            </p>
-            <a href={current.letterboxd_url} target="_blank" rel="noopener noreferrer">
-              <h2 style={{
-                color: "#F2F2F7", fontSize: "2.2rem", fontWeight: 800,
-                lineHeight: 1.1, margin: "0 0 12px 0",
-                letterSpacing: "-0.03em",
-              }}>
-                {current.name}
-              </h2>
-            </a>
-            {current.year > 0 && (
-              <p style={{ color: "#7a8b99", fontSize: "0.9rem", margin: "0 0 6px 0" }}>{current.year}</p>
-            )}
-            {current.director && (
-              <p style={{ color: "#a0b0c0", fontSize: "0.9rem", fontStyle: "italic", margin: "0 0 20px 0" }}>{current.director}</p>
-            )}
-            <p style={{ color: "#e0e6ed", fontSize: "1.5rem", fontWeight: 300, margin: "0 0 8px 0" }}>
-              <span style={{ color: "#c5a059" }}>★</span> {current.rating} / 5.0
-            </p>
-            <span style={{
-              background: "rgba(197,160,89,0.1)",
-              border: "1px solid rgba(197,160,89,0.25)",
-              color: "#c5a059",
-              padding: "4px 12px",
-              borderRadius: "20px",
-              fontSize: "0.7rem",
-              fontWeight: 700,
-              letterSpacing: "1.5px",
-              textTransform: "uppercase",
-            }}>
-              Rated by Burak
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Nav tabs — bottom */}
-      <div className="decades-nav">
+    <div>
+      {/* Tab bar — thin gold underline on active, whisper line on container */}
+      <div style={{
+        display: "flex",
+        overflowX: "auto",
+        overflowY: "hidden",
+        borderBottom: "1px solid var(--color-border-whisper)",
+        marginBottom: "40px",
+        scrollbarWidth: "none",
+        gap: "0",
+      }}>
         {decades.map((d, i) => (
           <button
             key={d.decade}
             ref={(el) => { btnRefs.current[i] = el; }}
             onClick={() => handleTabClick(i)}
-            className={`decades-nav-btn${i === active ? " decades-nav-btn--active" : ""}`}
-          >
-            <span style={{
-              color: i === active ? "#F2F2F7" : "#5a6b7c",
-              fontSize: i === active ? "1.35rem" : "1.1rem",
-              fontWeight: i === active ? 700 : 400,
-              fontFamily: "var(--font-cormorant), Georgia, serif",
+            style={{
+              background: "none",
+              border: "none",
+              borderBottom: i === active
+                ? "1px solid var(--color-film-gold)"
+                : "1px solid transparent",
+              marginBottom: "-1px",
+              position: "relative",
+              zIndex: i === active ? 1 : 0,
+              cursor: "pointer",
+              padding: "12px 24px 14px",
+              fontFamily: "var(--font-display)",
+              fontSize: "1rem",
+              fontWeight: 400,
               letterSpacing: "0.02em",
-              transition: "all 0.2s",
-            }}>
-              &apos;{String(d.decade).slice(-2)}s
-            </span>
+              color: i === active ? "var(--color-primary-text)" : "var(--color-muted-text)",
+              transition: "color 0.15s",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+          >
+            &apos;{String(d.decade).slice(-2)}s
           </button>
         ))}
+      </div>
+
+      {/* Content — poster left, text right */}
+      <div
+        ref={contentRef}
+        className="decades-content-inner"
+        style={{ display: "flex", gap: "40px", alignItems: "flex-start", padding: "0" }}
+      >
+        {/* Poster — 2px radius, no shadow */}
+        <a
+          href={current.letterboxd_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ flexShrink: 0, display: "block" }}
+        >
+          <div style={{
+            width: "160px", height: "240px",
+            borderRadius: "2px", overflow: "hidden",
+            position: "relative",
+          }}>
+            <Image
+              src={current.poster_url || "https://s.ltrbxd.com/static/img/empty-poster-1000.v3.jpg"}
+              alt={current.name}
+              fill
+              style={{ objectFit: "cover" }}
+            />
+          </div>
+        </a>
+
+        {/* Info */}
+        <div>
+          {/* Decade label */}
+          <p style={{
+            fontFamily: "var(--font-headline)", fontSize: "11px", fontWeight: 400,
+            letterSpacing: "0.15em", textTransform: "uppercase",
+            color: "var(--color-muted-text)", margin: "0 0 20px 0", lineHeight: 1,
+          }}>
+            The {current.decade}s
+          </p>
+
+          {/* Film title — display serif */}
+          <a href={current.letterboxd_url} target="_blank" rel="noopener noreferrer"
+            style={{ textDecoration: "none" }}>
+            <h2 style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "32px", fontWeight: 400,
+              letterSpacing: "-0.02em", lineHeight: 1.05,
+              color: "var(--color-primary-text)",
+              margin: "0 0 12px 0",
+            }}>
+              {current.name}
+            </h2>
+          </a>
+
+          {/* Director */}
+          {current.director && (
+            <p style={{
+              fontFamily: "var(--font-body)", fontSize: "15px", fontWeight: 400,
+              color: "var(--color-muted-text)", margin: "0 0 4px 0",
+            }}>
+              {current.director}
+            </p>
+          )}
+
+          {/* Year */}
+          {current.year > 0 && (
+            <p style={{
+              fontFamily: "var(--font-body)", fontSize: "13px",
+              color: "var(--color-muted-text)", margin: "0 0 24px 0",
+            }}>
+              {current.year}
+            </p>
+          )}
+
+          {/* Rating — plain text fraction, no star, no pill */}
+          <p style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "24px", fontWeight: 400,
+            letterSpacing: "-0.01em", lineHeight: 1,
+            color: "var(--color-film-gold)", margin: 0,
+          }}>
+            {current.rating} / 5
+          </p>
+        </div>
       </div>
     </div>
   );

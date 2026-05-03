@@ -68,31 +68,40 @@ export default function WeekSection({ initialWeek }: Props) {
     : "No Activity";
 
   return (
-    <div className="glass-card card-hover" style={{
-      padding: "24px",
-      display: "flex", flexDirection: "column", minHeight: "360px",
-    }}>
-      {/* Header: pulse dot + chips */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", flexWrap: "wrap", gap: "8px" }}>
-        <p style={{ color: "#a0b0c0", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", margin: 0 }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "360px" }}>
+
+      {/* Header: pulse dot + "RECORDING" label */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        marginBottom: "20px", flexWrap: "wrap", gap: "8px",
+      }}>
+        <p style={{
+          fontFamily: "var(--font-headline)",
+          fontSize: "11px", fontWeight: 400,
+          letterSpacing: "0.15em", textTransform: "uppercase",
+          color: "var(--color-muted-text)", margin: 0,
+        }}>
           <span className="pulse-dot" />Recording
         </p>
+
+        {/* Week nav — flat buttons, 2px radius */}
         <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
           {[0, 1, 2, 3].map((offset) => (
             <button
               key={offset}
               onClick={() => handleSelect(offset)}
               style={{
-                background: selected === offset ? "rgba(197,160,89,0.15)" : "rgba(255,255,255,0.04)",
-                border: `1px solid ${selected === offset ? "rgba(197,160,89,0.4)" : "rgba(255,255,255,0.08)"}`,
-                color: selected === offset ? "#c5a059" : "#5a6b7c",
-                borderRadius: "20px",
-                padding: "3px 10px",
-                fontSize: "0.65rem",
-                fontWeight: selected === offset ? 700 : 400,
-                letterSpacing: "0.5px",
+                background: "none",
+                border: `1px solid ${selected === offset ? "var(--color-film-gold)" : "var(--color-border-whisper)"}`,
+                color: selected === offset ? "var(--color-film-gold)" : "var(--color-muted-text)",
+                borderRadius: "2px",
+                padding: "4px 10px",
+                fontSize: "11px",
+                fontFamily: "var(--font-headline)",
+                fontWeight: 400,
+                letterSpacing: "0.08em",
                 cursor: "pointer",
-                transition: "all 0.2s",
+                transition: "border-color 0.15s, color 0.15s",
                 whiteSpace: "nowrap",
               }}
             >
@@ -102,37 +111,39 @@ export default function WeekSection({ initialWeek }: Props) {
         </div>
       </div>
 
-      {/* Big bold date heading */}
+      {/* Date range — Playfair Display */}
       <h3 style={{
-        color: "#F2F2F7",
-        fontSize: "1.75rem",
-        fontWeight: 800,
-        letterSpacing: "-0.03em",
-        lineHeight: 1.1,
-        margin: "0 0 20px 0",
-        opacity: isPending ? 0.4 : 1,
+        fontFamily: "var(--font-display)",
+        fontSize: "32px",
+        fontWeight: 400,
+        letterSpacing: "-0.02em",
+        lineHeight: 1.05,
+        color: "var(--color-primary-text)",
+        margin: "0 0 8px 0",
+        opacity: isPending ? 0.35 : 1,
         transition: "opacity 0.2s",
-        fontFamily: "var(--font-geist-sans), sans-serif",
       }}>
         {title}
       </h3>
 
-      {/* Stats row */}
-      <div style={{ display: "flex", gap: "24px", marginBottom: "20px", opacity: isPending ? 0.4 : 1, transition: "opacity 0.2s" }}>
-        {[
-          { label: "Films", val: week.count },
-          { label: "Avg Rating", val: week.avg_rating > 0 ? week.avg_rating.toFixed(2) : "—" },
-          { label: "Total Mins", val: week.runtime_mins.toLocaleString() },
-        ].map((s) => (
-          <div key={s.label}>
-            <p style={{ color: "#5a6b7c", fontSize: "0.65rem", fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase", margin: "0 0 4px 0" }}>{s.label}</p>
-            <p style={{ color: "#e0e6ed", fontSize: "1.6rem", fontWeight: 700, margin: 0, lineHeight: 1 }}>{s.val}</p>
-          </div>
-        ))}
-      </div>
+      {/* Single metadata line */}
+      <p style={{
+        fontFamily: "var(--font-body)",
+        fontSize: "12px",
+        fontWeight: 400,
+        color: "var(--color-muted-text)",
+        letterSpacing: "0.03em",
+        margin: "0 0 24px 0",
+        opacity: isPending ? 0.35 : 1,
+        transition: "opacity 0.2s",
+      }}>
+        {week.count} {week.count === 1 ? "film" : "films"}
+        {week.avg_rating > 0 && ` · ${week.avg_rating.toFixed(2)} avg`}
+        {week.runtime_mins > 0 && ` · ${week.runtime_mins.toLocaleString()} min`}
+      </p>
 
       {/* Film list */}
-      <div style={{ opacity: isPending ? 0.4 : 1, transition: "opacity 0.2s", flex: 1 }}>
+      <div style={{ opacity: isPending ? 0.35 : 1, transition: "opacity 0.2s", flex: 1 }}>
         <WeekFilmList movies={week.movies} />
       </div>
     </div>

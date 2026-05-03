@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Cormorant_Garamond } from "next/font/google";
+import { Geist, Geist_Mono, Cormorant_Garamond, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import KeepAlive from "@/components/KeepAlive";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -13,6 +13,12 @@ const cormorant = Cormorant_Garamond({
   weight: ["300", "400", "500", "600", "700"],
   style: ["normal", "italic"],
 });
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+});
 
 export const metadata: Metadata = {
   title: "Letterboxd Analytics — @burakxly",
@@ -21,7 +27,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable}`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${playfair.variable}`}>
       <body>
         <OpeningSequence />
         <ScrollProgress />
