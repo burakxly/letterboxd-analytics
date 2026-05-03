@@ -328,8 +328,16 @@ a:hover { opacity: 0.75; }
 
 .grid-insights {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
+  grid-template-columns: 1fr 1px 1fr;
+  column-gap: 40px;
+  row-gap: 0;
+  align-items: start;
+}
+
+.grid-insights-divider {
+  align-self: stretch;
+  background: var(--color-border-whisper);
+  width: 1px;
 }
 
 /* ── Glass card — nulled per DESIGN.md (no glass morphism) */
@@ -443,6 +451,7 @@ a:hover { opacity: 0.75; }
 
   .grid-week    { grid-template-columns: 1fr; }
   .grid-insights { grid-template-columns: 1fr; }
+  .grid-insights-divider { display: none; }
 
   .decades-nav-btn {
     padding: 12px 14px;

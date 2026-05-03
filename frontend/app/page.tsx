@@ -361,36 +361,21 @@ function MarathonCard({ insights }: { insights: Insights }) {
               })}
             </p>
 
-            {/* Film list — clean table */}
+            {/* Film list — editorial, no dividers */}
             <div>
-              <p style={{
-                fontFamily: "var(--font-headline)", fontSize: "11px", fontWeight: 400,
-                letterSpacing: "0.15em", textTransform: "uppercase",
-                color: "var(--color-muted-text)", margin: "0 0 0 0",
-                paddingBottom: "10px",
-                borderBottom: "1px solid var(--color-border-whisper)",
-              }}>
-                Films watched
-              </p>
               {marathon.films.map((f, i) => (
                 <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
-                  style={{
-                    display: "flex", justifyContent: "space-between", alignItems: "center",
-                    padding: "10px 0",
-                    borderBottom: "1px solid var(--color-border-whisper)",
-                    textDecoration: "none",
-                  }}>
+                  style={{ display: "block", textDecoration: "none", lineHeight: 2.3 }}>
                   <span style={{
                     fontFamily: "var(--font-body)", fontSize: "15px", fontWeight: 400,
                     color: "var(--color-body-text)",
                   }}>
                     {f.name && f.name.length > 45 ? f.name.slice(0, 42) + "…" : f.name}
-                  </span>
-                  <span style={{
-                    fontFamily: "var(--font-body)", fontSize: "13px",
-                    color: "var(--color-muted-text)", flexShrink: 0, marginLeft: "16px",
-                  }}>
-                    {f.runtime ? `${f.runtime} min` : ""}
+                    {f.runtime ? (
+                      <span style={{ color: "var(--color-muted-text)" }}>
+                        {" "}— {f.runtime} min
+                      </span>
+                    ) : null}
                   </span>
                 </a>
               ))}
@@ -430,23 +415,17 @@ function MarathonCard({ insights }: { insights: Insights }) {
             </p>
             {time_wasted.films.map((f, i) => (
               <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
-                style={{
-                  display: "flex", justifyContent: "space-between", alignItems: "center",
-                  padding: "8px 0",
-                  borderBottom: "1px solid var(--color-border-whisper)",
-                  textDecoration: "none",
-                }}>
+                style={{ display: "block", textDecoration: "none", lineHeight: 2.3 }}>
                 <span style={{
                   fontFamily: "var(--font-body)", fontSize: "15px", fontWeight: 400,
                   color: "var(--color-body-text)",
                 }}>
                   {f.name && f.name.length > 36 ? f.name.slice(0, 33) + "…" : f.name}
-                </span>
-                <span style={{
-                  fontFamily: "var(--font-body)", fontSize: "13px",
-                  color: "var(--color-negative)", marginLeft: "16px", flexShrink: 0,
-                }}>
-                  {f.rating}★
+                  {f.rating ? (
+                    <span style={{ color: "var(--color-negative)" }}>
+                      {" "}— {f.rating}★
+                    </span>
+                  ) : null}
                 </span>
               </a>
             ))}
@@ -473,8 +452,7 @@ function InsightsRight({ insights }: { insights: Insights }) {
     display: "block",
     fontFamily: "var(--font-body)", fontSize: "15px", fontWeight: 400,
     color: "var(--color-body-text)",
-    padding: "10px 0",
-    borderBottom: "1px solid var(--color-border-whisper)",
+    lineHeight: 2.3,
     textDecoration: "none",
   };
 
@@ -559,26 +537,20 @@ function InsightsRight({ insights }: { insights: Insights }) {
           </div>
 
           {/* Film list */}
-          <div style={{ borderTop: "1px solid var(--color-border-whisper)" }}>
+          <div>
             {best_decade.top_films.map((f, i) => (
               <a key={i} href={f.letterboxd_url} target="_blank" rel="noopener noreferrer"
-                style={{
-                  display: "flex", justifyContent: "space-between", alignItems: "baseline",
-                  padding: "10px 0",
-                  borderBottom: "1px solid var(--color-border-whisper)",
-                  textDecoration: "none",
-                }}>
+                style={{ display: "block", textDecoration: "none", lineHeight: 2.3 }}>
                 <span style={{
                   fontFamily: "var(--font-body)", fontSize: "15px", fontWeight: 400,
                   color: "var(--color-body-text)",
                 }}>
                   {f.name && f.name.length > 42 ? f.name.slice(0, 39) + "…" : f.name}
-                </span>
-                <span style={{
-                  fontFamily: "var(--font-body)", fontSize: "13px",
-                  color: "var(--color-muted-text)", marginLeft: "16px", flexShrink: 0,
-                }}>
-                  {f.year}
+                  {f.year ? (
+                    <span style={{ color: "var(--color-muted-text)" }}>
+                      {" "}— {f.year}
+                    </span>
+                  ) : null}
                 </span>
               </a>
             ))}
@@ -669,6 +641,7 @@ export default async function HomePage() {
           </p>
           <div className="grid-insights">
             <MarathonCard insights={insights} />
+            <div className="grid-insights-divider" />
             <InsightsRight insights={insights} />
           </div>
         </div>

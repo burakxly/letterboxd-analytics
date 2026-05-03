@@ -42,7 +42,7 @@ export default function WeekFilmList({ movies }: Props) {
 
       {/* Column headers */}
       <div style={{
-        display: "grid", gridTemplateColumns: colTemplate, alignItems: "center",
+        display: "grid", gridTemplateColumns: colTemplate, columnGap: "32px", alignItems: "center",
         paddingBottom: "10px",
         borderBottom: "1px solid var(--color-border-whisper)",
         marginBottom: "0",
@@ -65,6 +65,7 @@ export default function WeekFilmList({ movies }: Props) {
             style={{
               display: "grid",
               gridTemplateColumns: colTemplate,
+              columnGap: "32px",
               alignItems: "center",
               padding: "10px 0",
               borderBottom: "1px solid var(--color-border-whisper)",
