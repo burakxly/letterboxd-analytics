@@ -92,9 +92,11 @@ def sync_rss_to_db():
             except (ValueError, AttributeError):
                 raw_rating = 0.0
 
+            # Dedup anahtarında Year YOK: enrichment yılı sonradan güncelleyebildiği
+            # için Year'a bağlı dedup, aynı kaydın her gün yeniden eklenmesine yol açar
             cursor.execute(
-                "SELECT * FROM movies WHERE Name = ? AND \"Watched Date\" = ? AND Year = ?",
-                (movie_name, watched_date, film_year)
+                "SELECT 1 FROM movies WHERE Name = ? AND \"Watched Date\" = ?",
+                (movie_name, watched_date)
             )
             if cursor.fetchone() is None:
                 print(f"Yeni keşif: {movie_name} ({film_year})")
@@ -182,14 +184,19 @@ def enrich_movie_data():
                         if m:
                             runtime = int(m.group(1))
 
-                # Year
+                # Year — eski JSON-LD yapısı releasedEvent kullanıyordu,
+                # Letterboxd ~Haziran 2026'da bunu kaldırıp dateCreated'a taşıdı
+                year = 0
                 released = data.get('releasedEvent', [])
                 if isinstance(released, list) and released:
                     year = int(released[0].get('startDate', '0')[:4] or 0)
                 elif isinstance(released, dict):
                     year = int(released.get('startDate', '0')[:4] or 0)
-                else:
-                    year = 0
+                if year == 0:
+                    date_created = str(data.get('dateCreated', '') or '')
+                    m = re.match(r'(\d{4})', date_created)
+                    if m:
+                        year = int(m.group(1))
 
                 # Community Rating
                 agg = data.get('aggregateRating', {})
@@ -198,11 +205,12 @@ def enrich_movie_data():
 
                 conn.execute("""
                     UPDATE movies
-                    SET Director = ?, Genre = ?, Runtime = ?, Year = ?,
+                    SET Director = ?, Genre = ?, Runtime = ?,
+                        Year = CASE WHEN ? > 0 THEN ? ELSE Year END,
                         "Letterboxd URI" = ?, Poster_URL = ?,
                         Community_Rating = ?, Community_Votes = ?
                     WHERE Name = ? AND "Letterboxd URI" = ?
-                """, (director_name, genre_name, runtime, year,
+                """, (director_name, genre_name, runtime, year, year,
                       clean_url, poster_url,
                       community_rating, community_votes,
                       row['Name'], original_url))

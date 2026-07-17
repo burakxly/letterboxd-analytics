@@ -99,6 +99,11 @@ def load_data() -> pd.DataFrame:
         df["Runtime"] = pd.to_numeric(df["Runtime"], errors="coerce").fillna(0)
         df["Year"] = pd.to_numeric(df["Year"], errors="coerce").fillna(0)
 
+        # Güvenlik ağı: aynı film + aynı izleme tarihi = mükerrer kayıt,
+        # scraper dedup'u kaçırırsa istatistikler bozulmasın
+        if "Watched Date" in df.columns:
+            df = df.drop_duplicates(subset=["Name", "Watched Date"], keep="first")
+
         _cache_df = df
         _cache_time = time.time()
         return df.copy()
@@ -290,6 +295,8 @@ def get_hall_of_fame(df: pd.DataFrame) -> list[dict]:
     # Gerçek izleme tarihine göre sırala
     df_dates = df.dropna(subset=["Watched Date"]).copy()
     df_5star = df_dates[(df_dates["Rating"] == HALL_OF_FAME_RATING) & (df_dates["Runtime"] >= MIN_FEATURE_RUNTIME)].sort_values("Watched Date", ascending=False)
+    # Aynı film birden fazla kez 5 yıldızla loglanmışsa (rewatch) tek kart göster
+    df_5star = df_5star.drop_duplicates(subset=["Name", "Year"], keep="first")
 
     result = []
     for _, row in df_5star.iterrows():
