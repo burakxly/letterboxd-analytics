@@ -32,6 +32,13 @@ jobs:
         run: |
           python web_scraper.py
 
+      # Bozuk veri commit'lenmesin: dogrulama fail olursa workflow durur,
+      # commit atilmaz ve GitHub fail bildirimi gonderir
+      - name: Validate DB integrity
+        run: |
+          git show HEAD:letterboxd_master.db > /tmp/prev_movies.db || true
+          python validate_db.py letterboxd_master.db /tmp/prev_movies.db
+
       - name: Commit and Push changes
         if: success()
         run: |

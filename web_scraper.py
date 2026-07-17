@@ -50,6 +50,16 @@ def migrate_db():
                 print(f"[migration] Kolon eklendi: {col_name}")
             except sqlite3.OperationalError:
                 pass  # zaten var
+
+        # Aynı film + aynı izleme tarihi fiziksel olarak iki kez giremesin —
+        # dedup mantığı kodda hata olsa bile depolama katmanında engellenir
+        try:
+            conn.execute(
+                'CREATE UNIQUE INDEX IF NOT EXISTS idx_movies_name_watched '
+                'ON movies(Name, "Watched Date")'
+            )
+        except sqlite3.OperationalError as e:
+            print(f"[migration] UNIQUE index olusturulamadi (DB'de mukerrer kayit olabilir): {e}")
         conn.commit()
     finally:
         conn.close()
@@ -100,13 +110,15 @@ def sync_rss_to_db():
             )
             if cursor.fetchone() is None:
                 print(f"Yeni keşif: {movie_name} ({film_year})")
+                # OR IGNORE: UNIQUE index'e takılırsa (dedup kontrolü kaçırsa bile)
+                # sessizce atla, asla çift kayıt oluşturma
                 cursor.execute("""
-                    INSERT INTO movies
+                    INSERT OR IGNORE INTO movies
                         (Name, Rating, "Watched Date", "Letterboxd URI",
                          Runtime, Director, Genre, Year, Watched_Date_Log, Poster_URL)
                     VALUES (?, ?, ?, ?, 0, '', '', ?, ?, '')
                 """, (movie_name, raw_rating, watched_date, movie_link, film_year, watched_date))
-                new_count += 1
+                new_count += cursor.rowcount if cursor.rowcount > 0 else 0
 
         conn.commit()
         print(f"Senkronizasyon: {new_count} yeni film eklendi.")
@@ -125,6 +137,7 @@ def enrich_movie_data():
         df = pd.read_sql("""
             SELECT * FROM movies
             WHERE Runtime = 0 OR Director = '' OR Genre = ''
+               OR Year IS NULL OR Year = 0
                OR Poster_URL  IS NULL OR Poster_URL  = ''
                OR Community_Rating IS NULL OR Community_Rating = 0
         """, conn)
@@ -203,16 +216,28 @@ def enrich_movie_data():
                 community_rating = float(agg.get('ratingValue', 0) or 0)
                 community_votes  = int(agg.get('ratingCount',  0) or 0)
 
+                # Kural: scrape'ten boş/sıfır değer geldiyse mevcut dolu alanı ASLA ezme.
+                # Letterboxd sayfa yapısını değiştirdiğinde (releasedEvent olayı gibi)
+                # veri kaybı yerine sadece "güncellenmeme" yaşanır.
                 conn.execute("""
                     UPDATE movies
-                    SET Director = ?, Genre = ?, Runtime = ?,
-                        Year = CASE WHEN ? > 0 THEN ? ELSE Year END,
-                        "Letterboxd URI" = ?, Poster_URL = ?,
-                        Community_Rating = ?, Community_Votes = ?
+                    SET Director   = CASE WHEN ? != '' THEN ? ELSE Director   END,
+                        Genre      = CASE WHEN ? != '' THEN ? ELSE Genre      END,
+                        Runtime    = CASE WHEN ? >  0  THEN ? ELSE Runtime    END,
+                        Year       = CASE WHEN ? >  0  THEN ? ELSE Year       END,
+                        "Letterboxd URI" = ?,
+                        Poster_URL = CASE WHEN ? != '' THEN ? ELSE Poster_URL END,
+                        Community_Rating = CASE WHEN ? > 0 THEN ? ELSE Community_Rating END,
+                        Community_Votes  = CASE WHEN ? > 0 THEN ? ELSE Community_Votes  END
                     WHERE Name = ? AND "Letterboxd URI" = ?
-                """, (director_name, genre_name, runtime, year, year,
-                      clean_url, poster_url,
-                      community_rating, community_votes,
+                """, (director_name, director_name,
+                      genre_name, genre_name,
+                      runtime, runtime,
+                      year, year,
+                      clean_url,
+                      poster_url, poster_url,
+                      community_rating, community_rating,
+                      community_votes, community_votes,
                       row['Name'], original_url))
                 conn.commit()
                 print(f"[OK] {director_name} | {genre_name} | {runtime}dk | community={community_rating}")
